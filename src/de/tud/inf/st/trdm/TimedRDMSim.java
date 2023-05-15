@@ -20,7 +20,7 @@ import org.graphstream.graph.implementations.SingleGraph;
  * 
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  * 
- * @created 14.05.2023
+ * Created: 14.05.2023
  */
 public class TimedRDMSim {
 	private int lastTimeStep;
@@ -104,7 +104,7 @@ public class TimedRDMSim {
 	/**
 	 * Get the probes of the network observing it.
 	 * 
-	 * @return List<Probe> all Probes added to observer the network
+	 * @return List of Probes all Probes added to observer the network
 	 */
 	public List<Probe> getProbes() {
 		return probes;

@@ -18,7 +18,7 @@ public class MirrorProbe extends Probe {
 	/**Called at each simulation time step.
 	 * Plots the current state of mirrors and the ratio between running and target mirrors.
 	 * 
-	 * @param sim_time
+	 * @param sim_time current simulation time
 	 */
 	@Override 
 	public void update(int sim_time) {
