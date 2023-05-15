@@ -1,0 +1,141 @@
+@startuml
+class TimedRDMSim
+{
+  + int getSimTime()
+  + void run()
+  + void runStep(int t)
+}
+
+note left of TimedRDMSim::run
+  for sim_time_range:
+    for(p in probes): p.print()
+    n.timeStep()
+end note
+
+class Effector
+{
+  - Map<int,int> setMirrorChanges
+  + setMirrors(int m, int t) 
+  + timeStep(int t)
+}
+
+class IDGenerator
+{
+  - {static} IDGenerator instance
+  - IDGenerator()
+  + {static} IDGenerator getInstance()
+  + int getNextID()
+}
+
+class Network
+{
+  - Properties props
+  - int numTargetMirrors
+  - int numTargetLinksPerMirror
+  ---
+  + void registerProbe(Probe p)
+  + void setEffector(Effector e)
+  ---
+  + int getNumTargetMirrors()
+  + int getNumReadyMirrors()
+  + int getNumMirrors(int m, int t)
+  ---
+  + void timeStep(int t)
+}
+
+note right of Network::timeStep
+  e.timeStep()t
+  for(m : mirrors): m.timeStep(t)
+  for(p : probes): p.update(t)
+end note
+
+abstract class Probe
+{
+  + {abstract} void update(int t)
+  + {abstract} void print(int t)
+}
+
+class MirrorProbe
+{
+  - double mirrorRatio
+  + void update(int t)
+  + void print(int t)
+  + int getNumMirrors()
+  + int getNumReadyMirrors()
+  + int getNumTargetMirrors()
+  + double getMirrorRatio()
+}
+
+enum MirrorState {
+  down
+  starting
+  up
+  ready
+  stopping
+  stopped
+}
+
+enum LinkState {
+  inactive
+  active
+  closed
+}
+
+class Mirror
+{
+  - int id;
+  - init_time;
+  - startup_time;
+  - ready_time;
+  - stop_time;
+  + void shutdown()
+  + void timeStep()
+}
+
+class Link
+{
+  - int id
+  - init_time
+  - ends_active_time
+  - activation_time
+  + void shutdown()
+  + void timeStep(t)
+}
+
+class LinkProbe
+{
+  - double ratio
+  + void print(int t)
+  + void update(int t)
+}
+
+interface TopologyStrategy
+{
+    + Set<Link> initNetwork(Network,Properties)
+    + void handleAddNewMirrors(Network,newMirrors,Properties)
+    + void handleRemoveMirrors(Network,removeMirrors,Properties)
+    + int getNumTargetLinks(Network)
+}
+
+class NextNTopologyStrategy
+
+TopologyStrategy <|.. NextNTopologyStrategy
+TimedRDMSim --> Effector
+TimedRDMSim --> "*" Probe
+Network --> TopologyStrategy
+Network <--> Effector
+Network *--> "*" Mirror
+Network *-> "*" Link
+Network <--> "*" Probe
+IDGenerator <-- Network
+Mirror -> MirrorState
+Mirror *--> Link
+Link -> LinkState
+Link --> "source" Mirror
+Link --> "target" Mirror
+
+Probe <|-- MirrorProbe
+Probe <|-- LinkProbe
+
+TimedRDMSim -> Network
+@enduml

@@ -1,0 +1,23 @@
+node {
+	shape: box;
+}
+
+node.running {
+	fill-color: #7F7;
+}
+
+node.starting {
+	fill-color: #FF7;
+}
+
+node.stopping {
+	fill-color: #F77;
+}
+
+edge.active {
+	fill-color: #2F2;
+}
+
+edge.inactive {
+	fill-color: #FF2;
+}
