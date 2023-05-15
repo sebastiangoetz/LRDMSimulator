@@ -31,5 +31,13 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Build with Maven
       run: mvn javadoc:javadoc --file pom.xml
-    - name: Publish JavaDoc
-      uses: ren130302/publish-javadoc@v1 
+    - name: Deploy - Publish Javadoc
+      uses: MathieuSoysal/Javadoc-publisher.yml@v2.4.0
+      with:
+        # Java version inside your project
+        java-version: 8 # default is 17
+        # Branch where the javadoc is hosted
+        javadoc-branch: main # default is javadoc
+        # Directory where the javadoc contents should be stored
+        target-folder: doc # default is .
+        # Java distribution inside your project
