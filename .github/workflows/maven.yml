@@ -36,6 +36,7 @@ jobs:
       with:
         # Java version inside your project
         java-version: 8 # default is 17
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # Branch where the javadoc is hosted
         javadoc-branch: main # default is javadoc
         # Directory where the javadoc contents should be stored
