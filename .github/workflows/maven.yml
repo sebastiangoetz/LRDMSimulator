@@ -31,3 +31,5 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Build with Maven
       run: mvn javadoc:javadoc --file pom.xml
+    - name: Publish JavaDoc
+      uses: ren130302/publish-javadoc@v1 
