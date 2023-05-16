@@ -40,9 +40,8 @@ public class NextNTopologyStrategy implements TopologyStrategy {
 		int numTargetLinksPerMirror = n.getNumTargetLinksPerMirror();
 		
 		//first add the mirrors
-		int numMirrorsToAdd = newMirrors;
 		List<Mirror> mirrorsToAdd = new ArrayList<>();
-		for (int i = 0; i < numMirrorsToAdd; i++) {
+		for (int i = 0; i < newMirrors; i++) {
 			mirrorsToAdd.add(new Mirror(IDGenerator.getInstance().getNextID(), sim_time, props));
 		}
 		// get last N mirrors to connect to the new mirrors (numTargetedLinksPerMirror)

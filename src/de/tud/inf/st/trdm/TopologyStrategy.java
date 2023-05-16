@@ -8,8 +8,8 @@ import java.util.Set;
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  */
 public interface TopologyStrategy {
-	public Set<Link> initNetwork(Network n, Properties props);
-	public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int sim_time);
-	public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int sim_time);
-	public int getNumTargetLinks(Network n);
+	Set<Link> initNetwork(Network n, Properties props);
+	void handleAddNewMirrors(Network n, int newMirrors, Properties props, int sim_time);
+	void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int sim_time);
+	int getNumTargetLinks(Network n);
 }

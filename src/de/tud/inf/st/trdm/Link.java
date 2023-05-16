@@ -76,10 +76,8 @@ public class Link {
 	public boolean equals(Object obj) {
 		if(obj instanceof Link) {
 			Link other = (Link)obj;
-			if(other.getSource().getID() == this.getSource().getID() &&
-			   other.getTarget().getID() == this.getTarget().getID()) {
-				   return true;
-			   }
+			return other.getSource().getID() == this.getSource().getID() &&
+					other.getTarget().getID() == this.getTarget().getID();
 		} 
 		return false;
 	}
