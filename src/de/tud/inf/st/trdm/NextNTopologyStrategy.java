@@ -8,6 +8,11 @@ import java.util.Set;
 
 import de.tud.inf.st.trdm.util.IDGenerator;
 
+/**A topology connecting each mirror with its next N mirrors.
+ * N can be set using the <i>numLinks</i> configuration parameter.
+ *
+ * @author Sebastian Götz (sebastian.goetz@acm.org)
+ */
 public class NextNTopologyStrategy implements TopologyStrategy {
 
 	@Override

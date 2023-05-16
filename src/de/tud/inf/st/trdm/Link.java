@@ -3,6 +3,10 @@ package de.tud.inf.st.trdm;
 import java.util.Properties;
 import java.util.Random;
 
+/**A link between two mirrors. Initially is inactive. Gets active after <i>activation_time</i> as soon as both mirrors are <i>ready</i>.
+ *
+ * @author Sebastian Götz (sebastian.goetz@acm.org)
+ */
 public class Link {
 	private int id;
 	public enum State { inactive, active, closed }

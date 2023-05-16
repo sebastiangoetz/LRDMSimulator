@@ -2,6 +2,10 @@ package de.tud.inf.st.trdm;
 
 import java.text.NumberFormat;
 
+/**A probe observing links.
+ *
+ * @author Sebastian Götz (sebastian.goetz@acm.org)
+ */
 public class LinkProbe extends Probe {
 	private double ratio;
 	
