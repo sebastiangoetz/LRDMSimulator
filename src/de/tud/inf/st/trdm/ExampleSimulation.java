@@ -10,6 +10,8 @@ import java.util.List;
 public class ExampleSimulation {
 	public static void main(String[] args) {		
 		TimedRDMSim sim = new TimedRDMSim();
+		sim.initialize(new RandomTopologyStrategy());
+		//sim.initialize(new NextNTopologyStrategy());
 		Effector effector = sim.getEffector();
 		effector.setMirrors(10, 40);
 		effector.setMirrors(30, 70);

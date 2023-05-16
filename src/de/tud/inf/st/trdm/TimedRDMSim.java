@@ -39,45 +39,57 @@ public class TimedRDMSim {
 			// load properties
 			props = new Properties();
 			props.load(new FileReader(new File("resources/sim.conf")));
-			// set initial number of mirrors from properties
-			int numMirrors = Integer.parseInt(props.getProperty("num_mirrors"));
-			int numLinksPerMirror = Integer.parseInt(props.getProperty("num_links_per_mirror"));
+
 			debug = Boolean.parseBoolean(props.getProperty("debug"));
 			// simulation time
 			sim_time = Integer.parseInt(props.getProperty("sim_time"));
-			TopologyStrategy strategy = new NextNTopologyStrategy();
-			// create network of mirrors
-			network = new Network(strategy, numMirrors, numLinksPerMirror, props);
-
-			effector = new Effector(network);
-			probes = new ArrayList<>();
-			Probe mprobe = new MirrorProbe(network);
-			Probe lprobe = new LinkProbe(network);
-			probes.add(mprobe);
-			probes.add(lprobe);
-			network.registerProbe(mprobe);
-			network.registerProbe(lprobe);
-			network.setEffector(effector);
-
-			graph = new SingleGraph("Runtime View");
-			String css = loadGraphCSS();
-			graph.setAttribute("ui.stylesheet", css);
-			for (Mirror m : network.getMirrors()) {
-				Node n = graph.addNode(m.getID() + "");
-				n.setAttribute("ui.class", "starting");
-			}
-			for (Link l : network.getLinks()) {
-				String sid = l.getSource().getID() + "";
-				String tid = l.getTarget().getID() + "";
-				Edge e = graph.addEdge("s" + sid + "t" + tid, sid, tid);
-				e.setAttribute("ui.class", "inactive");
-			}
-			graph.display();
 		} catch (FileNotFoundException fnfe) {
 			System.out.println("You have to place a sim.conf in your current folder.");
 		} catch (IOException e) {
 			System.out.println("I cannot access the sim.conf in your current folder.");
 		}
+	}
+
+	public void initialize(TopologyStrategy strategy) {
+		// set initial number of mirrors from properties
+		int numMirrors = Integer.parseInt(props.getProperty("num_mirrors"));
+		int numLinksPerMirror = Integer.parseInt(props.getProperty("num_links_per_mirror"));
+
+		if(strategy == null) {
+			strategy = new NextNTopologyStrategy();
+		}
+
+		// create network of mirrors
+		network = new Network(strategy, numMirrors, numLinksPerMirror, props);
+
+		effector = new Effector(network);
+		probes = new ArrayList<>();
+		Probe mprobe = new MirrorProbe(network);
+		Probe lprobe = new LinkProbe(network);
+		probes.add(mprobe);
+		probes.add(lprobe);
+		network.registerProbe(mprobe);
+		network.registerProbe(lprobe);
+		network.setEffector(effector);
+
+		graph = new SingleGraph("Runtime View");
+		String css = loadGraphCSS();
+		graph.setAttribute("ui.stylesheet", css);
+		for (Mirror m : network.getMirrors()) {
+			Node n = graph.addNode(m.getID() + "");
+			n.setAttribute("ui.class", "starting");
+		}
+		for (Link l : network.getLinks()) {
+			String sid = l.getSource().getID() + "";
+			String tid = l.getTarget().getID() + "";
+			Edge e = graph.addEdge("s" + sid + "t" + tid, sid, tid);
+			e.setAttribute("ui.class", "inactive");
+		}
+		graph.display();
+	}
+
+	public void setTopologyStrategy(TopologyStrategy strategy, int time_step) {
+		network.setTopologyStrategy(strategy, time_step);
 	}
 
 	private String loadGraphCSS() {

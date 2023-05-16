@@ -71,6 +71,14 @@ public class Mirror {
 		return links;
 	}
 
+	public boolean isLinkedWith(Mirror m) {
+		boolean linked = false;
+		for(Link l : links) {
+			if(l.getTarget().getID() == m.getID() || l.getSource().getID() == m.getID()) linked = true;
+		}
+		return linked;
+	}
+
 	/**Simulates a single time step in the simulation. Changes the state of the mirror if the respective time has passed.
 	 * 
 	 * @param current_sim_time (int) current simulation time
@@ -99,6 +107,7 @@ public class Mirror {
 	public void shutdown(int sim_time) {
 		state = State.stopping;
 		shutdown_time = sim_time;
+		links.forEach(l -> l.shutdown());
 	}
 
 	@Override

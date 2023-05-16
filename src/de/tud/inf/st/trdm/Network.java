@@ -136,6 +136,13 @@ public class Network {
 		return ret;
 	}
 
+	public void setTopologyStrategy(TopologyStrategy strategy, int time_step) {
+		if(time_step == 0)
+			this.strategy = strategy;
+		else
+			throw new UnsupportedOperationException("changing topologies is not yet implemented");
+	}
+
 	/**
 	 * Performs a single simulation step. Clears stopped mirrors and delegates
 	 * simulation to all active mirrors. Notifies all probes.
