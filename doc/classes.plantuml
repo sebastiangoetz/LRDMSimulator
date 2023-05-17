@@ -119,7 +119,10 @@ interface TopologyStrategy
 
 class NextNTopologyStrategy
 
+class RandomTopologyStrategy
+
 TopologyStrategy <|.. NextNTopologyStrategy
+TopologyStrategy <|.. RandomTopologyStrategy
 TimedRDMSim --> Effector
 TimedRDMSim --> "*" Probe
 Network --> TopologyStrategy
