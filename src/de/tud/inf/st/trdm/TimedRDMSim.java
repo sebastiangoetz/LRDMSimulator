@@ -77,10 +77,9 @@ public class TimedRDMSim {
 		visualizationStrategy.init(network);
 	}
 
-	public void setTopologyStrategy(TopologyStrategy strategy, int time_step) {
-		network.setTopologyStrategy(strategy, time_step);
-	}
-
+	/**
+	 * @return the current simulation time
+	 */
 	public int getSimTime() {
 		return sim_time;
 	}
@@ -94,6 +93,10 @@ public class TimedRDMSim {
 		return probes;
 	}
 
+	/**Get the effector to apply changes to the network.
+	 *
+	 * @return the {@link Effector}
+	 */
 	public Effector getEffector() {
 		return effector;
 	}

@@ -13,12 +13,12 @@ public class ExampleSimulation {
 		//sim.initialize(new RandomTopologyStrategy());
 		sim.initialize(new NextNTopologyStrategy());
 		Effector effector = sim.getEffector();
-		effector.setMirrors(10, 30);
-		effector.setStrategy(new RandomTopologyStrategy(), 50);
-		effector.setMirrors(50, 70);
-		effector.setStrategy(new NextNTopologyStrategy(), 100);
-		effector.setMirrors(80, 130);
-		effector.setStrategy(new RandomTopologyStrategy(), 170);
+		effector.setMirrors(70, 30);
+		effector.setTargetedLinkChanges(5, 50);
+		effector.setStrategy(new RandomTopologyStrategy(), 75);
+		effector.setTargetedLinkChanges(1, 100);
+		effector.setStrategy(new NextNTopologyStrategy(), 130);
+		effector.setTargetedLinkChanges(3, 170);
 		
 		//use this code to manually run the simulation step by step
 		List<Probe> probes = sim.getProbes();

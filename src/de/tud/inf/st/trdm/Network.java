@@ -97,6 +97,14 @@ public class Network {
 		}
 	}
 
+	public void setNumTargetedLinksPerMirror(int numTargetLinksPerMirror, int time_step) {
+		System.out.println("setNumTargetedLinksPerMirror("+numTargetLinksPerMirror+","+time_step+")");
+		this.numTargetLinksPerMirror = numTargetLinksPerMirror;
+		if(time_step > 0) {
+			strategy.restartNetwork(this, props);
+		}
+	}
+
 	/**
 	 * @return number of mirrors in the net (regardless of their state)
 	 */
