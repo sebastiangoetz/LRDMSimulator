@@ -169,6 +169,19 @@ public class TimedRDMSim {
 			if (!exists)
 				graph.removeNode(i);
 		}
+		//remove links
+		for(int i = 0; i < graph.getEdgeCount(); i++) {
+			Edge e = graph.getEdge(i);
+			boolean exists = false;
+			for(Link l : network.getLinks()) {
+				String sid = l.getSource().getID() + "";
+				String tid = l.getTarget().getID() + "";
+				String eid = "s" + sid + "t" + tid;
+				if(eid.equals(e.getId())) exists = true;
+			}
+			if(!exists) graph.removeEdge(e);
+		}
+		//add or update links
 		for (Link l : network.getLinks()) {
 			if (l.getState() != Link.State.closed) {
 				String sid = l.getSource().getID() + "";

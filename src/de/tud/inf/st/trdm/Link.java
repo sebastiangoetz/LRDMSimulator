@@ -84,7 +84,7 @@ public class Link {
 	
 	@Override
 	public String toString() {
-		return source+" -> "+target;
+		return "["+(isActive()?"active":"")+"] "+source+" -> "+target;
 	}
 	
 }

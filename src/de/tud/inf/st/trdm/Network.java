@@ -53,11 +53,19 @@ public class Network {
 	public void setEffector(Effector e) {
 		this.effector = e;
 	}
-	
+
+	/**Returns aks Mirrors of the net.
+	 *
+	 * @return List of all {@link Mirror}s
+	 */
 	public List<Mirror> getMirrors() {
 		return mirrors;
 	}
-	
+
+	/**Returns all links of the net as a set.
+	 *
+	 * @return {@link Set} of {@link Link}s of the whole net.
+	 */
 	public Set<Link> getLinks() {
 		return links;
 	}
@@ -79,6 +87,16 @@ public class Network {
 		numTargetMirrors = newMirrors;
 	}
 
+	public void setTopologyStrategy(TopologyStrategy strategy, int time_step) {
+		System.out.println("setTopologyStrategy("+strategy.getClass().getName()+","+time_step+")");
+		if(time_step == 0)
+			this.strategy = strategy;
+		else {
+			this.strategy = strategy;
+			this.strategy.restartNetwork(this, props);
+		}
+	}
+
 	/**
 	 * @return number of mirrors in the net (regardless of their state)
 	 */
@@ -86,6 +104,9 @@ public class Network {
 		return mirrors.size();
 	}
 
+	/**
+	 * @return number of all links in the net regardless of their state
+	 */
 	public int getNumLinks() {
 		return links.size();
 	}
@@ -134,13 +155,6 @@ public class Network {
 			}
 		}
 		return ret;
-	}
-
-	public void setTopologyStrategy(TopologyStrategy strategy, int time_step) {
-		if(time_step == 0)
-			this.strategy = strategy;
-		else
-			throw new UnsupportedOperationException("changing topologies is not yet implemented");
 	}
 
 	/**

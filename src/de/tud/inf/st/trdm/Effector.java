@@ -11,11 +11,13 @@ import java.util.Map;
 public class Effector {
 	private Network n;
 	/** Map mapping simulation time to desired mirrors (sim_time -> num_mirrors)*/
-	private Map<Integer, Integer> setMirrorChanges; 
+	private Map<Integer, Integer> setMirrorChanges;
+	private Map<Integer, TopologyStrategy> setStrategyChanges;
 	
 	public Effector(Network n) {
 		this.n = n;
 		setMirrorChanges = new HashMap<>();
+		setStrategyChanges = new HashMap<>();
 	}
 	
 	/**Specify that at time step <i>t</i> the number of targeted mirrors is to be changed to <i>m</i>.
@@ -26,12 +28,18 @@ public class Effector {
 	public void setMirrors(int m, int t) {
 		setMirrorChanges.put(t, m);
 	}
-	
+
+	public void setStrategy(TopologyStrategy strategy, int t) { setStrategyChanges.put(t, strategy); }
+
 	/**Triggers mirror changes at the respective simulation time step.
 	 * 
 	 * @param t current simulation time
 	 */
 	public void timeStep(int t) {
+		if(setStrategyChanges.get(t) != null)
+		{
+			n.setTopologyStrategy(setStrategyChanges.get(t), t);
+		}
 		if(setMirrorChanges.get(t) != null) {
 			n.setNumMirrors(setMirrorChanges.get(t), t);
 		}

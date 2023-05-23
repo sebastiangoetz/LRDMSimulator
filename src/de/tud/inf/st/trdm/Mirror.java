@@ -71,6 +71,10 @@ public class Mirror {
 		return links;
 	}
 
+	public long getNumNonClosedLinks() {
+		return links.stream().filter(l -> l.getState() != Link.State.closed).count();
+	}
+
 	public boolean isLinkedWith(Mirror m) {
 		boolean linked = false;
 		for(Link l : links) {

@@ -35,6 +35,16 @@ public class NextNTopologyStrategy implements TopologyStrategy {
 	}
 
 	@Override
+	public void restartNetwork(Network n, Properties props) {
+		//close all existing links
+		for(Link l : n.getLinks()) {
+			l.shutdown();
+		}
+		//establish new links
+		n.getLinks().addAll(initNetwork(n, props));
+	}
+
+	@Override
 	public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int sim_time) {
 		List<Mirror> mirrors = n.getMirrors();
 		int numTargetLinksPerMirror = n.getNumTargetLinksPerMirror();

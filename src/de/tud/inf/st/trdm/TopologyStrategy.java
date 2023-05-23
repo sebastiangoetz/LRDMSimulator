@@ -9,6 +9,7 @@ import java.util.Set;
  */
 public interface TopologyStrategy {
 	Set<Link> initNetwork(Network n, Properties props);
+	void restartNetwork(Network n, Properties props);
 	void handleAddNewMirrors(Network n, int newMirrors, Properties props, int sim_time);
 	void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int sim_time);
 	int getNumTargetLinks(Network n);

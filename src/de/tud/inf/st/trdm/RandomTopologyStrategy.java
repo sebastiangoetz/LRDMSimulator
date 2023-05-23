@@ -25,7 +25,7 @@ public class RandomTopologyStrategy implements TopologyStrategy {
     public Set<Link> initNetwork(Network n, Properties props) {
         Set<Link> ret = new HashSet<>();
         for(Mirror source : n.getMirrors()) {
-            for(int i = 0; i < n.getNumTargetLinksPerMirror() - source.getLinks().size(); i++) {
+            for(int i = 0; i < n.getNumTargetLinksPerMirror() - source.getNumNonClosedLinks(); i++) {
                 Mirror target = getRandomMirror(n, source);
                 if(target != null) {
                     System.out.println(source.getID()+" -> "+target.getID());
@@ -37,6 +37,16 @@ public class RandomTopologyStrategy implements TopologyStrategy {
             }
         }
         return ret;
+    }
+
+    @Override
+    public void restartNetwork(Network n, Properties props) {
+        //close all existing links
+        for(Link l : n.getLinks()) {
+            l.shutdown();
+        }
+        //establish new links
+        n.getLinks().addAll(initNetwork(n, props));
     }
 
     /**Returns a random mirror from the network if no mirror is set to be excluded.
