@@ -1,6 +1,5 @@
 package de.tud.inf.st.trdm;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +15,7 @@ public class AppTest {
     @Test()
     public void testInitializeHasToBeCalled() {
         initSimulator();
-        assertThrows(RuntimeException.class, () -> { sim.run(); });
+        assertThrows(RuntimeException.class, () -> sim.run());
     }
     @Test
     public void testMirrorChange() {
@@ -29,6 +28,7 @@ public class AppTest {
                 mp = (MirrorProbe) p;
             }
         }
+        assert(mp != null);
         for(int t = 1; t < sim.getSimTime(); t++) {
             System.out.println("timestep: "+t+" mirrors: "+mp.getNumMirrors());
             sim.runStep(t);

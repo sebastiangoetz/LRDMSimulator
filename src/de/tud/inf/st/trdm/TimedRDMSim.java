@@ -1,18 +1,11 @@
 package de.tud.inf.st.trdm;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
 
 /**
  * Time-aware simulator for remote data mirroring (RDM). Requires a sim.conf
@@ -132,7 +125,7 @@ public class TimedRDMSim {
 	/**
 	 * Run a single time step.
 	 * 
-	 * @param time_step
+	 * @param time_step the current time step
 	 */
 	public void runStep(int time_step) {
 		try {

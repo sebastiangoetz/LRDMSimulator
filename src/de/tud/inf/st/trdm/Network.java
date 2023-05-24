@@ -13,12 +13,12 @@ import java.util.Set;
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  */
 public class Network {
-	private Properties props;
-	private List<Mirror> mirrors;
-	private Set<Link> links;
-	private List<Probe> probes;
+	private final Properties props;
+	private final List<Mirror> mirrors;
+	private final Set<Link> links;
+	private final List<Probe> probes;
 	private Effector effector;
-	private int numTargetMirrors = 0;
+	private int numTargetMirrors;
 	private int numTargetLinksPerMirror;
 	private TopologyStrategy strategy;
 
@@ -194,7 +194,7 @@ public class Network {
 			l.getSource().removeLink(l);
 			l.getTarget().removeLink(l);
 		}
-		links.removeAll(closedLinks);
+		closedLinks.forEach(links::remove);
 		
 		effector.timeStep(sim_time);
 

@@ -8,15 +8,15 @@ import java.util.Random;
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  */
 public class Link {
-	private int id;
+	private final int id;
 	public enum State { inactive, active, closed }
 	private State state;
-	private Mirror source;
-	private Mirror target;
+	private final Mirror source;
+	private final Mirror target;
 	
-	private int init_time;
+	private final int init_time;
 	private int ends_active_time = -1;
-	private int activation_time;
+	private final int activation_time;
 	
 	public Link(int id, Mirror source, Mirror target, int init_time, Properties props) {
 		this.source = source;

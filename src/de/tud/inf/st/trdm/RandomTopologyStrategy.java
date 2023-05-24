@@ -62,7 +62,7 @@ public class RandomTopologyStrategy implements TopologyStrategy {
     private Mirror getRandomMirror(Network n, Mirror exclude) {
         int maxLinks = n.getNumTargetLinksPerMirror();
         Random r = new Random();
-        Mirror m = null;
+        Mirror m;
 
         if(exclude == null) {
             return n.getMirrors().get(r.nextInt(n.getMirrors().size()));

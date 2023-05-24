@@ -3,19 +3,19 @@ package de.tud.inf.st.trdm;
 import java.util.HashMap;
 import java.util.Map;
 
-/**An effector for the RDM network. Currently collects requests to change the number of mirrors and triggers these changes at the respective time step.
+/**An effector for the RDM network. Collects requests to change the number of mirrors, links per mirror and topology and triggers these changes at the respective time step.
  * 
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  *
  */
 public class Effector {
-	private Network n;
+	private final Network n;
 	/** Map mapping simulation time to desired mirrors (sim_time -> num_mirrors)*/
-	private Map<Integer, Integer> setMirrorChanges;
+	private final Map<Integer, Integer> setMirrorChanges;
 	/** Map mapping simulation time to desired topology strategy */
-	private Map<Integer, TopologyStrategy> setStrategyChanges;
+	private final Map<Integer, TopologyStrategy> setStrategyChanges;
 	/** Map mapping simulation time to desired targeted links per mirror of the network*/
-	private Map<Integer, Integer> setTargetedLinkChanges;
+	private final Map<Integer, Integer> setTargetedLinkChanges;
 	
 	public Effector(Network n) {
 		this.n = n;

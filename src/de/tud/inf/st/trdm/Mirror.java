@@ -13,19 +13,19 @@ import java.util.Set;
  */
 public class Mirror {
 	public enum State {
-		down, starting, up, ready, stopping, stopped;
+		down, starting, up, ready, stopping, stopped
 	}
 
-	private int id;
+	private final int id;
 	private State state = State.down;
-	private Set<Link> links;
+	private final Set<Link> links;
 	
 	private int shutdown_time = -1;
 
-	private int init_time; // simulation time when the mirror was started
-	private int startup_time; // time required to startup the container
-	private int ready_time; // time required to get the data transfered
-	private int stop_time; // time required to stop the container
+	private final int init_time; // simulation time when the mirror was started
+	private final int startup_time; // time required to start the container
+	private final int ready_time; // time required to get the data transfered
+	private final int stop_time; // time required to stop the container
 
 	public Mirror(int id, int init_time, Properties props) {
 		this.id = id;
@@ -78,7 +78,10 @@ public class Mirror {
 	public boolean isLinkedWith(Mirror m) {
 		boolean linked = false;
 		for(Link l : links) {
-			if(l.getTarget().getID() == m.getID() || l.getSource().getID() == m.getID()) linked = true;
+			if (l.getTarget().getID() == m.getID() || l.getSource().getID() == m.getID()) {
+				linked = true;
+				break;
+			}
 		}
 		return linked;
 	}
@@ -111,7 +114,7 @@ public class Mirror {
 	public void shutdown(int sim_time) {
 		state = State.stopping;
 		shutdown_time = sim_time;
-		links.forEach(l -> l.shutdown());
+		links.forEach(Link::shutdown);
 	}
 
 	@Override

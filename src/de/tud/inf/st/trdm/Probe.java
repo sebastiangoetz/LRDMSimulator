@@ -6,7 +6,7 @@ package de.tud.inf.st.trdm;
  *
  */
 public abstract class Probe {
-	protected Network n;
+	protected final Network n;
 	
 	public Probe(Network n) {
 		this.n = n;
