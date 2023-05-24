@@ -32,14 +32,19 @@ public class TimedRDMSim {
 	private VisualizationStrategy visualizationStrategy;
 
 	private boolean debug;
+	private boolean headless; //no visualization
 
 	public TimedRDMSim() {
+		this("resources/sim.conf");
+	}
+
+	public TimedRDMSim(String conf) {
 		try {
 			System.setProperty("org.graphstream.ui", "swing");
 			// load properties
 			props = new Properties();
-			props.load(new FileReader(new File("resources/sim.conf")));
-
+			props.load(new FileReader(conf));
+			probes = new ArrayList<>();
 			debug = Boolean.parseBoolean(props.getProperty("debug"));
 			// simulation time
 			sim_time = Integer.parseInt(props.getProperty("sim_time"));
@@ -50,6 +55,14 @@ public class TimedRDMSim {
 		}
 	}
 
+	public void setHeadless(boolean headless) {
+		this.headless = headless;
+	}
+
+	public boolean isHeadless() {
+		return headless;
+	}
+
 	public void initialize(TopologyStrategy strategy) {
 		// set initial number of mirrors from properties
 		int numMirrors = Integer.parseInt(props.getProperty("num_mirrors"));
@@ -58,8 +71,8 @@ public class TimedRDMSim {
 		if(strategy == null) {
 			strategy = new NextNTopologyStrategy();
 		}
-
-		visualizationStrategy = new GraphVisualization();
+		if(!headless)
+			visualizationStrategy = new GraphVisualization();
 
 		// create network of mirrors
 		network = new Network(strategy, numMirrors, numLinksPerMirror, props);
@@ -74,7 +87,8 @@ public class TimedRDMSim {
 		network.registerProbe(lprobe);
 		network.setEffector(effector);
 
-		visualizationStrategy.init(network);
+		if(!headless)
+			visualizationStrategy.init(network);
 	}
 
 	/**
@@ -110,7 +124,8 @@ public class TimedRDMSim {
 			if (debug)
 				for (Probe p : probes)
 					p.print(t);
-			network.timeStep(t);
+			if(network == null) throw new RuntimeException("You need to call initialize(..) first!");
+			runStep(t);
 		}
 	}
 
@@ -125,7 +140,8 @@ public class TimedRDMSim {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		visualizationStrategy.updateGraph(network);
+		if(!headless)
+			visualizationStrategy.updateGraph(network);
 		if (time_step != lastTimeStep + 1) {
 			System.out.println(
 					"Warning: you have to execute this method for each timestep in sequence. No action was taken!");
