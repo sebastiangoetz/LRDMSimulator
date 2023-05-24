@@ -118,15 +118,6 @@ public class Network {
 	public int getNumLinks() {
 		return links.size();
 	}
-
-	public int getNumNonClosedLinks() {
-		int numNonClosedLinks = 0;
-		for (Link l : links) {
-			if (l.getState() != Link.State.closed)
-				numNonClosedLinks++;
-		}
-		return numNonClosedLinks;
-	}
 	
 	public int getNumActiveLinks() {
 		int numActiveLinks = 0;

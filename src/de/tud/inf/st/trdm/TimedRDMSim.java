@@ -52,10 +52,6 @@ public class TimedRDMSim {
 		this.headless = headless;
 	}
 
-	public boolean isHeadless() {
-		return headless;
-	}
-
 	public void initialize(TopologyStrategy strategy) {
 		// set initial number of mirrors from properties
 		int numMirrors = Integer.parseInt(props.getProperty("num_mirrors"));
