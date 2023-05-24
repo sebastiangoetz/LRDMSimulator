@@ -26,9 +26,9 @@ public class MirrorTest {
         assertEquals(1, m.getID());
         assertEquals(0, m.getLinks().size());
         assertEquals(0, m.getNumNonClosedLinks());
-        assertEquals(Mirror.State.down, m.getState());
+        assertEquals(Mirror.State.DOWN, m.getState());
         assertNotEquals(0, m.toString().length());
         m.shutdown(0);
-        assertEquals(Mirror.State.stopping, m.getState());
+        assertEquals(Mirror.State.STOPPING, m.getState());
     }
 }

@@ -2,6 +2,8 @@ package de.tud.inf.st.trdm;
 
 import de.tud.inf.st.trdm.util.IDGenerator;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Random;
@@ -61,7 +63,9 @@ public class RandomTopologyStrategy implements TopologyStrategy {
      */
     private Mirror getRandomMirror(Network n, Mirror exclude) {
         int maxLinks = n.getNumTargetLinksPerMirror();
-        Random r = new Random();
+        try {
+        Random r = SecureRandom.getInstanceStrong();
+
         Mirror m;
 
         if(exclude == null) {
@@ -77,10 +81,13 @@ public class RandomTopologyStrategy implements TopologyStrategy {
                 m = n.getMirrors().get(r.nextInt(n.getMirrors().size()));
                 tested.add(m.getID());
             } while (m.getID() == exclude.getID() ||
-                    m.getLinks().stream().filter(l -> l.getState() != Link.State.closed).count() >= maxLinks ||
+                    m.getLinks().stream().filter(l -> l.getState() != Link.State.CLOSED).count() >= maxLinks ||
                     m.isLinkedWith(exclude) ||
-                    m.getState() == Mirror.State.stopping);
+                    m.getState() == Mirror.State.STOPPING);
             return m;
+        }
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -89,16 +96,16 @@ public class RandomTopologyStrategy implements TopologyStrategy {
      * @param n ({@link Network}) the network to which the mirrors shall be added
      * @param newMirrors (int) number of mirrors to be added
      * @param props ({@link Properties} properties of the simulation
-     * @param sim_time (int) current simulation time
+     * @param simTime (int) current simulation time
      */
     @Override
-    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int sim_time) {
+    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
         for(int i = 0; i < newMirrors; i++) {
-            Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), sim_time, props);
+            Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props);
             n.getMirrors().add(m);
         }
         //reestablish link constraints
-        reestablishLinks(n, sim_time, props);
+        reestablishLinks(n, simTime, props);
     }
 
     /**Simples removes the number of mirrors specified and calls {@link #reestablishLinks(Network, int, Properties)}
@@ -106,32 +113,32 @@ public class RandomTopologyStrategy implements TopologyStrategy {
      * @param n ({@link Network}) the Network from which the mirrors shall be removed
      * @param removeMirrors (int) the number of mirrors to be removed
      * @param props ({@link Properties}) properties of the simulation
-     * @param sim_time (int) current simulation time
+     * @param simTime (int) current simulation time
      */
     @Override
-    public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int sim_time) {
+    public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime) {
         for(int i = 0; i < removeMirrors; i++) {
-            getRandomMirror(n, null).shutdown(sim_time);
+            getRandomMirror(n, null).shutdown(simTime);
         }
         //reestablish link constraints
-        reestablishLinks(n, sim_time, props);
+        reestablishLinks(n, simTime, props);
     }
 
     /**This method investigates for each mirror if it has N links.
      * If there are less than N non-closing links, it will initiate the missing links.
      *
      * @param n ({@link Network}) the Network for which the links shall be reestablished
-     * @param sim_time (int) the current simulation time
+     * @param simTime (int) the current simulation time
      * @param props ({@link Properties}) the properties of the simulation
      */
-    private void reestablishLinks(Network n, int sim_time, Properties props) {
+    private void reestablishLinks(Network n, int simTime, Properties props) {
         //run through all mirror of the network
         for(Mirror m : n.getMirrors()) {
-            if(m.getState() == Mirror.State.stopping) continue; //ignore stopping mirrors, we don't need to establish links for them
+            if(m.getState() == Mirror.State.STOPPING) continue; //ignore stopping mirrors, we don't need to establish links for them
             //count number of non-stopped links for the current mirror
             int numNonStoppedLinks = 0;
             for(Link l : m.getLinks()) {
-                if(l.getState() != Link.State.closed) numNonStoppedLinks++;
+                if(l.getState() != Link.State.CLOSED) numNonStoppedLinks++;
             }
             //for each missing link
             for(int i = numNonStoppedLinks; i <= n.getNumTargetLinksPerMirror(); i++) {
@@ -139,7 +146,7 @@ public class RandomTopologyStrategy implements TopologyStrategy {
                 Mirror target = getRandomMirror(n, m);
                 //initiate a new link if a target is found
                 if(target != null) {
-                    Link l = new Link(IDGenerator.getInstance().getNextID(), m, target, sim_time, props);
+                    Link l = new Link(IDGenerator.getInstance().getNextID(), m, target, simTime, props);
                     n.getLinks().add(l);
                     m.getLinks().add(l);
                     target.getLinks().add(l);

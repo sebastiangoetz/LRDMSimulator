@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * An RDM Network. Holds references to all mirrors part of the net. Offers
@@ -21,6 +22,8 @@ public class Network {
 	private int numTargetMirrors;
 	private int numTargetLinksPerMirror;
 	private TopologyStrategy strategy;
+
+	private Logger log;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
 	 * Uses the TopologyStrategy to interlink the mirrors.
@@ -44,6 +47,7 @@ public class Network {
 		}
 		// create the links - default strategy: spanning tree
 		links = strategy.initNetwork(this, props);
+		log = Logger.getLogger(this.getClass().getName());
 	}
 
 	public void registerProbe(Probe p) {
@@ -73,23 +77,22 @@ public class Network {
 	/**
 	 * Set a new target number of mirrors. Will initiate the startup or shutdown of
 	 * mirrors if there are too many or too few.
-	 * 
-	 * @param newMirrors (int) new target number of mirrors
-	 * @param sim_time   (int) current simulation time for logging purposes
+	 * 	 * @param newMirrors (int) new target number of mirrors
+	 * @param simTime   (int) current simulation time for logging purposes
 	 */
-	public void setNumMirrors(int newMirrors, int sim_time) {
-		System.out.println("setNumMirrors(" + newMirrors + "," + sim_time + "): ");
+	public void setNumMirrors(int newMirrors, int simTime) {
+		log.info("setNumMirrors(" + newMirrors + "," + simTime + "): ");
 		if (newMirrors > mirrors.size()) { // create new mirrors
-			strategy.handleAddNewMirrors(this, newMirrors - mirrors.size(), props, sim_time);
+			strategy.handleAddNewMirrors(this, newMirrors - mirrors.size(), props, simTime);
 		} else if (newMirrors < mirrors.size()) { // send shutdown signal to mirrors being too much
-			strategy.handleRemoveMirrors(this, mirrors.size() - newMirrors, props, sim_time);
+			strategy.handleRemoveMirrors(this, mirrors.size() - newMirrors, props, simTime);
 		}
 		numTargetMirrors = newMirrors;
 	}
 
-	public void setTopologyStrategy(TopologyStrategy strategy, int time_step) {
-		System.out.println("setTopologyStrategy("+strategy.getClass().getName()+","+time_step+")");
-		if(time_step == 0)
+	public void setTopologyStrategy(TopologyStrategy strategy, int timeStep) {
+		log.info("setTopologyStrategy("+strategy.getClass().getName()+","+timeStep+")");
+		if(timeStep == 0)
 			this.strategy = strategy;
 		else {
 			this.strategy = strategy;
@@ -97,10 +100,10 @@ public class Network {
 		}
 	}
 
-	public void setNumTargetedLinksPerMirror(int numTargetLinksPerMirror, int time_step) {
-		System.out.println("setNumTargetedLinksPerMirror("+numTargetLinksPerMirror+","+time_step+")");
+	public void setNumTargetedLinksPerMirror(int numTargetLinksPerMirror, int timeStep) {
+		log.info("setNumTargetedLinksPerMirror("+numTargetLinksPerMirror+","+timeStep+")");
 		this.numTargetLinksPerMirror = numTargetLinksPerMirror;
-		if(time_step > 0) {
+		if(timeStep > 0) {
 			strategy.restartNetwork(this, props);
 		}
 	}
@@ -149,7 +152,7 @@ public class Network {
 	public int getNumReadyMirrors() {
 		int ret = 0;
 		for (Mirror m : mirrors) {
-			if (m.getState() == Mirror.State.ready) {
+			if (m.getState() == Mirror.State.READY) {
 				ret++;
 			}
 		}
@@ -160,26 +163,26 @@ public class Network {
 	 * Performs a single simulation step. Clears stopped mirrors and delegates
 	 * simulation to all active mirrors. Notifies all probes.
 	 * 
-	 * @param sim_time (int) current simulation time for logging purposes
+	 * @param simTime (int) current simulation time for logging purposes
 	 */
-	public void timeStep(int sim_time) {
+	public void timeStep(int simTime) {
 		List<Mirror> stoppedMirrors = new ArrayList<>();
 		for (Mirror m : mirrors) {
-			if (m.getState() == Mirror.State.stopped)
+			if (m.getState() == Mirror.State.STOPPED)
 				stoppedMirrors.add(m);
 			else
-				m.timeStep(sim_time);
+				m.timeStep(simTime);
 		}
 		mirrors.removeAll(stoppedMirrors);
 
 		List<Link> closedLinks = new ArrayList<>();
 		for (Link l : links) {
-			if (l.getState() == Link.State.closed ||
-				l.getSource().getState() == Mirror.State.stopped ||
-				l.getTarget().getState() == Mirror.State.stopped)
+			if (l.getState() == Link.State.CLOSED ||
+				l.getSource().getState() == Mirror.State.STOPPED ||
+				l.getTarget().getState() == Mirror.State.STOPPED)
 				closedLinks.add(l);
 			else
-				l.timeStep(sim_time);
+				l.timeStep(simTime);
 		}
 		for(Link l : closedLinks) {
 			l.getSource().removeLink(l);
@@ -187,11 +190,10 @@ public class Network {
 		}
 		closedLinks.forEach(links::remove);
 		
-		effector.timeStep(sim_time);
+		effector.timeStep(simTime);
 
 		for (Probe probe : probes) {
-			probe.update(sim_time);
+			probe.update(simTime);
 		}
-		// System.out.println("["+sim_time+"] "+mirrors);
 	}
 }

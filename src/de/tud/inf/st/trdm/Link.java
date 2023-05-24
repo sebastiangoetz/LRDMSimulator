@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm;
 
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 
@@ -9,30 +10,30 @@ import java.util.Random;
  */
 public class Link {
 	private final int id;
-	public enum State { inactive, active, closed }
+	public enum State {INACTIVE, ACTIVE, CLOSED }
 	private State state;
 	private final Mirror source;
 	private final Mirror target;
 	
-	private final int init_time;
-	private int ends_active_time = -1;
-	private final int activation_time;
+	private final int initTime;
+	private int endsActiveTime = -1;
+	private final int activationTime;
 	
-	public Link(int id, Mirror source, Mirror target, int init_time, Properties props) {
+	public Link(int id, Mirror source, Mirror target, int initTime, Properties props) {
 		this.source = source;
 		this.target = target;
-		this.init_time = init_time;
+		this.initTime = initTime;
 		this.id = id;
 		
 		source.addLink(this);
 		target.addLink(this);
 		
-		state = State.inactive;
+		state = State.INACTIVE;
 		
-		int min_activation_time = Integer.parseInt(props.getProperty("link_activation_time_min")); 
-		int max_activation_time = Integer.parseInt(props.getProperty("link_activation_time_max"));
+		int minActivationTime = Integer.parseInt(props.getProperty("link_activation_time_min"));
+		int maxActivationTime = Integer.parseInt(props.getProperty("link_activation_time_max"));
 		
-		activation_time = min_activation_time + (int) (new Random().nextDouble() * (max_activation_time - min_activation_time));
+		activationTime = minActivationTime + (int)Math.round(new Random().nextDouble() * (maxActivationTime - minActivationTime));
 	}
 	
 	public int getID() {
@@ -44,7 +45,7 @@ public class Link {
 	}
 	
 	public boolean isActive() {
-		return state == State.active;
+		return state == State.ACTIVE;
 	}
 	
 	public Mirror getSource() {
@@ -56,19 +57,19 @@ public class Link {
 	}
 	
 	public void shutdown() {
-		state = State.closed;
+		state = State.CLOSED;
 	}
 	
 	public void timeStep(int t) {
 		//wait until source and target are active
-		if(ends_active_time == -1) {
-			if(source.getState() == Mirror.State.ready &&
-			   target.getState() == Mirror.State.ready && 
-			   t >= init_time) 
-				ends_active_time = t;
+		if(endsActiveTime == -1 &&
+			(source.getState() == Mirror.State.READY &&
+			   target.getState() == Mirror.State.READY &&
+			   t >= initTime)) {
+				endsActiveTime = t;
 		}
-		if(ends_active_time != -1 && t == ends_active_time + activation_time) {
-			state = State.active;
+		if(endsActiveTime != -1 && t == endsActiveTime + activationTime) {
+			state = State.ACTIVE;
 		}
 	}
 	
@@ -81,7 +82,12 @@ public class Link {
 		} 
 		return false;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
 	@Override
 	public String toString() {
 		return "["+(isActive()?"active":"")+"] "+source+" -> "+target;

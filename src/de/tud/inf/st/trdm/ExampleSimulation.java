@@ -10,7 +10,6 @@ import java.util.List;
 public class ExampleSimulation {
 	public static void main(String[] args) {		
 		TimedRDMSim sim = new TimedRDMSim();
-		//sim.initialize(new RandomTopologyStrategy());
 		sim.initialize(new NextNTopologyStrategy());
 		Effector effector = sim.getEffector();
 		effector.setMirrors(70, 30);
@@ -22,8 +21,8 @@ public class ExampleSimulation {
 		
 		//use this code to manually run the simulation step by step
 		List<Probe> probes = sim.getProbes();
-		int sim_time = sim.getSimTime();
-		for (int t = 1; t <= sim_time; t++) {
+		int simTime = sim.getSimTime();
+		for (int t = 1; t <= simTime; t++) {
 			for(Probe p : probes) p.print(t);
 
 			sim.runStep(t);

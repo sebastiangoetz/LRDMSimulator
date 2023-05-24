@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Time-aware simulator for remote data mirroring (RDM). Requires a sim.conf
@@ -16,14 +17,15 @@ import java.util.Properties;
  * Created: 14.05.2023
  */
 public class TimedRDMSim {
+	private Logger log;
 	private int lastTimeStep;
-	private int sim_time;
 	private Network network;
 	private Properties props;
 	private Effector effector;
 	private List<Probe> probes;
 	private VisualizationStrategy visualizationStrategy;
 
+	private int simTime;
 	private boolean debug;
 	private boolean headless; //no visualization
 
@@ -32,19 +34,20 @@ public class TimedRDMSim {
 	}
 
 	public TimedRDMSim(String conf) {
-		try {
+		props = new Properties();
+		try(FileReader fr = new FileReader(conf)) {
 			System.setProperty("org.graphstream.ui", "swing");
-			// load properties
-			props = new Properties();
-			props.load(new FileReader(conf));
+			log = Logger.getLogger(TimedRDMSim.class.getName());
+
+			props.load(fr);
 			probes = new ArrayList<>();
 			debug = Boolean.parseBoolean(props.getProperty("debug"));
 			// simulation time
-			sim_time = Integer.parseInt(props.getProperty("sim_time"));
+			simTime = Integer.parseInt(props.getProperty("sim_time"));
 		} catch (FileNotFoundException fnfe) {
-			System.out.println("You have to place a sim.conf in your current folder.");
+			log.warning("You have to place a sim.conf in your current folder.");
 		} catch (IOException e) {
-			System.out.println("I cannot access the sim.conf in your current folder.");
+			log.warning("I cannot access the sim.conf in your current folder.");
 		}
 	}
 
@@ -84,7 +87,7 @@ public class TimedRDMSim {
 	 * @return the current simulation time
 	 */
 	public int getSimTime() {
-		return sim_time;
+		return simTime;
 	}
 
 	/**
@@ -109,11 +112,14 @@ public class TimedRDMSim {
 	 * all probes and timeStep on the effector.
 	 */
 	public void run() {
-		for (int t = 0; t < sim_time; t++) {
+		for (int t = 0; t < simTime; t++) {
 			if (debug)
 				for (Probe p : probes)
 					p.print(t);
-			if(network == null) throw new RuntimeException("You need to call initialize(..) first!");
+			if(network == null)
+			{
+				log.warning("You need to call initialize(..) first!");
+			}
 			runStep(t);
 		}
 	}
@@ -121,28 +127,28 @@ public class TimedRDMSim {
 	/**
 	 * Run a single time step.
 	 * 
-	 * @param time_step the current time step
+	 * @param timeStep the current time step
 	 */
-	public void runStep(int time_step) {
+	public void runStep(int timeStep) {
 		try {
 			Thread.sleep(250);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 		if(!headless)
 			visualizationStrategy.updateGraph(network);
-		if (time_step != lastTimeStep + 1) {
-			System.out.println(
+		if (timeStep != lastTimeStep + 1) {
+			log.warning(
 					"Warning: you have to execute this method for each timestep in sequence. No action was taken!");
 		} else {
-			network.timeStep(time_step);
+			network.timeStep(timeStep);
 			lastTimeStep++;
 		}
 	}
 
 	public void plotLinks() {
 		for(Link l : network.getLinks()) {
-			System.out.println(l.getID()+"\t"+l.getSource().getID()+"\t"+l.getTarget().getID());			
+			log.info(l.getID()+"\t"+l.getSource().getID()+"\t"+l.getTarget().getID());
 		}
 	}
 }

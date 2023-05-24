@@ -2,6 +2,7 @@ package de.tud.inf.st.trdm;
 
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**A probe to observe mirrors in an RDM network.
  * 
@@ -18,10 +19,10 @@ public class MirrorProbe extends Probe {
 	/**Called at each simulation time step.
 	 * Plots the current state of mirrors and the ratio between running and target mirrors.
 	 * 
-	 * @param sim_time current simulation time
+	 * @param simTime current simulation time
 	 */
 	@Override 
-	public void update(int sim_time) {
+	public void update(int simTime) {
 		//get ratio
 		mirrorRatio = (double)n.getNumReadyMirrors() / (double)n.getNumTargetMirrors();
 	}
@@ -29,8 +30,8 @@ public class MirrorProbe extends Probe {
 	/**Prints all relevant information to the console.
 	 */
 	@Override
-	public void print(int sim_time) {
-		System.out.println("["+sim_time+"] [Mirror] All/Ready/Target/Ratio: "+n.getNumMirrors()+" | "+n.getNumReadyMirrors()+" | "+n.getNumTargetMirrors()+" | "+NumberFormat.getInstance().format(mirrorRatio));
+	public void print(int simTime) {
+		Logger.getLogger(this.getClass().getName()).info("["+simTime+"] [Mirror] All/Ready/Target/Ratio: "+n.getNumMirrors()+" | "+n.getNumReadyMirrors()+" | "+n.getNumTargetMirrors()+" | "+NumberFormat.getInstance().format(mirrorRatio));
 	}
 	
 	/**

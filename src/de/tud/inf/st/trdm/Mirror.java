@@ -13,35 +13,35 @@ import java.util.Set;
  */
 public class Mirror {
 	public enum State {
-		down, starting, up, ready, stopping, stopped
+		DOWN, STARTING, UP, READY, STOPPING, STOPPED
 	}
 
 	private final int id;
-	private State state = State.down;
+	private State state = State.DOWN;
 	private final Set<Link> links;
 	
-	private int shutdown_time = -1;
+	private int shutdownTime = -1;
 
-	private final int init_time; // simulation time when the mirror was started
-	private final int startup_time; // time required to start the container
-	private final int ready_time; // time required to get the data transfered
-	private final int stop_time; // time required to stop the container
+	private final int initTime; // simulation time when the mirror was started
+	private final int startupTime; // time required to start the container
+	private final int readyTime; // time required to get the data transfered
+	private final int stopTime; // time required to stop the container
 
-	public Mirror(int id, int init_time, Properties props) {
+	public Mirror(int id, int initTime, Properties props) {
 		this.id = id;
-		this.init_time = init_time;
+		this.initTime = initTime;
 		// get time to startup
-		int startup_time_min = Integer.parseInt(props.getProperty("startup_time_min"));
-		int startup_time_max = Integer.parseInt(props.getProperty("startup_time_max"));
-		startup_time = startup_time_min + (int) (new Random().nextDouble() * (startup_time_max - startup_time_min));
+		int startupTimeMin = Integer.parseInt(props.getProperty("startup_time_min"));
+		int startupTimeMax = Integer.parseInt(props.getProperty("startup_time_max"));
+		startupTime = startupTimeMin + new Random().nextInt(startupTimeMin, startupTimeMax);
 
-		int ready_time_min = startup_time + Integer.parseInt(props.getProperty("ready_time_min"));
-		int ready_time_max = startup_time + Integer.parseInt(props.getProperty("ready_time_max"));
-		ready_time = ready_time_min + (int) (new Random().nextDouble() * (ready_time_max - ready_time_min));
+		int readyTimeMin = startupTime + Integer.parseInt(props.getProperty("ready_time_min"));
+		int readyTimeMax = startupTime + Integer.parseInt(props.getProperty("ready_time_max"));
+		readyTime = readyTimeMin + new Random().nextInt(readyTimeMin, readyTimeMax);
 
-		int stop_time_min = Integer.parseInt(props.getProperty("stop_time_min"));
-		int stop_time_max = Integer.parseInt(props.getProperty("stop_time_max"));
-		stop_time = (int) (new Random().nextDouble() * (stop_time_max - stop_time_min));
+		int stopTimeMin = Integer.parseInt(props.getProperty("stop_time_min"));
+		int stopTimeMax = Integer.parseInt(props.getProperty("stop_time_max"));
+		stopTime = new Random().nextInt(stopTimeMin,stopTimeMax);
 		
 		links = new HashSet<>();
 	}
@@ -72,7 +72,7 @@ public class Mirror {
 	}
 
 	public long getNumNonClosedLinks() {
-		return links.stream().filter(l -> l.getState() != Link.State.closed).count();
+		return links.stream().filter(l -> l.getState() != Link.State.CLOSED).count();
 	}
 
 	public boolean isLinkedWith(Mirror m) {
@@ -88,20 +88,20 @@ public class Mirror {
 
 	/**Simulates a single time step in the simulation. Changes the state of the mirror if the respective time has passed.
 	 * 
-	 * @param current_sim_time (int) current simulation time
+	 * @param currentSimTime (int) current simulation time
 	 */
-	public void timeStep(int current_sim_time) {
-		if (state != State.stopping) {
-			if (current_sim_time - init_time > ready_time) {
-				state = State.ready;
-			} else if (current_sim_time - init_time > startup_time) {
-				state = State.up;
-			} else if (current_sim_time > init_time) {
-				state = State.starting;
+	public void timeStep(int currentSimTime) {
+		if (state != State.STOPPING) {
+			if (currentSimTime - initTime > readyTime) {
+				state = State.READY;
+			} else if (currentSimTime - initTime > startupTime) {
+				state = State.UP;
+			} else if (currentSimTime > initTime) {
+				state = State.STARTING;
 			}
 		} else {
-			if (current_sim_time > shutdown_time + stop_time) {
-				state = State.stopped;
+			if (currentSimTime > shutdownTime + stopTime) {
+				state = State.STOPPED;
 			}
 		}
 	}
@@ -109,11 +109,11 @@ public class Mirror {
 	/**Send a shutdown signal to the mirror. The mirror will change its state to <i>stopping</i>.
 	 * After <i>stop_time</i> time steps, it will change its state to <i>stopped</i> and will be removed from the network in its timestep method.
 	 * 
-	 * @param sim_time (int) simulation time when the mirror shall be shut down
+	 * @param simTime (int) simulation time when the mirror shall be shut down
 	 */
-	public void shutdown(int sim_time) {
-		state = State.stopping;
-		shutdown_time = sim_time;
+	public void shutdown(int simTime) {
+		state = State.STOPPING;
+		shutdownTime = simTime;
 		links.forEach(Link::shutdown);
 	}
 

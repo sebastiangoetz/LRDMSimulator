@@ -8,11 +8,11 @@ package de.tud.inf.st.trdm;
 public abstract class Probe {
 	protected final Network n;
 	
-	public Probe(Network n) {
+	protected Probe(Network n) {
 		this.n = n;
 	}
 	
-	abstract void update(int sim_time);
+	abstract void update(int simTime);
 	
-	abstract void print(int sime_time);
+	abstract void print(int simTime);
 }

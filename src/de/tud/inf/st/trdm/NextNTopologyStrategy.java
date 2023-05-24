@@ -45,14 +45,14 @@ public class NextNTopologyStrategy implements TopologyStrategy {
 	}
 
 	@Override
-	public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int sim_time) {
+	public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
 		List<Mirror> mirrors = n.getMirrors();
 		int numTargetLinksPerMirror = n.getNumTargetLinksPerMirror();
 		
 		//first add the mirrors
 		List<Mirror> mirrorsToAdd = new ArrayList<>();
 		for (int i = 0; i < newMirrors; i++) {
-			mirrorsToAdd.add(new Mirror(IDGenerator.getInstance().getNextID(), sim_time, props));
+			mirrorsToAdd.add(new Mirror(IDGenerator.getInstance().getNextID(), simTime, props));
 		}
 		// get last N mirrors to connect to the new mirrors (numTargetedLinksPerMirror)
 		List<Mirror> lastMirrors = new ArrayList<>();
@@ -70,7 +70,7 @@ public class NextNTopologyStrategy implements TopologyStrategy {
 				} else {
 					target = mirrorsToAdd.get(i + j - lastMirrors.size());
 				}
-				Link l = new Link(IDGenerator.getInstance().getNextID(), source, target, sim_time, props);
+				Link l = new Link(IDGenerator.getInstance().getNextID(), source, target, simTime, props);
 				n.getLinks().add(l);
 			}
 		}
@@ -80,19 +80,19 @@ public class NextNTopologyStrategy implements TopologyStrategy {
 			for (int j = 1; j <= numTargetLinksPerMirror; j++) {
 				if (i + j < mirrorsToAdd.size())
 					n.getLinks().add(new Link(IDGenerator.getInstance().getNextID(), mirrorsToAdd.get(i),
-							mirrorsToAdd.get(i + j), sim_time, props));
+							mirrorsToAdd.get(i + j), simTime, props));
 			}
 		}
 
 	}
 
 	@Override
-	public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int sim_time) {
+	public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime) {
 		List<Mirror> mirrors = n.getMirrors();
 		
 		for (int i = 0; i < removeMirrors; i++) {
 			Mirror m = mirrors.get(i);
-			m.shutdown(sim_time);
+			m.shutdown(simTime);
 			for (Link l : m.getLinks()) {
 				l.shutdown();
 			}
