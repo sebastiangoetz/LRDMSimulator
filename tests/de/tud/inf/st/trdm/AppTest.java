@@ -15,6 +15,7 @@ public class AppTest {
     }
     @Test()
     public void testInitializeHasToBeCalled() {
+        initSimulator();
         assertThrows(RuntimeException.class, () -> { sim.run(); });
     }
     @Test

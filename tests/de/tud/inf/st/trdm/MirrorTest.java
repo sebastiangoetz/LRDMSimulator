@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class MirrorTest {
     Properties props;
-    @BeforeEach
     public void loadProperties() {
         props = new Properties();
         try {
@@ -23,6 +22,7 @@ public class MirrorTest {
     }
     @Test
     public void testMirror() {
+        loadProperties();
         Mirror m = new Mirror(1, 0, props);
         assertEquals(1, m.getID());
         assertEquals(0, m.getLinks().size());
