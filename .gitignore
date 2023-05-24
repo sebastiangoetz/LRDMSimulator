@@ -2,3 +2,6 @@
 /.classpath
 /target/
 /.idea
+/.vscode
+/.settings
+/target
