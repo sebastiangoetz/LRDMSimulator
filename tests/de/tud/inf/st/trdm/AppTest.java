@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AppTest {
     private TimedRDMSim sim;
-    @BeforeEach
+
     public void initSimulator() {
         sim = new TimedRDMSim("resources/sim-test-1.conf");
         sim.setHeadless(true);
@@ -19,6 +19,7 @@ public class AppTest {
     }
     @Test
     public void testMirrorChange() {
+        initSimulator();
         sim.initialize(new NextNTopologyStrategy());
         sim.getEffector().setMirrors(20, 10);
         MirrorProbe mp = null;
@@ -37,6 +38,7 @@ public class AppTest {
 
     @Test
     public void testTopologyChange() {
+        initSimulator();
         sim.initialize(new NextNTopologyStrategy());
         sim.getEffector().setStrategy(new RandomTopologyStrategy(),10);
         sim.getEffector().setStrategy(new NextNTopologyStrategy(), 20);
