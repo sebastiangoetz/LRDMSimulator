@@ -9,7 +9,7 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class MirrorTest {
+class MirrorTest {
     Properties props;
     public void loadProperties() {
         props = new Properties();
@@ -20,7 +20,7 @@ public class MirrorTest {
         }
     }
     @Test
-    public void testMirror() {
+    void testMirror() {
         loadProperties();
         Mirror m = new Mirror(1, 0, props);
         assertEquals(1, m.getID());

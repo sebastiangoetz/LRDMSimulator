@@ -1,6 +1,7 @@
 package de.tud.inf.st.trdm;
 
 import java.text.NumberFormat;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**A probe observing links.
@@ -16,7 +17,7 @@ public class LinkProbe extends Probe {
 
 	@Override
 	void print(int simTime) {
-		Logger.getLogger(this.getClass().getName()).info("["+ simTime +"] [Links ] NC/Active/Target/Ratio:  "+n.getNumLinks()+" | "+n.getNumActiveLinks()+" | "+n.getNumTargetLinks()+" | "+NumberFormat.getInstance().format(ratio));
+		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Links ] NC/Active/Target/Ratio:  {1} | {2} | {3} | {4}",new Object[]{simTime, n.getNumLinks(),n.getNumActiveLinks(),n.getNumTargetLinks(),NumberFormat.getInstance().format(ratio)});
 	}
 	
 	@Override

@@ -6,6 +6,8 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GraphVisualization implements VisualizationStrategy {
     private static final String UI_CLASS = "ui.class";
@@ -118,7 +120,7 @@ public class GraphVisualization implements VisualizationStrategy {
             }
             return ret.toString();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Could not read css file for visualization.");
         }
         return "";
     }

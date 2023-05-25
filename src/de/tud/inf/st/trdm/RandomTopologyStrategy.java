@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**A topology connecting each mirror with N other mirrors.
  * Each mirror can only have N links. There is no difference between in- and outgoing links.
@@ -16,6 +18,7 @@ import java.util.Set;
  */
 public class RandomTopologyStrategy implements TopologyStrategy {
 
+    private Logger logger = Logger.getLogger(this.getClass().getName());
     /**Initializes the network with the amount of mirrors as specified in the properties and
      * connects these mirrors.
      *
@@ -30,7 +33,7 @@ public class RandomTopologyStrategy implements TopologyStrategy {
             for(int i = 0; i < n.getNumTargetLinksPerMirror() - source.getNumNonClosedLinks(); i++) {
                 Mirror target = getRandomMirror(n, source);
                 if(target != null) {
-                    System.out.println(source.getID()+" -> "+target.getID());
+                    logger.log(Level.INFO, "{0} -> {1}", new Object[]{source.getID(), target.getID()});
                     Link l = new Link(IDGenerator.getInstance().getNextID(),source,target,0,props);
                     ret.add(l);
                     source.addLink(l);
@@ -74,7 +77,7 @@ public class RandomTopologyStrategy implements TopologyStrategy {
             Set<Integer> tested = new HashSet<>();
             do {
                 if (tested.size() == n.getMirrors().size() - 1) {
-                    System.out.println("All alternatives checked. No mirror qualifies as target anymore.");
+                    logger.warning("All alternatives checked. No mirror qualifies as target anymore.");
                     m = null;
                     break;
                 }
@@ -87,7 +90,8 @@ public class RandomTopologyStrategy implements TopologyStrategy {
             return m;
         }
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            logger.warning("no algorithm found");
+            return null;
         }
     }
 
@@ -118,7 +122,8 @@ public class RandomTopologyStrategy implements TopologyStrategy {
     @Override
     public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime) {
         for(int i = 0; i < removeMirrors; i++) {
-            getRandomMirror(n, null).shutdown(simTime);
+            Mirror m = getRandomMirror(n, null);
+            if(m != null) m.shutdown(simTime);
         }
         //reestablish link constraints
         reestablishLinks(n, simTime, props);

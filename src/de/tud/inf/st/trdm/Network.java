@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -81,7 +82,7 @@ public class Network {
 	 * @param simTime   (int) current simulation time for logging purposes
 	 */
 	public void setNumMirrors(int newMirrors, int simTime) {
-		log.info("setNumMirrors(" + newMirrors + "," + simTime + "): ");
+		log.log(Level.INFO, "setNumMirrors({0},{1})",  new Object[] {newMirrors, simTime});
 		if (newMirrors > mirrors.size()) { // create new mirrors
 			strategy.handleAddNewMirrors(this, newMirrors - mirrors.size(), props, simTime);
 		} else if (newMirrors < mirrors.size()) { // send shutdown signal to mirrors being too much
@@ -91,7 +92,7 @@ public class Network {
 	}
 
 	public void setTopologyStrategy(TopologyStrategy strategy, int timeStep) {
-		log.info("setTopologyStrategy("+strategy.getClass().getName()+","+timeStep+")");
+		log.log(Level.INFO,"setTopologyStrategy({0},{1})", new Object[] {strategy.getClass().getName(),timeStep});
 		if(timeStep == 0)
 			this.strategy = strategy;
 		else {
@@ -101,7 +102,7 @@ public class Network {
 	}
 
 	public void setNumTargetedLinksPerMirror(int numTargetLinksPerMirror, int timeStep) {
-		log.info("setNumTargetedLinksPerMirror("+numTargetLinksPerMirror+","+timeStep+")");
+		log.log(Level.INFO,"setNumTargetedLinksPerMirror({0},{1})", new Object[] { numTargetLinksPerMirror,timeStep});
 		this.numTargetLinksPerMirror = numTargetLinksPerMirror;
 		if(timeStep > 0) {
 			strategy.restartNetwork(this, props);

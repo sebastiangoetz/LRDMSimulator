@@ -2,10 +2,9 @@ package de.tud.inf.st.trdm;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class AppTest {
+class AppTest {
     private TimedRDMSim sim;
 
     public void initSimulator() {
@@ -13,12 +12,12 @@ public class AppTest {
         sim.setHeadless(true);
     }
     @Test()
-    public void testInitializeHasToBeCalled() {
+    void testInitializeHasToBeCalled() {
         initSimulator();
         assertThrows(RuntimeException.class, () -> sim.run());
     }
     @Test
-    public void testMirrorChange() {
+    void testMirrorChange() {
         initSimulator();
         sim.initialize(new NextNTopologyStrategy());
         sim.getEffector().setMirrors(20, 10);
@@ -38,13 +37,13 @@ public class AppTest {
     }
 
     @Test
-    public void testTopologyChange() {
+    void testTopologyChange() {
         initSimulator();
         sim.initialize(new NextNTopologyStrategy());
         sim.getEffector().setStrategy(new RandomTopologyStrategy(),10);
         sim.getEffector().setStrategy(new NextNTopologyStrategy(), 20);
         sim.getEffector().setStrategy(new RandomTopologyStrategy(),30);
         sim.getEffector().setStrategy(new RandomTopologyStrategy(),40);
-        sim.run();
+        assertDoesNotThrow(() -> sim.run());
     }
 }

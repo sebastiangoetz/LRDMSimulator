@@ -33,7 +33,7 @@ public class Link {
 		int minActivationTime = Integer.parseInt(props.getProperty("link_activation_time_min"));
 		int maxActivationTime = Integer.parseInt(props.getProperty("link_activation_time_max"));
 		
-		activationTime = minActivationTime + (int)Math.round(new Random().nextDouble() * (maxActivationTime - minActivationTime));
+		activationTime = minActivationTime + new Random().nextInt(minActivationTime, maxActivationTime);
 	}
 	
 	public int getID() {
@@ -75,8 +75,7 @@ public class Link {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Link) {
-			Link other = (Link)obj;
+		if(obj instanceof Link other) {
 			return other.getSource().getID() == this.getSource().getID() &&
 					other.getTarget().getID() == this.getTarget().getID();
 		} 
