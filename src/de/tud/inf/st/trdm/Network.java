@@ -24,7 +24,7 @@ public class Network {
 	private int numTargetLinksPerMirror;
 	private TopologyStrategy strategy;
 
-	private Logger log;
+	private final Logger log;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
 	 * Uses the TopologyStrategy to interlink the mirrors.

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class RandomTopologyStrategy implements TopologyStrategy {
 
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     /**Initializes the network with the amount of mirrors as specified in the properties and
      * connects these mirrors.
      *
