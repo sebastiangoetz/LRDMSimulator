@@ -33,11 +33,11 @@ public class Mirror {
 		// get time to startup
 		int startupTimeMin = Integer.parseInt(props.getProperty("startup_time_min"));
 		int startupTimeMax = Integer.parseInt(props.getProperty("startup_time_max"));
-		startupTime = startupTimeMin + new Random().nextInt(startupTimeMin, startupTimeMax);
+		startupTime = new Random().nextInt(startupTimeMin, startupTimeMax);
 
 		int readyTimeMin = startupTime + Integer.parseInt(props.getProperty("ready_time_min"));
 		int readyTimeMax = startupTime + Integer.parseInt(props.getProperty("ready_time_max"));
-		readyTime = readyTimeMin + new Random().nextInt(readyTimeMin, readyTimeMax);
+		readyTime = new Random().nextInt(readyTimeMin, readyTimeMax);
 
 		int stopTimeMin = Integer.parseInt(props.getProperty("stop_time_min"));
 		int stopTimeMax = Integer.parseInt(props.getProperty("stop_time_max"));
@@ -92,15 +92,15 @@ public class Mirror {
 	 */
 	public void timeStep(int currentSimTime) {
 		if (state != State.STOPPING) {
-			if (currentSimTime - initTime > readyTime) {
+			if (currentSimTime - initTime >= readyTime+startupTime - 1) {
 				state = State.READY;
-			} else if (currentSimTime - initTime > startupTime) {
+			} else if (currentSimTime - initTime >= startupTime - 1) {
 				state = State.UP;
 			} else if (currentSimTime > initTime) {
 				state = State.STARTING;
 			}
 		} else {
-			if (currentSimTime > shutdownTime + stopTime) {
+			if (currentSimTime >= shutdownTime + stopTime - 1) {
 				state = State.STOPPED;
 			}
 		}
@@ -120,5 +120,9 @@ public class Mirror {
 	@Override
 	public String toString() {
 		return id + " {" + state + "}";
+	}
+
+	public int getStartupTime() {
+		return startupTime;
 	}
 }

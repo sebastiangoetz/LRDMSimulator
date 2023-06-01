@@ -12,6 +12,7 @@ public class ExampleSimulation {
 		TimedRDMSim sim = new TimedRDMSim();
 		sim.initialize(new NextNTopologyStrategy());
 		Effector effector = sim.getEffector();
+		effector.setMirrors(100,0);
 		effector.setMirrors(70, 30);
 		effector.setTargetedLinkChanges(5, 50);
 		effector.setStrategy(new RandomTopologyStrategy(), 75);
