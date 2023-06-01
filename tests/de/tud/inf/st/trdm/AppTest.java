@@ -2,7 +2,6 @@ package de.tud.inf.st.trdm;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -55,6 +54,7 @@ class AppTest {
         for(Probe p : sim.getProbes()) {
             if(p instanceof MirrorProbe) mp = (MirrorProbe)p;
         }
+        assertNotNull(mp);
         for(int i = 1; i < sim.getSimTime(); i++) {
             System.out.print("T = "+i+": ");
             for(Mirror m : mp.getMirrors()) {
