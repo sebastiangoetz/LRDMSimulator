@@ -20,7 +20,7 @@ public class TimedRDMSim {
 	private Logger log;
 	private int lastTimeStep;
 	private Network network;
-	private Properties props;
+	private final Properties props;
 	private Effector effector;
 	private List<Probe> probes;
 	private VisualizationStrategy visualizationStrategy;

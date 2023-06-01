@@ -35,8 +35,8 @@ public class Mirror {
 		int startupTimeMax = Integer.parseInt(props.getProperty("startup_time_max"));
 		startupTime = new Random().nextInt(startupTimeMin, startupTimeMax);
 
-		int readyTimeMin = startupTime + Integer.parseInt(props.getProperty("ready_time_min"));
-		int readyTimeMax = startupTime + Integer.parseInt(props.getProperty("ready_time_max"));
+		int readyTimeMin = Integer.parseInt(props.getProperty("ready_time_min"));
+		int readyTimeMax = Integer.parseInt(props.getProperty("ready_time_max"));
 		readyTime = new Random().nextInt(readyTimeMin, readyTimeMax);
 
 		int stopTimeMin = Integer.parseInt(props.getProperty("stop_time_min"));
@@ -124,5 +124,9 @@ public class Mirror {
 
 	public int getStartupTime() {
 		return startupTime;
+	}
+
+	public int getReadyTime() {
+		return readyTime;
 	}
 }

@@ -33,7 +33,7 @@ public class Link {
 		int minActivationTime = Integer.parseInt(props.getProperty("link_activation_time_min"));
 		int maxActivationTime = Integer.parseInt(props.getProperty("link_activation_time_max"));
 		
-		activationTime = minActivationTime + new Random().nextInt(minActivationTime, maxActivationTime);
+		activationTime = new Random().nextInt(minActivationTime, maxActivationTime);
 	}
 	
 	public int getID() {
@@ -91,5 +91,8 @@ public class Link {
 	public String toString() {
 		return "["+(isActive()?"active":"")+"] "+source+" -> "+target;
 	}
-	
+
+	public int getActivationTime() {
+		return activationTime;
+	}
 }

@@ -1,6 +1,7 @@
 package de.tud.inf.st.trdm;
 
 import java.text.NumberFormat;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +14,10 @@ public class LinkProbe extends Probe {
 	
 	public LinkProbe(Network n) {
 		super(n);
+	}
+
+	public Set<Link> getLinks() {
+		return n.getLinks();
 	}
 
 	@Override
