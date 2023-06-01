@@ -80,7 +80,7 @@ class AppTest {
     }
     @Test
     void testLinkActiveTime() throws IOException {
-        MirrorProbe mp = initTimeTest();
+        initTimeTest();
         LinkProbe lp = getLinkProbe();
         Map<Integer,Integer> activeTimes = new HashMap<>();
         for(int i = 1; i < sim.getSimTime(); i++) {
