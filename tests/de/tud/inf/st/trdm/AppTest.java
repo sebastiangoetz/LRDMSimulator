@@ -2,19 +2,17 @@ package de.tud.inf.st.trdm;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
+import static de.tud.inf.st.trdm.TestUtils.loadProperties;
+import static de.tud.inf.st.trdm.TestUtils.props;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
     private TimedRDMSim sim;
     private static final String config = "resources/sim-test-1.conf";
-    private static final Properties props = new Properties();
-
     int startup_time_min;
     int startup_time_max;
     int ready_time_min;
@@ -23,7 +21,7 @@ class AppTest {
     int link_activation_time_max;
 
     public void initSimulator() throws IOException {
-        props.load(new FileReader(config));
+        loadProperties(config);
         startup_time_min = Integer.parseInt(props.get("startup_time_min").toString());
         startup_time_max = Integer.parseInt(props.get("startup_time_max").toString());
         ready_time_min = Integer.parseInt(props.get("ready_time_min").toString());
@@ -31,13 +29,18 @@ class AppTest {
         link_activation_time_min = Integer.parseInt(props.get("link_activation_time_min").toString());
         link_activation_time_max = Integer.parseInt(props.get("link_activation_time_max").toString());
         sim = new TimedRDMSim(config);
-        sim.setHeadless(true);
+        sim.setHeadless(false);
     }
     @Test()
     void testInitializeHasToBeCalled() throws IOException {
         initSimulator();
         assertThrows(RuntimeException.class, () -> sim.run());
     }
+    @Test
+    void testExampleSimulator() {
+        assertDoesNotThrow(()->ExampleSimulation.main(new String[]{}));
+    }
+
     @Test
     void testMirrorChange() throws IOException {
         initSimulator();
@@ -55,6 +58,20 @@ class AppTest {
             sim.runStep(t);
             if(t < 10) assertEquals(5, mp.getNumMirrors());
             else if(t >= 30) assertEquals(20, mp.getNumMirrors());
+        }
+    }
+
+    @Test
+    void testMirrorReduction() throws IOException {
+        initSimulator();
+        sim.initialize(new NextNTopologyStrategy());
+        sim.getEffector().setMirrors(2, 10);
+        MirrorProbe mp = getMirrorProbe();
+        assert(mp != null);
+        for(int t = 1; t < sim.getSimTime(); t++) {
+            sim.runStep(t);
+            if(t < 10) assertEquals(5, mp.getNumMirrors());
+            else if(t >= 15) assertEquals(2, mp.getNumMirrors());
         }
     }
 

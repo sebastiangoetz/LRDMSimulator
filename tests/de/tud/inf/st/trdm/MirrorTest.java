@@ -1,22 +1,17 @@
 package de.tud.inf.st.trdm;
 
 import org.junit.jupiter.api.Test;
-
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
+import static de.tud.inf.st.trdm.TestUtils.loadProperties;
+import static de.tud.inf.st.trdm.TestUtils.props;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MirrorTest {
-    Properties props;
-    public void loadProperties()  throws IOException {
-        props = new Properties();
-        props.load(new FileReader("resources/sim-test-1.conf"));
-    }
+
     @Test
     void testMirror() throws IOException {
-        loadProperties();
+        loadProperties("resources/sim-test-1.conf");
         Mirror m = new Mirror(1, 0, props);
         assertEquals(1, m.getID());
         assertEquals(0, m.getLinks().size());
@@ -29,7 +24,7 @@ class MirrorTest {
 
     @Test
     void testTimes() throws IOException {
-        loadProperties();
+        loadProperties("resources/sim-test-1.conf");
         int startup_time_min = Integer.parseInt(props.get("startup_time_min").toString());
         int startup_time_max = Integer.parseInt(props.get("startup_time_max").toString());
         int ready_time_min = Integer.parseInt(props.get("ready_time_min").toString());
