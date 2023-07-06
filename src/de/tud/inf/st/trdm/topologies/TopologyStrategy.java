@@ -1,4 +1,7 @@
-package de.tud.inf.st.trdm;
+package de.tud.inf.st.trdm.topologies;
+
+import de.tud.inf.st.trdm.Link;
+import de.tud.inf.st.trdm.Network;
 
 import java.util.Properties;
 import java.util.Set;

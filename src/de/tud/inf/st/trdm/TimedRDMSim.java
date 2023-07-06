@@ -1,5 +1,8 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
+import de.tud.inf.st.trdm.topologies.TopologyStrategy;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;

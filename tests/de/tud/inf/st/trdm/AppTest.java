@@ -1,5 +1,7 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
+import de.tud.inf.st.trdm.topologies.RandomTopologyStrategy;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -109,9 +111,9 @@ class AppTest {
             sim.runStep(i);
         }
         double avg = getAvg(activeTimes);
-        assertTrue(avg > startup_time_min+ready_time_min+link_activation_time_min && avg < startup_time_max+ready_time_max+link_activation_time_max);
+        assertTrue(avg > startup_time_min+link_activation_time_min && avg < startup_time_max+link_activation_time_max);
         for(Link l : lp.getLinks()) {
-            int expected = l.getActivationTime() + Math.max(l.getSource().getStartupTime() + l.getSource().getReadyTime(), l.getTarget().getStartupTime() + l.getTarget().getReadyTime());
+            int expected = l.getActivationTime() + Math.max(l.getSource().getStartupTime(), l.getTarget().getStartupTime());
             assertEquals(expected, activeTimes.get(l.getID()));
         }
     }

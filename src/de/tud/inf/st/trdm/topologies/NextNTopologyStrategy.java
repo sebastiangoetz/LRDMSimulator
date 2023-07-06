@@ -1,4 +1,4 @@
-package de.tud.inf.st.trdm;
+package de.tud.inf.st.trdm.topologies;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import de.tud.inf.st.trdm.Link;
+import de.tud.inf.st.trdm.Mirror;
+import de.tud.inf.st.trdm.Network;
 import de.tud.inf.st.trdm.util.IDGenerator;
 
 /**A topology connecting each mirror with its next N mirrors.

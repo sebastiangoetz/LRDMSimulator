@@ -1,0 +1,9 @@
+@startuml
+'https://plantuml.com/state-diagram
+[*] -> Starting : /start
+Starting -> Up : [booted]
+Up -> Ready : [data arrived]
+Ready --> Stopping : /stop
+Stopped <- Stopping : [shutdown complete]
+[*] <- Stopped
+@enduml

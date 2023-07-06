@@ -1,5 +1,7 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.topologies.TopologyStrategy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;

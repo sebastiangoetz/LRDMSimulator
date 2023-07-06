@@ -63,8 +63,8 @@ public class Link {
 	public void timeStep(int t) {
 		//wait until source and target are active
 		if(endsActiveTime == -1 &&
-			(source.getState() == Mirror.State.READY &&
-			   target.getState() == Mirror.State.READY &&
+			(source.getState() == Mirror.State.UP &&
+			   target.getState() == Mirror.State.UP &&
 			   t >= initTime)) {
 				endsActiveTime = t;
 		}

@@ -26,6 +26,7 @@ public class Mirror {
 	private final int startupTime; // time required to start the container
 	private final int readyTime; // time required to get the data transfered
 	private final int stopTime; // time required to stop the container
+	private int maxLinkActiveTime; // largest time amongst all links to become active
 
 	public Mirror(int id, int initTime, Properties props) {
 		this.id = id;
@@ -56,6 +57,7 @@ public class Mirror {
 	
 	public void addLink(Link l) {
 		links.add(l);
+		if(l.getActivationTime() > maxLinkActiveTime) maxLinkActiveTime = l.getActivationTime();
 	}
 	
 	public void removeLink(Link l) {
@@ -63,8 +65,18 @@ public class Mirror {
 		for(Link x : links) {
 			if(x.getID() == l.getID()) toRemove = x; 
 		}
-		if(toRemove != null)
+		if(toRemove != null) {
 			links.remove(toRemove);
+			updateMaxLinkActiveTime();
+		}
+	}
+
+	private void updateMaxLinkActiveTime() {
+		int max = 0;
+		for(Link l : links) {
+			if(l.getActivationTime() > max) max = l.getActivationTime();
+		}
+		maxLinkActiveTime = max;
 	}
 	
 	public Set<Link> getLinks() {
@@ -92,7 +104,7 @@ public class Mirror {
 	 */
 	public void timeStep(int currentSimTime) {
 		if (state != State.STOPPING) {
-			if (currentSimTime - initTime >= readyTime+startupTime - 1) {
+			if (currentSimTime - initTime >= readyTime+startupTime+maxLinkActiveTime - 1) {
 				state = State.READY;
 			} else if (currentSimTime - initTime >= startupTime - 1) {
 				state = State.UP;

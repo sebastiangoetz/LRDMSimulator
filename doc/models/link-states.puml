@@ -1,0 +1,6 @@
+@startuml
+'https://plantuml.com/state-diagram
+[*] -> inactive : /create
+inactive -> active : [established]
+active -> closed : /close
+@enduml

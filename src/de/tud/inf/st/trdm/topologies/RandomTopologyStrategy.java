@@ -1,5 +1,8 @@
-package de.tud.inf.st.trdm;
+package de.tud.inf.st.trdm.topologies;
 
+import de.tud.inf.st.trdm.Link;
+import de.tud.inf.st.trdm.Mirror;
+import de.tud.inf.st.trdm.Network;
 import de.tud.inf.st.trdm.util.IDGenerator;
 
 import java.security.NoSuchAlgorithmException;
@@ -19,8 +22,8 @@ import java.util.logging.Logger;
 public class RandomTopologyStrategy implements TopologyStrategy {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-    /**Initializes the network with the amount of mirrors as specified in the properties and
-     * connects these mirrors.
+    /**Initializes the network already having the amount of mirrors as specified in the properties by
+     * connecting these mirrors randomly adhering to the max links per mirror rule.
      *
      * @param n ({@link Network}) the network to initialize
      * @param props ({@link Properties}) the properties of the simulation
