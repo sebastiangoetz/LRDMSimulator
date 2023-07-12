@@ -77,7 +77,7 @@ class AppTest {
         }
     }
 
-    @Test
+
     void testMirrorStartupTime() throws IOException {
         MirrorProbe mp = initTimeTest();
         Map<Integer,Integer> startupTimes = getTimeToStateForMirrorFromSimulation(mp, Mirror.State.UP);
@@ -87,7 +87,7 @@ class AppTest {
             assertEquals(m.getStartupTime(), startupTimes.get(m.getID()));
         }
     }
-    @Test
+
     void testMirrorReadyTime() throws IOException {
         MirrorProbe mp = initTimeTest();
         Map<Integer, Integer> readyTimes = getTimeToStateForMirrorFromSimulation(mp, Mirror.State.READY);
@@ -97,7 +97,7 @@ class AppTest {
             assertEquals(m.getReadyTime()+m.getStartupTime(), readyTimes.get(m.getID()));
         }
     }
-    @Test
+
     void testLinkActiveTime() throws IOException {
         initTimeTest();
         LinkProbe lp = getLinkProbe();

@@ -3,7 +3,6 @@ package de.tud.inf.st.trdm;
 import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
 
 import java.util.List;
-import java.util.Random;
 
 /**Simple simulation runner.
  * 
@@ -16,7 +15,7 @@ public class ExampleSimulation {
 		sim.initialize(new NextNTopologyStrategy());
 		Effector effector = sim.getEffector();
 		for(int i = 0; i < 200; i += 20) {
-			effector.setMirrors(new Random().nextInt(10,100), i);
+			effector.setMirrors((i+10), i);
 		}
 
 		//use this code to manually run the simulation step by step
