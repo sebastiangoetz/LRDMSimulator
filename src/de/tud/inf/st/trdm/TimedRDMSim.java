@@ -62,6 +62,7 @@ public class TimedRDMSim {
 		// set initial number of mirrors from properties
 		int numMirrors = Integer.parseInt(props.getProperty("num_mirrors"));
 		int numLinksPerMirror = Integer.parseInt(props.getProperty("num_links_per_mirror"));
+		int fileSize = Integer.parseInt(props.getProperty("fileSize"));
 
 		if(strategy == null) {
 			strategy = new NextNTopologyStrategy();
@@ -70,7 +71,7 @@ public class TimedRDMSim {
 			visualizationStrategy = new GraphVisualization();
 
 		// create network of mirrors
-		network = new Network(strategy, numMirrors, numLinksPerMirror, props);
+		network = new Network(strategy, numMirrors, numLinksPerMirror, fileSize, props);
 
 		effector = new Effector(network);
 		probes = new ArrayList<>();
