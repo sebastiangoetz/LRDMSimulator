@@ -1,5 +1,8 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.probes.LinkProbe;
+import de.tud.inf.st.trdm.probes.MirrorProbe;
+import de.tud.inf.st.trdm.probes.Probe;
 import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.RandomTopologyStrategy;
 import org.junit.jupiter.api.Test;

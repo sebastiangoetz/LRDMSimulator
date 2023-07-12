@@ -1,4 +1,7 @@
-package de.tud.inf.st.trdm;
+package de.tud.inf.st.trdm.probes;
+
+import de.tud.inf.st.trdm.Mirror;
+import de.tud.inf.st.trdm.Network;
 
 import java.text.NumberFormat;
 import java.util.List;

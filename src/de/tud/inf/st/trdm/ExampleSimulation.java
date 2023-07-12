@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.probes.Probe;
 import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
 
 import java.util.List;

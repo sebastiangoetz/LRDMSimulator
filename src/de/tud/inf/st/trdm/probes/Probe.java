@@ -1,4 +1,6 @@
-package de.tud.inf.st.trdm;
+package de.tud.inf.st.trdm.probes;
+
+import de.tud.inf.st.trdm.Network;
 
 /**A Probe to observer an RDM Network. Concrete observations are to be implemented in subclasses.
  * 
@@ -12,7 +14,7 @@ public abstract class Probe {
 		this.n = n;
 	}
 	
-	abstract void update(int simTime);
-	
-	abstract void print(int simTime);
+	public abstract void update(int simTime);
+
+	public abstract void print(int simTime);
 }

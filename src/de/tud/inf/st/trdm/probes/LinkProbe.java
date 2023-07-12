@@ -1,4 +1,7 @@
-package de.tud.inf.st.trdm;
+package de.tud.inf.st.trdm.probes;
+
+import de.tud.inf.st.trdm.Link;
+import de.tud.inf.st.trdm.Network;
 
 import java.text.NumberFormat;
 import java.util.Set;
@@ -21,12 +24,12 @@ public class LinkProbe extends Probe {
 	}
 
 	@Override
-	void print(int simTime) {
+	public void print(int simTime) {
 		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Links ] NC/Active/Target/Ratio:  {1} | {2} | {3} | {4}",new Object[]{simTime, n.getNumLinks(),n.getNumActiveLinks(),n.getNumTargetLinks(),NumberFormat.getInstance().format(ratio)});
 	}
 	
 	@Override
-	void update(int simTime) {
+	public void update(int simTime) {
 		ratio = (double)n.getNumActiveLinks() / (double)n.getNumTargetLinks();
 	}
 }
