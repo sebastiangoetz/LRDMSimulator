@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Mirror {
 	public enum State {
-		DOWN, STARTING, UP, READY, STOPPING, STOPPED
+		DOWN, STARTING, UP, READY, HASDATA, STOPPING, STOPPED
 	}
 
 	private final int id;
@@ -27,6 +27,8 @@ public class Mirror {
 	private final int readyTime; // time required to get the data transfered
 	private final int stopTime; // time required to stop the container
 	private int maxLinkActiveTime; // largest time amongst all links to become active
+
+	private DataPackage data; //the data hosted on this mirror
 
 	public Mirror(int id, int initTime, Properties props) {
 		this.id = id;
@@ -45,6 +47,8 @@ public class Mirror {
 		stopTime = new Random().nextInt(stopTimeMin,stopTimeMax);
 		
 		links = new HashSet<>();
+
+		data = null;
 	}
 
 	public State getState() {
@@ -53,6 +57,10 @@ public class Mirror {
 
 	public int getID() {
 		return id;
+	}
+
+	public void setDataPackage(DataPackage data) {
+		this.data = data;
 	}
 	
 	public void addLink(Link l) {
@@ -83,6 +91,10 @@ public class Mirror {
 		return links;
 	}
 
+	public DataPackage getData() {
+		return data;
+	}
+
 	public long getNumNonClosedLinks() {
 		return links.stream().filter(l -> l.getState() != Link.State.CLOSED).count();
 	}
@@ -104,7 +116,9 @@ public class Mirror {
 	 */
 	public void timeStep(int currentSimTime) {
 		if (state != State.STOPPING) {
-			if (currentSimTime - initTime >= readyTime+startupTime+maxLinkActiveTime - 1) {
+			if (data != null && data.isLoaded()) {
+				state = State.HASDATA;
+			} else if (currentSimTime - initTime >= readyTime+startupTime+maxLinkActiveTime - 1) {
 				state = State.READY;
 			} else if (currentSimTime - initTime >= startupTime - 1) {
 				state = State.UP;
@@ -116,6 +130,31 @@ public class Mirror {
 				state = State.STOPPED;
 			}
 		}
+		handleDataTransfer();
+	}
+
+	private void handleDataTransfer() {
+		if(state == State.READY && (data == null || !data.isLoaded())) {
+			//try to fetch data from linked mirrors if necessary
+			//find all ready partners
+			for(Link l : links) {
+				Mirror sourceMirror = getActiveMirrorForLink(l);
+				if(sourceMirror != null) {
+					if (data == null) data = new DataPackage(sourceMirror.getData().getFileSize());
+					data.increaseReceived(l.getCurrentBandwidth());
+				}
+			}
+		}
+	}
+
+	private static Mirror getActiveMirrorForLink(Link l) {
+		Mirror sourceMirror = null;
+		if(l.getState() == Link.State.ACTIVE && l.getTarget().getState() == State.HASDATA) {
+			sourceMirror = l.getTarget();
+		} else if(l.getState() == Link.State.ACTIVE && l.getSource().getState() == State.HASDATA) {
+			sourceMirror = l.getSource();
+		}
+		return sourceMirror;
 	}
 
 	/**Send a shutdown signal to the mirror. The mirror will change its state to <i>stopping</i>.

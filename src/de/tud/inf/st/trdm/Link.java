@@ -16,8 +16,12 @@ public class Link {
 	private final Mirror target;
 	
 	private final int initTime;
+	private final int minBandwidth;
+	private final int maxBandwidth;
 	private int endsActiveTime = -1;
 	private final int activationTime;
+
+	private final Random rand = new Random();
 	
 	public Link(int id, Mirror source, Mirror target, int initTime, Properties props) {
 		this.source = source;
@@ -32,8 +36,11 @@ public class Link {
 		
 		int minActivationTime = Integer.parseInt(props.getProperty("link_activation_time_min"));
 		int maxActivationTime = Integer.parseInt(props.getProperty("link_activation_time_max"));
+
+		minBandwidth = Integer.parseInt(props.getProperty("min_bandwidth"));
+		maxBandwidth = Integer.parseInt(props.getProperty("max_bandwidth"));
 		
-		activationTime = new Random().nextInt(minActivationTime, maxActivationTime);
+		activationTime = rand.nextInt(minActivationTime, maxActivationTime);
 	}
 	
 	public int getID() {
@@ -43,7 +50,11 @@ public class Link {
 	public State getState() {
 		return state;
 	}
-	
+
+	public int getCurrentBandwidth() {
+		return rand.nextInt(minBandwidth,maxBandwidth);
+	}
+
 	public boolean isActive() {
 		return state == State.ACTIVE;
 	}
@@ -63,8 +74,8 @@ public class Link {
 	public void timeStep(int t) {
 		//wait until source and target are active
 		if(endsActiveTime == -1 &&
-			(source.getState() == Mirror.State.UP &&
-			   target.getState() == Mirror.State.UP &&
+			((source.getState() == Mirror.State.UP || source.getState() == Mirror.State.HASDATA || source.getState() == Mirror.State.READY) &&
+					(target.getState() == Mirror.State.UP || target.getState() == Mirror.State.HASDATA || target.getState() == Mirror.State.READY) &&
 			   t >= initTime)) {
 				endsActiveTime = t;
 		}

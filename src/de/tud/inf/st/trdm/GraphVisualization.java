@@ -96,6 +96,7 @@ public class GraphVisualization implements VisualizationStrategy {
                 n = graph.addNode(String.valueOf(m.getID()));
             n.setAttribute("ui.label", m.getID());
             switch (m.getState()) {
+                case HASDATA -> n.setAttribute(UI_CLASS, "hasdata");
                 case READY -> n.setAttribute(UI_CLASS, "running");
                 case STOPPING -> n.setAttribute(UI_CLASS, "stopping");
                 default -> n.setAttribute(UI_CLASS,"starting");

@@ -36,7 +36,7 @@ public class Network {
 	 * @param numLinks the number of links each mirror should have
 	 * @param props the properties of the simulation
 	 */
-	public Network(TopologyStrategy strategy, int numMirrors, int numLinks, Properties props) {
+	public Network(TopologyStrategy strategy, int numMirrors, int numLinks, int fileSize, Properties props) {
 		numTargetMirrors = numMirrors;
 		numTargetLinksPerMirror = numLinks;
 		this.props = props;
@@ -51,6 +51,10 @@ public class Network {
 		// create the links - default strategy: spanning tree
 		links = strategy.initNetwork(this, props);
 		log = Logger.getLogger(this.getClass().getName());
+		//put a new data package on the first mirror
+		DataPackage initialData = new DataPackage(fileSize);
+		initialData.increaseReceived(fileSize);
+		mirrors.get(0).setDataPackage(initialData);
 	}
 
 	public void registerProbe(Probe p) {
@@ -169,6 +173,7 @@ public class Network {
 	 * @param simTime (int) current simulation time for logging purposes
 	 */
 	public void timeStep(int simTime) {
+		//find stopped mirrors to remove them or invoke timeStep on the active mirrors
 		List<Mirror> stoppedMirrors = new ArrayList<>();
 		for (Mirror m : mirrors) {
 			if (m.getState() == Mirror.State.STOPPED)
@@ -178,6 +183,7 @@ public class Network {
 		}
 		mirrors.removeAll(stoppedMirrors);
 
+		//find closed links to remove them or invoke timeStep on active links
 		List<Link> closedLinks = new ArrayList<>();
 		for (Link l : links) {
 			if (l.getState() == Link.State.CLOSED ||
@@ -192,9 +198,11 @@ public class Network {
 			l.getTarget().removeLink(l);
 		}
 		closedLinks.forEach(links::remove);
-		
+
+		//run timeStep on effector
 		effector.timeStep(simTime);
 
+		//update probes
 		for (Probe probe : probes) {
 			probe.update(simTime);
 		}

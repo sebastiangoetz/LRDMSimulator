@@ -1,11 +1,9 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
-import de.tud.inf.st.trdm.topologies.RandomTopologyStrategy;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Random;
 
 /**Simple simulation runner.
  * 
@@ -13,18 +11,14 @@ import java.util.List;
  *
  */
 public class ExampleSimulation {
-	public static void main(String[] args) throws NoSuchAlgorithmException {
+	public static void main(String[] args) {
 		TimedRDMSim sim = new TimedRDMSim();
-		sim.initialize(new BalancedTreeTopologyStrategy());
-		//Effector effector = sim.getEffector();
-		//effector.setMirrors(100,0);
-		//effector.setMirrors(70, 30);
-		//effector.setTargetedLinkChanges(5, 50);
-		//effector.setStrategy(new RandomTopologyStrategy(), 75);
-		//effector.setTargetedLinkChanges(1, 100);
-		//effector.setStrategy(new NextNTopologyStrategy(), 130);
-		//effector.setTargetedLinkChanges(3, 170);
-		
+		sim.initialize(new NextNTopologyStrategy());
+		Effector effector = sim.getEffector();
+		for(int i = 0; i < 200; i += 20) {
+			effector.setMirrors(new Random().nextInt(10,100), i);
+		}
+
 		//use this code to manually run the simulation step by step
 		List<Probe> probes = sim.getProbes();
 		int simTime = sim.getSimTime();

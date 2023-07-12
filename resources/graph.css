@@ -2,6 +2,10 @@ node {
 	shape: box;
 }
 
+node.hasdata {
+	fill-color: #ee5cdd;
+}
+
 node.running {
 	fill-color: #7F7;
 }
