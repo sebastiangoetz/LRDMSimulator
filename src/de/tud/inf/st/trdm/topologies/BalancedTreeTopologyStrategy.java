@@ -5,15 +5,13 @@ import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;
 import de.tud.inf.st.trdm.util.IDGenerator;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BalancedTreeTopologyStrategy implements TopologyStrategy {
-    private Random rand = SecureRandom.getInstanceStrong();
 
-    public BalancedTreeTopologyStrategy() throws NoSuchAlgorithmException {
-    }
+    private final Logger log = Logger.getLogger(BalancedTreeTopologyStrategy.class.getName());
 
     /**Initializes the network already having the amount of mirrors as specified in the properties and
      * connects these mirrors forming a balanced tree.
@@ -24,15 +22,12 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
      */
     @Override
     public Set<Link> initNetwork(Network n, Properties props) {
-        Set<Link> ret = new HashSet<>();
 
         List<Mirror> mirrors = new ArrayList<>(n.getMirrors());
         Mirror root = mirrors.get(0);
         mirrors.remove(root);
 
-        ret.addAll(createTreeBranch(n, root, mirrors, props));
-
-        return ret;
+        return new HashSet<>(createTreeBranch(n, root, mirrors, props));
     }
 
     private Set<Link> createTreeBranch(Network n, Mirror root, List<Mirror> mirrorsToConnect, Properties props) {
@@ -43,7 +38,7 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
         List<Mirror> children = new ArrayList<>();
         for(int i = 0; i < numChilds; i++) {
             Mirror m = connect(root, remainingMirrors, ret, props);
-            System.out.println(root+" -> "+m);
+            log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
             if(m != null)
                 children.add(m);
         }
@@ -56,7 +51,7 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
             if(i == children.size()-1) upper = remainingMirrors.size();
             List<Mirror> currentPartition = remainingMirrors.subList(lower,upper);
             if(m != null && !remainingMirrors.isEmpty()) {
-                System.out.println("-- "+m+" :: "+currentPartition.size());
+                log.log(Level.INFO, "-- {0} :: {1}", new Object[] {m, currentPartition.size()});
                 ret.addAll(createTreeBranch(n, m, currentPartition, props));
             }
             i++;
@@ -78,17 +73,17 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
 
     @Override
     public void restartNetwork(Network n, Properties props) {
-
+        //not yet implemented
     }
 
     @Override
     public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
-
+        //not yet implemented
     }
 
     @Override
     public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime) {
-
+        //not yet implemented
     }
 
     /**Returns the number of links the network should have. For a minimum spanning tree the links per mirror property is not used,
