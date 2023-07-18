@@ -1,9 +1,6 @@
 package de.tud.inf.st.trdm;
 
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**A single mirror in an RDM network. Can have the following states: down -&gt; starting -&gt; up -&gt; ready -&gt; stopping -&gt; stopped.
  * Each state change requires time. These times are fetched from the properties, which specify min/max ranges for them. Each mirror will randomlöy  
@@ -30,6 +27,8 @@ public class Mirror {
 
 	private DataPackage data; //the data hosted on this mirror
 
+	private Map<Integer, Integer> receivedDataPerTimestep;
+
 	public Mirror(int id, int initTime, Properties props) {
 		this.id = id;
 		this.initTime = initTime;
@@ -49,6 +48,8 @@ public class Mirror {
 		links = new HashSet<>();
 
 		data = null;
+
+		receivedDataPerTimestep = new HashMap<>();
 	}
 
 	public State getState() {
@@ -130,20 +131,23 @@ public class Mirror {
 				state = State.STOPPED;
 			}
 		}
-		handleDataTransfer();
+		handleDataTransfer(currentSimTime);
 	}
 
-	private void handleDataTransfer() {
+	private void handleDataTransfer(int currentSimTime) {
 		if(state == State.READY && (data == null || !data.isLoaded())) {
 			//try to fetch data from linked mirrors if necessary
 			//find all ready partners
+			int received = 0;
 			for(Link l : links) {
 				Mirror sourceMirror = getActiveMirrorForLink(l);
 				if(sourceMirror != null) {
 					if (data == null) data = new DataPackage(sourceMirror.getData().getFileSize());
 					data.increaseReceived(l.getCurrentBandwidth());
+					received += l.getCurrentBandwidth();
 				}
 			}
+			receivedDataPerTimestep.put(currentSimTime, received);
 		}
 	}
 
@@ -179,5 +183,9 @@ public class Mirror {
 
 	public int getReadyTime() {
 		return readyTime;
+	}
+
+	public Integer getReceivedPerTimestep(int timestep) {
+		return receivedDataPerTimestep.get(timestep);
 	}
 }

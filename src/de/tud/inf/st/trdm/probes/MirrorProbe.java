@@ -4,7 +4,9 @@ import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,9 +17,11 @@ import java.util.logging.Logger;
  */
 public class MirrorProbe extends Probe {
 	private double mirrorRatio;
+	private Map<Integer, Integer> bandwidthUsedPerTimestep;
 	
 	public MirrorProbe(Network n) {
 		super(n);
+		bandwidthUsedPerTimestep = new HashMap<>();
 	}
 
 	/**Called at each simulation time step.
@@ -36,7 +40,6 @@ public class MirrorProbe extends Probe {
 	@Override
 	public void print(int simTime) {
 		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Mirror] All/Ready/Target/Ratio: {1} | {2} | {3} | {4}", new Object[]{simTime,n.getNumMirrors(),n.getNumReadyMirrors(),n.getNumTargetMirrors(),NumberFormat.getInstance().format(mirrorRatio)});
-
 	}
 	
 	/**

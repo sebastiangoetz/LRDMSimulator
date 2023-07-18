@@ -138,6 +138,16 @@ public class Network {
 		}
 		return numActiveLinks;
 	}
+
+	public int getBandwidthUsed(int timestep) {
+		int total = 0;
+		for(Mirror m : getMirrors()) {
+			Integer rec = m.getReceivedPerTimestep(timestep);
+			if(rec == null) rec = 0;
+			total += rec;
+		}
+		return total;
+	}
 	
 	public int getNumTargetLinksPerMirror() {
 		return numTargetLinksPerMirror;
@@ -207,5 +217,7 @@ public class Network {
 		for (Probe probe : probes) {
 			probe.update(simTime);
 		}
+
+		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"### Current Total Bandwidth = {0} GB/timestep", new Object[]{getBandwidthUsed(simTime)});
 	}
 }

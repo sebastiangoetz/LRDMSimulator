@@ -1,7 +1,7 @@
 package de.tud.inf.st.trdm;
 
 import de.tud.inf.st.trdm.probes.Probe;
-import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
+import de.tud.inf.st.trdm.topologies.RandomTopologyStrategy;
 
 import java.util.List;
 
@@ -13,9 +13,10 @@ import java.util.List;
 public class ExampleSimulation {
 	public static void main(String[] args) {
 		TimedRDMSim sim = new TimedRDMSim();
-		sim.initialize(new NextNTopologyStrategy());
+		sim.initialize(new RandomTopologyStrategy());
 		Effector effector = sim.getEffector();
-		for(int i = 0; i < 200; i += 20) {
+		effector.setTargetedLinkChanges(5, 10);
+		for(int i = 0; i < 100; i += 20) {
 			effector.setMirrors((i+10), i);
 		}
 
