@@ -4,9 +4,7 @@ import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,11 +15,9 @@ import java.util.logging.Logger;
  */
 public class MirrorProbe extends Probe {
 	private double mirrorRatio;
-	private Map<Integer, Integer> bandwidthUsedPerTimestep;
 	
 	public MirrorProbe(Network n) {
 		super(n);
-		bandwidthUsedPerTimestep = new HashMap<>();
 	}
 
 	/**Called at each simulation time step.
