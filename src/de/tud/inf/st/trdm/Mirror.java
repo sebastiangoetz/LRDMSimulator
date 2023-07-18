@@ -27,7 +27,7 @@ public class Mirror {
 
 	private DataPackage data; //the data hosted on this mirror
 
-	private Map<Integer, Integer> receivedDataPerTimestep;
+	private final Map<Integer, Integer> receivedDataPerTimestep;
 
 	public Mirror(int id, int initTime, Properties props) {
 		this.id = id;
