@@ -143,7 +143,7 @@ public class TimedRDMSim {
 			Thread.currentThread().interrupt();
 		}
 		if(!headless)
-			visualizationStrategy.updateGraph(network);
+			visualizationStrategy.updateGraph(network, timeStep);
 		if (timeStep != lastTimeStep + 1) {
 			log.warning(
 					"Warning: you have to execute this method for each timestep in sequence. No action was taken!");

@@ -4,19 +4,43 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.swing_viewer.DefaultView;
+import org.graphstream.ui.swing_viewer.SwingViewer;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
+import org.knowm.xchart.QuickChart;
+import org.knowm.xchart.XChartPanel;
+import org.knowm.xchart.XYChart;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GraphVisualization implements VisualizationStrategy {
     private static final String UI_CLASS = "ui.class";
+    private static final String BANDWIDTH = "Bandwidth";
     private Graph graph;
+    private JLabel simTimeLabel;
+    private XYChart bandwidthChart;
+    private JPanel chartPanel;
+
     @Override
     public void init(Network network) {
         graph = new SingleGraph("Runtime View");
         String css = loadGraphCSS();
         graph.setAttribute("ui.stylesheet", css);
+        Viewer viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+        View view = viewer.addDefaultView(false);
+        viewer.enableAutoLayout();
+        if(view instanceof DefaultView dv) {
+            createUI(dv);
+        }
         for (Mirror m : network.getMirrors()) {
             Node n = graph.addNode(String.valueOf(m.getID()));
             n.setAttribute(UI_CLASS, "starting");
@@ -27,15 +51,75 @@ public class GraphVisualization implements VisualizationStrategy {
             Edge e = graph.addEdge("s" + sid + "t" + tid, sid, tid);
             e.setAttribute(UI_CLASS, "inactive");
         }
-        graph.display();
+    }
+
+    private void createUI(DefaultView dv) {
+        JFrame frame = new JFrame();
+        JPanel panel = new JPanel();
+
+        GridBagLayout gl = new GridBagLayout();
+        GridBagConstraints gc = new GridBagConstraints();
+        panel.setLayout(gl);
+
+        frame.add(panel);
+        frame.setTitle("Timed RDM Simulator");
+
+        simTimeLabel = new JLabel();
+        simTimeLabel.setText("Simulation Time: 0");
+        simTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        gc.gridx=0;
+        gc.gridy=0;
+        gc.gridwidth=2;
+        gc.gridheight=1;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gl.setConstraints(simTimeLabel, gc);
+        panel.add(simTimeLabel);
+
+        gc.gridx=0;
+        gc.gridy=1;
+        gc.gridwidth=1;
+        gl.setConstraints(dv, gc);
+        dv.setMinimumSize(new Dimension(600,400));
+        panel.add(dv);
+
+        bandwidthChart = QuickChart.getChart("Bandwidth over Time","Timestep",BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
+        bandwidthChart.getStyler().setLegendVisible(false);
+        chartPanel = new XChartPanel<>(bandwidthChart);
+        gc.gridx=0;
+        gc.gridy=2;
+        gc.gridwidth=1;
+        gl.setConstraints(chartPanel, gc);
+        chartPanel.setMinimumSize(new Dimension(600,400));
+        chartPanel.setMaximumSize(new Dimension(600,400));
+        panel.add(chartPanel);
+        frame.setSize(600,850);
+        frame.setVisible(true);
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
     }
 
     @Override
-    public void updateGraph(Network network) {
+    public void updateGraph(Network network, long timeStep) {
+        updateTimeStep(network, timeStep);
         updateMirrors(network);
         removeVanishedMirrors(network);
         removeVanishedLinks(network);
         updateLinks(network);
+    }
+
+    private void updateTimeStep(Network network, long timeStep) {
+        simTimeLabel.setText("Simulation Time: "+timeStep);
+
+        List<Integer> timeSteps = new ArrayList<>(network.getBandwidthHistory().keySet());
+        List<Integer> bandwidthTS = new ArrayList<>(network.getBandwidthHistory().values());
+
+        bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
+        chartPanel.repaint();
     }
 
     private void updateLinks(Network network) {

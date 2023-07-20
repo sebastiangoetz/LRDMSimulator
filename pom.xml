@@ -17,6 +17,11 @@
 			<version>2.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.knowm.xchart</groupId>
+			<artifactId>xchart</artifactId>
+			<version>3.8.4</version>
+		</dependency>
+		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>5.9.1</version>
@@ -82,4 +87,15 @@
 		</build>
 	</profile>
 	</profiles>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<layout>default</layout>
+			<url>https://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>

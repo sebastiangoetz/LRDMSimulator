@@ -3,10 +3,7 @@ package de.tud.inf.st.trdm;
 import de.tud.inf.st.trdm.probes.Probe;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +25,8 @@ public class Network {
 	private TopologyStrategy strategy;
 
 	private final Logger log;
+
+	private final Map<Integer,Integer> bandwidthHistory;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
 	 * Uses the TopologyStrategy to interlink the mirrors.
@@ -56,6 +55,8 @@ public class Network {
 		DataPackage initialData = new DataPackage(fileSize);
 		initialData.increaseReceived(fileSize);
 		mirrors.get(0).setDataPackage(initialData);
+
+		bandwidthHistory = new HashMap<>();
 	}
 
 	public void registerProbe(Probe p) {
@@ -177,6 +178,10 @@ public class Network {
 		return ret;
 	}
 
+	public Map<Integer, Integer> getBandwidthHistory() {
+		return bandwidthHistory;
+	}
+
 	/**
 	 * Performs a single simulation step. Clears stopped mirrors and delegates
 	 * simulation to all active mirrors. Notifies all probes.
@@ -218,6 +223,7 @@ public class Network {
 			probe.update(simTime);
 		}
 
+		bandwidthHistory.put(simTime, getBandwidthUsed(simTime));
 		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"### Current Total Bandwidth = {0} GB/timestep", new Object[]{getBandwidthUsed(simTime)});
 	}
 }

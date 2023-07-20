@@ -2,7 +2,7 @@ package de.tud.inf.st.trdm;
 
 public class DataPackage {
     /** the file size of the data package measured in GB*/
-    private int fileSize; //in GB
+    private final int fileSize; //in GB
     /** how much data of the file measured in GB is already received. has to be less than fileSize. */
     private int received; //in GB
 
