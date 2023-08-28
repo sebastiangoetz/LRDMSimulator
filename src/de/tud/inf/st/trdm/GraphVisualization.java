@@ -11,6 +11,7 @@ import org.graphstream.ui.view.Viewer;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
+import org.knowm.xchart.style.theme.MatlabTheme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,6 +84,7 @@ public class GraphVisualization implements VisualizationStrategy {
         panel.add(dv);
 
         bandwidthChart = QuickChart.getChart("Bandwidth over Time","Timestep",BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
+        bandwidthChart.getStyler().setTheme(new MatlabTheme());
         bandwidthChart.getStyler().setLegendVisible(false);
         chartPanel = new XChartPanel<>(bandwidthChart);
         gc.gridx=0;
