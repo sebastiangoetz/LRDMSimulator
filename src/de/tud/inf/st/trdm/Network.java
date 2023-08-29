@@ -27,6 +27,7 @@ public class Network {
 	private final Logger log;
 
 	private final Map<Integer,Integer> bandwidthHistory;
+	private final Map<Integer,Integer> activeLinkHistory;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
 	 * Uses the TopologyStrategy to interlink the mirrors.
@@ -57,6 +58,7 @@ public class Network {
 		mirrors.get(0).setDataPackage(initialData);
 
 		bandwidthHistory = new HashMap<>();
+		activeLinkHistory = new HashMap<>();
 	}
 
 	public void registerProbe(Probe p) {
@@ -75,6 +77,14 @@ public class Network {
 		return mirrors;
 	}
 
+	/**Get Mirrors sorted by ID in ascending order.
+	 *
+	 * @return {@link List} or mirrors sorted in ascending order by ID
+	 */
+	public List<Mirror> getMirrorsSortedById() {
+		return mirrors.stream().sorted(Comparator.comparingInt(Mirror::getID)).toList();
+	}
+
 	/**Returns all links of the net as a set.
 	 *
 	 * @return {@link Set} of {@link Link}s of the whole net.
@@ -86,7 +96,7 @@ public class Network {
 	/**
 	 * Set a new target number of mirrors. Will initiate the startup or shutdown of
 	 * mirrors if there are too many or too few.
-	 * 	 * @param newMirrors (int) new target number of mirrors
+	 * @param newMirrors (int) new target number of mirrors (i.e., not the number of mirrors to add)
 	 * @param simTime   (int) current simulation time for logging purposes
 	 */
 	public void setNumMirrors(int newMirrors, int simTime) {
@@ -182,6 +192,10 @@ public class Network {
 		return bandwidthHistory;
 	}
 
+	public Map<Integer, Integer> getActiveLinksHistory() {
+		return activeLinkHistory;
+	}
+
 	/**
 	 * Performs a single simulation step. Clears stopped mirrors and delegates
 	 * simulation to all active mirrors. Notifies all probes.
@@ -224,6 +238,11 @@ public class Network {
 		}
 
 		bandwidthHistory.put(simTime, getBandwidthUsed(simTime));
+		int m = getNumTargetMirrors();
+		float maxLinks = (m*(m-1))/2f;
+		float linkRatio = 100 * (getNumActiveLinks() / maxLinks);
+		activeLinkHistory.put(simTime, Math.round(linkRatio));
 		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"### Current Total Bandwidth = {0} GB/timestep", new Object[]{getBandwidthUsed(simTime)});
+		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"### Current Active Links Ratio = {0} Mirrors {1} Max Links {2} Actual Links {3} Ratio", new Object[]{getNumTargetMirrors(), maxLinks, getNumActiveLinks(), linkRatio});
 	}
 }

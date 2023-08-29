@@ -34,27 +34,39 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
         Set<Link> ret = new HashSet<>();
 
         List<Mirror> remainingMirrors = new ArrayList<>(mirrorsToConnect);
+        int numMirrorsLeft = remainingMirrors.size();
         int numChilds = n.getNumTargetLinksPerMirror();
-        List<Mirror> children = new ArrayList<>();
-        for(int i = 0; i < numChilds; i++) {
-            Mirror m = connect(root, remainingMirrors, ret, props);
-            log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
-            if(m != null)
-                children.add(m);
-        }
-        int i = 0;
-        for(Mirror m : children) {
-            //split the children to get a balanced tree
-            int lower = i*(remainingMirrors.size()/numChilds);
-            int upper = ((i+1)*(remainingMirrors.size()/numChilds));
-            if(remainingMirrors.size() == 1) upper = 1;
-            if(i == children.size()-1) upper = remainingMirrors.size();
-            List<Mirror> currentPartition = remainingMirrors.subList(lower,upper);
-            if(m != null && !remainingMirrors.isEmpty()) {
-                log.log(Level.INFO, "-- {0} :: {1}", new Object[] {m, currentPartition.size()});
-                ret.addAll(createTreeBranch(n, m, currentPartition, props));
+
+        if(remainingMirrors.size() > numChilds) {
+            //create children and subdivide remaining mirrors among them
+            List<Mirror> children = new ArrayList<>();
+            for(int i = 0; i < numChilds; i++) {
+                Mirror m = connect(root, remainingMirrors, ret, props);
+                log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
+                if(m != null)
+                    children.add(m);
             }
-            i++;
+            int i = 0;
+            for(Mirror m : children) {
+                //split the children to get a balanced tree
+                int lower = i*Math.round((numMirrorsLeft-numChilds)/(float)numChilds);
+                int upper = (i+1)*Math.round((numMirrorsLeft-numChilds)/(float)numChilds);
+                if(remainingMirrors.size() == 1) upper = 1;
+                if(i == children.size()-1) upper = remainingMirrors.size();
+                if(upper > remainingMirrors.size()) continue;
+                List<Mirror> currentPartition = remainingMirrors.subList(lower,upper);
+                if(m != null && !remainingMirrors.isEmpty()) {
+                    log.log(Level.INFO, "-- {0} :: {1}", new Object[] {m, currentPartition.size()});
+                    ret.addAll(createTreeBranch(n, m, currentPartition, props));
+                }
+                i++;
+            }
+        } else {
+            //end recursion, just link the children
+            for(int i = 0; i < numMirrorsLeft; i++) {
+                Mirror m = connect(root, remainingMirrors, ret, props);
+                log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
+            }
         }
 
         return ret;
@@ -78,7 +90,26 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
 
     @Override
     public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
-        //not yet implemented
+        List<Mirror> mirrorsToAdd = new ArrayList<>();
+        for(int i = 0; i < newMirrors; i++) {
+            Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props);
+            mirrorsToAdd.add(m);
+        }
+        //add links by filling up existing nodes with less than the max amount of links per node
+        List<Link> linksToAdd = new ArrayList<>();
+        List<Mirror> mirrorsToLink = new ArrayList<>(mirrorsToAdd);
+        for(Mirror m : n.getMirrorsSortedById()) {
+            if(m.getOutLinks().size() < n.getNumTargetLinksPerMirror()) {
+                if(mirrorsToLink.isEmpty()) break;
+                Mirror target = mirrorsToLink.remove(0);
+                linksToAdd.add(new Link(IDGenerator.getInstance().getNextID(), m,target, simTime, props));
+            }
+        }
+        //what if there are still mirrors left to add? this is the case if all leafs are filled up
+        log.log(Level.INFO, "Adding Mirrors: {0}", mirrorsToAdd);
+        log.log(Level.INFO, "Adding Links: {0}", linksToAdd);
+        n.getMirrors().addAll(mirrorsToAdd);
+        n.getLinks().addAll(linksToAdd);
     }
 
     @Override

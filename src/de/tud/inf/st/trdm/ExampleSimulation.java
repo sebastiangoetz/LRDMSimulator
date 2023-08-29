@@ -1,7 +1,7 @@
 package de.tud.inf.st.trdm;
 
 import de.tud.inf.st.trdm.probes.Probe;
-import de.tud.inf.st.trdm.topologies.RandomTopologyStrategy;
+import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 
 import java.util.List;
 
@@ -15,11 +15,12 @@ public class ExampleSimulation {
 		System.setProperty("java.util.logging.SimpleFormatter.format",
 				"[%1$tF %1$tT] [%4$-7s] %5$s %n");
 		TimedRDMSim sim = new TimedRDMSim();
-		sim.initialize(new RandomTopologyStrategy());
+		sim.initialize(new BalancedTreeTopologyStrategy());
 		Effector effector = sim.getEffector();
-		effector.setTargetedLinkChanges(5, 10);
-		for(int i = 0; i < 100; i += 20) {
-			effector.setMirrors((i+10), i);
+		int mirrors = 10;
+		for(int t = 0; t < 200; t += 10) {
+			effector.setMirrors(mirrors, t);
+			mirrors += 4;
 		}
 
 		//use this code to manually run the simulation step by step

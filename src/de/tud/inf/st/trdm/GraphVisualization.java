@@ -26,10 +26,13 @@ import java.util.logging.Logger;
 public class GraphVisualization implements VisualizationStrategy {
     private static final String UI_CLASS = "ui.class";
     private static final String BANDWIDTH = "Bandwidth";
+    private static final String ACTIVE_LINKS = "% Active Links";
     private Graph graph;
     private JLabel simTimeLabel;
     private XYChart bandwidthChart;
+    private XYChart activeLinksChart;
     private JPanel chartPanel;
+    private JPanel linkChartPanel;
 
     @Override
     public void init(Network network) {
@@ -76,9 +79,11 @@ public class GraphVisualization implements VisualizationStrategy {
         gl.setConstraints(simTimeLabel, gc);
         panel.add(simTimeLabel);
 
+        gc = new GridBagConstraints();
         gc.gridx=0;
         gc.gridy=1;
         gc.gridwidth=1;
+        gc.fill = GridBagConstraints.HORIZONTAL;
         gl.setConstraints(dv, gc);
         dv.setMinimumSize(new Dimension(600,400));
         panel.add(dv);
@@ -87,13 +92,29 @@ public class GraphVisualization implements VisualizationStrategy {
         bandwidthChart.getStyler().setTheme(new MatlabTheme());
         bandwidthChart.getStyler().setLegendVisible(false);
         chartPanel = new XChartPanel<>(bandwidthChart);
+        gc = new GridBagConstraints();
         gc.gridx=0;
         gc.gridy=2;
         gc.gridwidth=1;
         gl.setConstraints(chartPanel, gc);
-        chartPanel.setMinimumSize(new Dimension(600,400));
-        chartPanel.setMaximumSize(new Dimension(600,400));
+        chartPanel.setMinimumSize(new Dimension(600,200));
+        chartPanel.setMaximumSize(new Dimension(600,200));
         panel.add(chartPanel);
+
+        activeLinksChart = QuickChart.getChart("Active Links", "Timestep", ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
+        activeLinksChart.getStyler().setTheme(new MatlabTheme());
+        activeLinksChart.getStyler().setLegendVisible(false);
+        linkChartPanel = new XChartPanel<>(activeLinksChart);
+        gc = new GridBagConstraints();
+        gc.gridx=0;
+        gc.gridy=3;
+        gc.gridwidth=1;
+        gl.setConstraints(linkChartPanel, gc);
+        linkChartPanel.setMinimumSize(new Dimension(600,200));
+        linkChartPanel.setMaximumSize(new Dimension(600,200));
+        panel.add(linkChartPanel);
+
+        frame.setResizable(false);
         frame.setSize(600,850);
         frame.setVisible(true);
 
@@ -119,9 +140,13 @@ public class GraphVisualization implements VisualizationStrategy {
 
         List<Integer> timeSteps = new ArrayList<>(network.getBandwidthHistory().keySet());
         List<Integer> bandwidthTS = new ArrayList<>(network.getBandwidthHistory().values());
+        List<Integer> activeLinksTS = new ArrayList<>(network.getActiveLinksHistory().values());
 
         bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
         chartPanel.repaint();
+
+        activeLinksChart.updateXYSeries(ACTIVE_LINKS, timeSteps, activeLinksTS, null);
+        linkChartPanel.repaint();
     }
 
     private void updateLinks(Network network) {
