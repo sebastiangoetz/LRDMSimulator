@@ -39,28 +39,7 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
 
         if(remainingMirrors.size() > numChilds) {
             //create children and subdivide remaining mirrors among them
-            List<Mirror> children = new ArrayList<>();
-            for(int i = 0; i < numChilds; i++) {
-                Mirror m = connect(root, remainingMirrors, ret, props);
-                log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
-                if(m != null)
-                    children.add(m);
-            }
-            int i = 0;
-            for(Mirror m : children) {
-                //split the children to get a balanced tree
-                int lower = i*Math.round((numMirrorsLeft-numChilds)/(float)numChilds);
-                int upper = (i+1)*Math.round((numMirrorsLeft-numChilds)/(float)numChilds);
-                if(remainingMirrors.size() == 1) upper = 1;
-                if(i == children.size()-1) upper = remainingMirrors.size();
-                if(upper > remainingMirrors.size()) continue;
-                List<Mirror> currentPartition = remainingMirrors.subList(lower,upper);
-                if(m != null && !remainingMirrors.isEmpty()) {
-                    log.log(Level.INFO, "-- {0} :: {1}", new Object[] {m, currentPartition.size()});
-                    ret.addAll(createTreeBranch(n, m, currentPartition, props));
-                }
-                i++;
-            }
+            createAndLinkChildren(n, root, props, numChilds, remainingMirrors, ret, numMirrorsLeft);
         } else {
             //end recursion, just link the children
             for(int i = 0; i < numMirrorsLeft; i++) {
@@ -70,6 +49,31 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
         }
 
         return ret;
+    }
+
+    private void createAndLinkChildren(Network n, Mirror root, Properties props, int numChilds, List<Mirror> remainingMirrors, Set<Link> ret, int numMirrorsLeft) {
+        List<Mirror> children = new ArrayList<>();
+        for(int i = 0; i < numChilds; i++) {
+            Mirror m = connect(root, remainingMirrors, ret, props);
+            log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
+            if(m != null)
+                children.add(m);
+        }
+        int i = 0;
+        for(Mirror m : children) {
+            //split the children to get a balanced tree
+            int lower = i*Math.round((numMirrorsLeft - numChilds)/(float) numChilds);
+            int upper = (i+1)*Math.round((numMirrorsLeft - numChilds)/(float) numChilds);
+            if(remainingMirrors.size() == 1) upper = 1;
+            if(i == children.size()-1) upper = remainingMirrors.size();
+            if(upper > remainingMirrors.size()) continue;
+            List<Mirror> currentPartition = remainingMirrors.subList(lower,upper);
+            if(m != null && !remainingMirrors.isEmpty()) {
+                log.log(Level.INFO, "-- {0} :: {1}", new Object[] {m, currentPartition.size()});
+                ret.addAll(createTreeBranch(n, m, currentPartition, props));
+            }
+            i++;
+        }
     }
 
     private Mirror connect(Mirror root, List<Mirror> mirrors, Set<Link> links, Properties props) {
