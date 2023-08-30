@@ -89,7 +89,7 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
 
     @Override
     public void restartNetwork(Network n, Properties props) {
-        //not yet implemented
+        //not yet implemented - has to reestablish all links
     }
 
     @Override
@@ -118,7 +118,11 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
 
     @Override
     public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime) {
-        //not yet implemented
+        //just remove the last n mirrors
+        List<Mirror> mirrors = n.getMirrorsSortedById();
+        for(int i = 0; i < removeMirrors; i++) {
+            mirrors.get(mirrors.size() - 1 - i).shutdown(simTime);
+        }
     }
 
     /**Returns the number of links the network should have. For a minimum spanning tree the links per mirror property is not used,
