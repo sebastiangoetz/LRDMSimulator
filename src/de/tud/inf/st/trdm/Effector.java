@@ -42,7 +42,7 @@ public class Effector {
 	 */
 	public void setStrategy(TopologyStrategy strategy, int t) { setStrategyChanges.put(t, strategy); }
 
-	public void setTargetedLinkChanges(int numTargetedLinks, int t) { setTargetedLinkChanges.put(t, numTargetedLinks); }
+	public void setTargetLinksPerMirror(int numTargetedLinks, int t) { setTargetedLinkChanges.put(t, numTargetedLinks); }
 	/**Triggers mirror changes at the respective simulation time step.
 	 * 
 	 * @param t current simulation time

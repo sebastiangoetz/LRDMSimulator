@@ -14,8 +14,9 @@ end note
 
 class Effector
 {
-  - Map<int,int> setMirrorChanges
-  + setMirrors(int m, int t) 
+  + setMirrors(int m, int t)
+  + setStrategy(TopologyStrategy strategy, int t)
+  + setTargetLinksPerMirror(int numTargetedLinks, int t)
   + timeStep(int t)
 }
 
@@ -73,6 +74,7 @@ enum MirrorState {
   ready
   stopping
   stopped
+  hasdata
 }
 
 enum LinkState {
@@ -102,6 +104,15 @@ class Link
   + void timeStep(t)
 }
 
+class DataPackage
+{
+  - int fileSize
+  - int received
+  + int getFileSize()
+  + void increaseReceived(int amount)
+  + boolean isLoaded()
+}
+
 class LinkProbe
 {
   - double ratio
@@ -117,12 +128,12 @@ interface TopologyStrategy
     + int getNumTargetLinks(Network)
 }
 
-class NextNTopologyStrategy
+class BalancedTreeTopologyStrategy
 
-class RandomTopologyStrategy
+class FullyConnectedTopologyStrategy
 
-TopologyStrategy <|.. NextNTopologyStrategy
-TopologyStrategy <|.. RandomTopologyStrategy
+TopologyStrategy <|.. BalancedTreeTopologyStrategy
+TopologyStrategy <|.. FullyConnectedTopologyStrategy
 TimedRDMSim --> Effector
 TimedRDMSim --> "*" Probe
 Network --> TopologyStrategy
@@ -133,6 +144,7 @@ Network <--> "*" Probe
 IDGenerator <-- Network
 Mirror -> MirrorState
 Mirror *--> Link
+Mirror --> DataPackage
 Link -> LinkState
 Link --> "source" Mirror
 Link --> "target" Mirror
