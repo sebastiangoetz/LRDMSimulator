@@ -38,7 +38,7 @@ public class NextNTopologyStrategy implements TopologyStrategy {
 	}
 
 	@Override
-	public void restartNetwork(Network n, Properties props) {
+	public void restartNetwork(Network n, Properties props, int simTime) {
 		//close all existing links
 		for(Link l : n.getLinks()) {
 			l.shutdown();

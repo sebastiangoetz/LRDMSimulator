@@ -26,7 +26,9 @@ public class Network {
 
 	private final Logger log;
 
+	/**The history of used bandwidth. A map with simulation time as key and the used bandwidth as value.*/
 	private final Map<Integer,Integer> bandwidthHistory;
+	/**The history of active links. A map with simulation time as key and the number of active links as value.*/
 	private final Map<Integer,Integer> activeLinkHistory;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
@@ -61,10 +63,18 @@ public class Network {
 		activeLinkHistory = new HashMap<>();
 	}
 
+	/**Adds a probe to the network, which will be called at each simulation time step.
+	 *
+	 * @param p {@link Probe} a probe to be notified by the simulation at each time step.
+	 */
 	public void registerProbe(Probe p) {
 		probes.add(p);
 	}
 
+	/**Set the effector implementation to be used.
+	 *
+	 * @param e the {@link Effector} to be used
+	 */
 	public void setEffector(Effector e) {
 		this.effector = e;
 	}
@@ -109,21 +119,32 @@ public class Network {
 		numTargetMirrors = newMirrors;
 	}
 
+	/**Set the topology strategy to use. This will call {@link TopologyStrategy#restartNetwork(Network, Properties, int)} to reestablish the links between the mirrors accordingly.
+	 *
+	 * @param strategy the concrete strategy to use for the topology
+	 * @param timeStep the timestep at which this change shall take effect
+	 */
 	public void setTopologyStrategy(TopologyStrategy strategy, int timeStep) {
 		log.log(Level.INFO,"setTopologyStrategy({0},{1})", new Object[] {strategy.getClass().getName(),timeStep});
 		if(timeStep == 0)
 			this.strategy = strategy;
 		else {
 			this.strategy = strategy;
-			this.strategy.restartNetwork(this, props);
+			this.strategy.restartNetwork(this, props, timeStep);
 		}
 	}
 
+	/**Set the number of expected links per mirror, i.e., how many links a single mirror should have.
+	 * This will call {@link TopologyStrategy#restartNetwork(Network, Properties, int)} to establish the required links.
+	 *
+	 * @param numTargetLinksPerMirror expected number of links per mirror
+	 * @param timeStep simulation time at which this change shall take effect
+	 */
 	public void setNumTargetedLinksPerMirror(int numTargetLinksPerMirror, int timeStep) {
 		log.log(Level.INFO,"setNumTargetedLinksPerMirror({0},{1})", new Object[] { numTargetLinksPerMirror,timeStep});
 		this.numTargetLinksPerMirror = numTargetLinksPerMirror;
 		if(timeStep > 0) {
-			strategy.restartNetwork(this, props);
+			strategy.restartNetwork(this, props, timeStep);
 		}
 	}
 
@@ -140,7 +161,11 @@ public class Network {
 	public int getNumLinks() {
 		return links.size();
 	}
-	
+
+	/**Get the number of links, which are currently in ACTIVE state.
+	 *
+	 * @return current number of active links
+	 */
 	public int getNumActiveLinks() {
 		int numActiveLinks = 0;
 		for (Link l : links) {
@@ -150,6 +175,11 @@ public class Network {
 		return numActiveLinks;
 	}
 
+	/**Get the bandwidth used by the network for a specific simulation time.
+	 *
+	 * @param timestep the simulation time
+	 * @return bandwidth used at the respective timestep
+	 */
 	public int getBandwidthUsed(int timestep) {
 		int total = 0;
 		for(Mirror m : getMirrors()) {
@@ -159,11 +189,19 @@ public class Network {
 		}
 		return total;
 	}
-	
+
+	/**Get the number of target links per mirror, i.e., how many links each mirror should have.
+	 *
+	 * @return number of links expected for each mirror
+	 */
 	public int getNumTargetLinksPerMirror() {
 		return numTargetLinksPerMirror;
 	}
-	
+
+	/**Get the number of target links, i.e., how many links the whole network should contain.
+	 *
+	 * @return number of links expected for the whole network
+	 */
 	public int getNumTargetLinks() {
 		return strategy.getNumTargetLinks(this);
 	}
@@ -188,10 +226,18 @@ public class Network {
 		return ret;
 	}
 
+	/**Get the history of the overall bandwidth use.
+	 *
+	 * @return a map with simulation time as key and the bandwidth used as value
+	 */
 	public Map<Integer, Integer> getBandwidthHistory() {
 		return bandwidthHistory;
 	}
 
+	/**Get the history of active links.
+	 *
+	 * @return a Map with simulation time as key and the number of active links as value
+	 */
 	public Map<Integer, Integer> getActiveLinksHistory() {
 		return activeLinkHistory;
 	}
@@ -203,6 +249,27 @@ public class Network {
 	 * @param simTime (int) current simulation time for logging purposes
 	 */
 	public void timeStep(int simTime) {
+		handleMirrors(simTime);
+
+		handleLinks(simTime);
+
+		//run timeStep on effector
+		effector.timeStep(simTime);
+
+		//update probes
+		for (Probe probe : probes) {
+			probe.update(simTime);
+		}
+
+		collectMetrics(simTime);
+	}
+
+	/**Inspect the network for mirrors in STOPPED state to remove them from the network.
+	 * Else calls {@link Mirror#timeStep(int)}
+	 *
+	 * @param simTime current simulation time
+	 */
+	private void handleMirrors(int simTime) {
 		//find stopped mirrors to remove them or invoke timeStep on the active mirrors
 		List<Mirror> stoppedMirrors = new ArrayList<>();
 		for (Mirror m : mirrors) {
@@ -212,7 +279,15 @@ public class Network {
 				m.timeStep(simTime);
 		}
 		mirrors.removeAll(stoppedMirrors);
+	}
 
+	/**Remove all links from the network which are in CLOSED state and
+	 * where source and target mirror are in STOPPED state.
+	 * Else calls {@link Link#timeStep(int)}.
+	 *
+	 * @param simTime current simulation time.
+	 */
+	private void handleLinks(int simTime) {
 		//find closed links to remove them or invoke timeStep on active links
 		List<Link> closedLinks = new ArrayList<>();
 		for (Link l : links) {
@@ -228,21 +303,17 @@ public class Network {
 			l.getTarget().removeLink(l);
 		}
 		closedLinks.forEach(links::remove);
+	}
 
-		//run timeStep on effector
-		effector.timeStep(simTime);
-
-		//update probes
-		for (Probe probe : probes) {
-			probe.update(simTime);
-		}
-
+	/**Collect metrics of the simulation. Currently, bandwidth and number of active links are collected.
+	 *
+	 * @param simTime current simulation time
+	 */
+	private void collectMetrics(int simTime) {
 		bandwidthHistory.put(simTime, getBandwidthUsed(simTime));
 		int m = getNumTargetMirrors();
 		float maxLinks = (m*(m-1))/2f;
 		float linkRatio = 100 * (getNumActiveLinks() / maxLinks);
 		activeLinkHistory.put(simTime, Math.round(linkRatio));
-		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"### Current Total Bandwidth = {0} GB/timestep", new Object[]{getBandwidthUsed(simTime)});
-		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"### Current Active Links Ratio = {0} Mirrors {1} Max Links {2} Actual Links {3} Ratio", new Object[]{getNumTargetMirrors(), maxLinks, getNumActiveLinks(), linkRatio});
 	}
 }

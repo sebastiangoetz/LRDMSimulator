@@ -6,12 +6,14 @@ import de.tud.inf.st.trdm.Network;
 import de.tud.inf.st.trdm.util.IDGenerator;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+/**A {@link TopologyStrategy} which links the mirrors of the {@link Network} as a balanced tree with a
+ * single root {@link Mirror}. Each Mirror will have at most {@link Network#getNumTargetLinksPerMirror()} children.
+ * The strategy aims to create a tree structure where each branch has the same number of ancestors (if possible).
+ *
+ * @author Sebastian Götz (sebastian.goetz@acm.org)
+ */
 public class BalancedTreeTopologyStrategy implements TopologyStrategy {
-
-    private final Logger log = Logger.getLogger(BalancedTreeTopologyStrategy.class.getName());
 
     /**Initializes the network already having the amount of mirrors as specified in the properties and
      * connects these mirrors forming a balanced tree.
@@ -22,15 +24,22 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
      */
     @Override
     public Set<Link> initNetwork(Network n, Properties props) {
-
         List<Mirror> mirrors = new ArrayList<>(n.getMirrors());
         Mirror root = mirrors.get(0);
         mirrors.remove(root);
 
-        return new HashSet<>(createTreeBranch(n, root, mirrors, props));
+        return new HashSet<>(createTree(n, root, mirrors, props));
     }
 
-    private Set<Link> createTreeBranch(Network n, Mirror root, List<Mirror> mirrorsToConnect, Properties props) {
+    /**Creates the links for a tree structure starting with the root node for all mirrors to be connected.
+     *
+     * @param n {@link Network} the network
+     * @param root {@link Mirror} the root mirror
+     * @param mirrorsToConnect {@link List} of {@link Mirror}s to be put into the tree structure
+     * @param props {@link Properties} of the simulation
+     * @return {@link Set} of links of the tree structure
+     */
+    private Set<Link> createTree(Network n, Mirror root, List<Mirror> mirrorsToConnect, Properties props) {
         Set<Link> ret = new HashSet<>();
 
         List<Mirror> remainingMirrors = new ArrayList<>(mirrorsToConnect);
@@ -43,19 +52,27 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
         } else {
             //end recursion, just link the children
             for(int i = 0; i < numMirrorsLeft; i++) {
-                Mirror m = connect(root, remainingMirrors, ret, props);
-                log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
+                connect(root, remainingMirrors, ret, props);
             }
         }
 
         return ret;
     }
 
+    /**Creates a new subtree structure starting with the root mirror.
+     *
+     * @param n {@link Network} the network
+     * @param root {@link Mirror} the root mirror
+     * @param props {@link Properties} of the simulation
+     * @param numChilds number of children a node in this tree shall have
+     * @param remainingMirrors {@link List} of {@link Mirror}s to be put into the current subtree
+     * @param ret {@link Set} of {@link Link}s created
+     * @param numMirrorsLeft number of mirrors still to be put into the tree
+     */
     private void createAndLinkChildren(Network n, Mirror root, Properties props, int numChilds, List<Mirror> remainingMirrors, Set<Link> ret, int numMirrorsLeft) {
         List<Mirror> children = new ArrayList<>();
         for(int i = 0; i < numChilds; i++) {
             Mirror m = connect(root, remainingMirrors, ret, props);
-            log.log(Level.INFO,"{0} -> {1}", new Object[] {root, m});
             if(m != null)
                 children.add(m);
         }
@@ -69,16 +86,24 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
             if(upper > remainingMirrors.size()) continue;
             List<Mirror> currentPartition = remainingMirrors.subList(lower,upper);
             if(m != null && !remainingMirrors.isEmpty()) {
-                log.log(Level.INFO, "-- {0} :: {1}", new Object[] {m, currentPartition.size()});
-                ret.addAll(createTreeBranch(n, m, currentPartition, props));
+                ret.addAll(createTree(n, m, currentPartition, props));
             }
             i++;
         }
     }
 
+    /**Creates a link between a root node and the first mirror of a list of mirrors.
+     * Updates the links parameter and removes the newly connected mirror from mirrors parameter.
+     *
+     * @param root the root {@link Mirror}
+     * @param mirrors the {@link List} of {@link Mirror}s of which the first is to be linked to the root
+     * @param links the {@link Set} of {@link Link}s to which the newly created link is added
+     * @param props {@link Properties} of the simulation
+     * @return the child {@link Mirror} which was connected to the root
+     */
     private Mirror connect(Mirror root, List<Mirror> mirrors, Set<Link> links, Properties props) {
         if(mirrors.isEmpty()) return null;
-        Mirror child = mirrors.get(0); //rand.nextInt(mirrors.size())
+        Mirror child = mirrors.get(0);
         mirrors.remove(child);
         Link l = new Link(IDGenerator.getInstance().getNextID(), root, child, 0, props);
         root.addLink(l);
@@ -87,11 +112,38 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
         return child;
     }
 
+    /**Recreates all links between the mirrors of the network to adhere to the balanced tree topology.
+     * First calls {@link Link#shutdown()} on all existing links and then recreates the links according to the balanced tree topology.
+     *
+     * @param n the {@link Network}
+     * @param props {@link Properties} of the simulation
+     * @param simTime current simulation time
+     */
     @Override
-    public void restartNetwork(Network n, Properties props) {
-        //not yet implemented - has to reestablish all links
+    public void restartNetwork(Network n, Properties props, int simTime) {
+        //stop all current links
+        n.getLinks().clear();
+        n.getMirrors().forEach(m -> m.getLinks().clear());
+        //create the tree structure
+        if(n.getMirrors().isEmpty()) return;
+        Mirror root = n.getMirrorsSortedById().get(0);
+        List<Mirror> mirrors = new ArrayList<>(n.getMirrorsSortedById());
+        mirrors.remove(root);
+        Set<Link> links = createTree(n, root, mirrors, props);
+        n.getLinks().addAll(links);
     }
 
+    /**Creates the respective number of mirrors to be added and links them according to the balanced tree topology.
+     * For this, the mirrors are traversed in ascending order of their IDs. Each mirror which still has less links than
+     * expected by {@link Network#getNumTargetLinksPerMirror()} will be "filled up".
+     * <br/>
+     * <i>Current restriction:</i> you should not add more mirrors than can be added to existing mirrors as children.
+     *
+     * @param n the {@link Network}
+     * @param newMirrors number of mirrors to be added
+     * @param props {@link Properties} of the simulation
+     * @param simTime current simulation time
+     */
     @Override
     public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
         List<Mirror> mirrorsToAdd = new ArrayList<>();
@@ -110,12 +162,17 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
             }
         }
         //what if there are still mirrors left to add? this is the case if all leafs are filled up
-        log.log(Level.INFO, "Adding Mirrors: {0}", mirrorsToAdd);
-        log.log(Level.INFO, "Adding Links: {0}", linksToAdd);
         n.getMirrors().addAll(mirrorsToAdd);
         n.getLinks().addAll(linksToAdd);
     }
 
+    /**Removes the requested amount of mirrors from the network. The mirrors with the largest ID will be removed.
+     *
+     * @param n the {@link Network}
+     * @param removeMirrors number of mirrors to be removed
+     * @param props {@link Properties} of the simulation
+     * @param simTime current simulation time
+     */
     @Override
     public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime) {
         //just remove the last n mirrors

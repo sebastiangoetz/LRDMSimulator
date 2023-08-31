@@ -20,8 +20,11 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class GraphVisualization implements VisualizationStrategy {
     private static final String UI_CLASS = "ui.class";
@@ -152,39 +155,47 @@ public class GraphVisualization implements VisualizationStrategy {
     private void updateLinks(Network network) {
         for (Link l : network.getLinks()) {
             if (l.getState() != Link.State.CLOSED) {
-                String sid = String.valueOf(l.getSource().getID());
-                String tid = String.valueOf(l.getTarget().getID());
-                String eid = "s" + sid + "t" + tid;
-                Edge e = graph.getEdge(eid);
-                if (e == null && (l.getSource().getState() != Mirror.State.STOPPING
+                Optional<Edge> e = graph.edges().filter(edge -> edge.getSourceNode().getId().equals(Integer.toString(l.getSource().getID())) &&
+                        edge.getTargetNode().getId().equals(Integer.toString(l.getTarget().getID()))).findAny();
+
+                Edge edge = null;
+                if (e.isEmpty() && (l.getSource().getState() != Mirror.State.STOPPING
                             && l.getSource().getState() != Mirror.State.STOPPED
                             && l.getTarget().getState() != Mirror.State.STOPPING
                             && l.getTarget().getState() != Mirror.State.STOPPED)) {
-                        e = graph.addEdge(eid, sid, tid);
+                        edge = graph.addEdge(Integer.toString(l.getID()), Integer.toString(l.getSource().getID()), Integer.toString(l.getTarget().getID()));
                 }
-                if (e != null) {
-                    if (l.isActive()) {
-                        e.setAttribute(UI_CLASS, "active");
-                    } else {
-                        e.setAttribute(UI_CLASS, "inactive");
-                    }
+                if (!e.isEmpty()) {
+                    edge = e.get();
                 }
+                updateUIClassOfEdge(l, edge);
+            }
+        }
+    }
+
+    private static void updateUIClassOfEdge(Link l, Edge addedEdge) {
+        if (addedEdge != null) {
+            if (l.isActive()) {
+                addedEdge.setAttribute(UI_CLASS, "active");
+            } else {
+                addedEdge.setAttribute(UI_CLASS, "inactive");
             }
         }
     }
 
     private void removeVanishedLinks(Network network) {
-        for(int i = 0; i < graph.getEdgeCount(); i++) {
-            Edge e = graph.getEdge(i);
+        Set<Edge> edgesToRemove = graph.edges().filter(e -> {
             boolean exists = false;
-            for(Link l : network.getLinks()) {
-                String sid = String.valueOf(l.getSource().getID());
-                String tid = String.valueOf(l.getTarget().getID());
-                String eid = "s" + sid + "t" + tid;
-                if(eid.equals(e.getId())) exists = true;
+            if(e != null) {
+                for (Link l : network.getLinks()) {
+                    if (e.getSourceNode().getId().equals(Integer.toString(l.getSource().getID())) &&
+                            e.getTargetNode().getId().equals(Integer.toString(l.getTarget().getID())))
+                        exists = true;
+                }
             }
-            if(!exists) graph.removeEdge(e);
-        }
+            return !exists;
+        }).collect(Collectors.toSet());
+        edgesToRemove.forEach(e -> graph.removeEdge(e));
     }
 
     private void removeVanishedMirrors(Network network) {
