@@ -165,7 +165,7 @@ public class GraphVisualization implements VisualizationStrategy {
                             && l.getTarget().getState() != Mirror.State.STOPPED)) {
                         edge = graph.addEdge(Integer.toString(l.getID()), Integer.toString(l.getSource().getID()), Integer.toString(l.getTarget().getID()));
                 }
-                if (!e.isEmpty()) {
+                if (e.isPresent()) {
                     edge = e.get();
                 }
                 updateUIClassOfEdge(l, edge);
