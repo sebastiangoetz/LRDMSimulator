@@ -3,7 +3,7 @@ package de.tud.inf.st.trdm;
 import de.tud.inf.st.trdm.probes.LinkProbe;
 import de.tud.inf.st.trdm.probes.MirrorProbe;
 import de.tud.inf.st.trdm.probes.Probe;
-import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
+import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
 import java.io.FileNotFoundException;
@@ -68,7 +68,7 @@ public class TimedRDMSim {
 		int fileSize = Integer.parseInt(props.getProperty("fileSize"));
 
 		if(strategy == null) {
-			strategy = new NextNTopologyStrategy();
+			strategy = new BalancedTreeTopologyStrategy();
 		}
 		if(!headless)
 			visualizationStrategy = new GraphVisualization();

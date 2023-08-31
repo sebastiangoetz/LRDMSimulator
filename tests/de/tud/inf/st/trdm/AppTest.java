@@ -3,8 +3,8 @@ package de.tud.inf.st.trdm;
 import de.tud.inf.st.trdm.probes.LinkProbe;
 import de.tud.inf.st.trdm.probes.MirrorProbe;
 import de.tud.inf.st.trdm.probes.Probe;
-import de.tud.inf.st.trdm.topologies.NextNTopologyStrategy;
-import de.tud.inf.st.trdm.topologies.RandomTopologyStrategy;
+import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
+import de.tud.inf.st.trdm.topologies.FullyConnectedTopology;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ class AppTest {
     @Test
     void testMirrorChange() throws IOException {
         initSimulator();
-        sim.initialize(new NextNTopologyStrategy());
+        sim.initialize(new BalancedTreeTopologyStrategy());
         sim.getEffector().setMirrors(20, 10);
         MirrorProbe mp = null;
         for(Probe p : sim.getProbes()) {
@@ -69,7 +69,7 @@ class AppTest {
     @Test
     void testMirrorReduction() throws IOException {
         initSimulator();
-        sim.initialize(new NextNTopologyStrategy());
+        sim.initialize(new BalancedTreeTopologyStrategy());
         sim.getEffector().setMirrors(2, 10);
         MirrorProbe mp = getMirrorProbe();
         assert(mp != null);
@@ -123,17 +123,17 @@ class AppTest {
     @Test
     void testTopologyChange() throws IOException {
         initSimulator();
-        sim.initialize(new NextNTopologyStrategy());
-        sim.getEffector().setStrategy(new RandomTopologyStrategy(),10);
-        sim.getEffector().setStrategy(new NextNTopologyStrategy(), 20);
-        sim.getEffector().setStrategy(new RandomTopologyStrategy(),30);
-        sim.getEffector().setStrategy(new RandomTopologyStrategy(),40);
+        sim.initialize(new FullyConnectedTopology());
+        sim.getEffector().setStrategy(new BalancedTreeTopologyStrategy(),10);
+        sim.getEffector().setStrategy(new FullyConnectedTopology(), 20);
+        sim.getEffector().setStrategy(new BalancedTreeTopologyStrategy(),30);
+        sim.getEffector().setStrategy(new FullyConnectedTopology(),40);
         assertDoesNotThrow(() -> sim.run());
     }
 
     private MirrorProbe initTimeTest() throws IOException {
         initSimulator();
-        sim.initialize(new NextNTopologyStrategy());
+        sim.initialize(new BalancedTreeTopologyStrategy());
         MirrorProbe mp = getMirrorProbe();
         assertNotNull(mp);
         return mp;
