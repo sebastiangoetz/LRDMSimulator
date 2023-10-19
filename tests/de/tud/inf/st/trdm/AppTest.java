@@ -63,6 +63,9 @@ class AppTest {
             sim.runStep(t);
             if(t < 10) assertEquals(5, mp.getNumMirrors());
             else if(t >= 30) assertEquals(20, mp.getNumMirrors());
+            assertFalse(mp.getMirrors().isEmpty());
+            assertTrue(mp.getNumReadyMirrors() <= mp.getNumTargetMirrors());
+            assertEquals(mp.getMirrorRatio(), (double) mp.getNumReadyMirrors() / mp.getNumTargetMirrors());
         }
     }
 
@@ -78,6 +81,16 @@ class AppTest {
             if(t < 10) assertEquals(5, mp.getNumMirrors());
             else if(t >= 15) assertEquals(2, mp.getNumMirrors());
         }
+    }
+
+    @Test
+    void testTargetLinkChange() throws IOException {
+        initSimulator();
+        sim.initialize(new BalancedTreeTopologyStrategy());
+        sim.getEffector().setTargetLinksPerMirror(5, 10);
+        LinkProbe lp = getLinkProbe();
+        assert(lp != null);
+        assertDoesNotThrow(() -> sim.run());
     }
 
 
