@@ -1,0 +1,37 @@
+@startuml
+class TimedRDMSim
+{
+  + int getSimTime()
+  + void run()
+  + void runStep(int t)
+}
+
+class Effector
+{
+  + setMirrors(int m, int t)
+  + setStrategy(TopologyStrategy strategy, int t)
+  + setTargetLinksPerMirror(int numTargetedLinks, int t)
+  + timeStep(int t)
+}
+
+
+class Network
+
+abstract class Probe
+{
+  + {abstract} void update(int t)
+  + {abstract} void print(int t)
+}
+
+class MirrorProbe
+
+class LinkProbe
+
+TimedRDMSim --> Effector
+TimedRDMSim --> "*" Probe
+
+Probe <|-- MirrorProbe
+Probe <|-- LinkProbe
+
+TimedRDMSim -> Network
+@enduml

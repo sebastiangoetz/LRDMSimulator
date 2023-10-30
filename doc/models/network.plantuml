@@ -1,0 +1,60 @@
+@startuml
+
+class Network
+
+enum MirrorState {
+  down
+  starting
+  up
+  ready
+  stopping
+  stopped
+  hasdata
+}
+
+enum LinkState {
+  inactive
+  active
+  closed
+}
+
+class Mirror
+{
+  - int id;
+  - init_time;
+  - startup_time;
+  - ready_time;
+  - stop_time;
+  + void shutdown()
+  + void timeStep()
+}
+
+class Link
+{
+  - int id
+  - init_time
+  - ends_active_time
+  - activation_time
+  + void shutdown()
+  + void timeStep(t)
+}
+
+class DataPackage
+{
+  - int fileSize
+  - int received
+  + int getFileSize()
+  + void increaseReceived(int amount)
+  + boolean isLoaded()
+}
+
+Network *--> "*" Mirror
+Network *-> "*" Link
+Mirror -> MirrorState
+Mirror *--> Link
+DataPackage <- Mirror
+Link -> LinkState
+Link --> "source" Mirror
+Link --> "target" Mirror
+
+@enduml
