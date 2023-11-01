@@ -1,4 +1,7 @@
 @startuml
+
+!define ABSTRACT &#123;abstract&#125;
+
 class TimedRDMSim
 {
   + int getSimTime()
@@ -17,6 +20,9 @@ class Effector
   + setMirrors(int m, int t)
   + setStrategy(TopologyStrategy strategy, int t)
   + setTargetLinksPerMirror(int numTargetedLinks, int t)
+  + setDataPackage(int mirrorId, List<String> data, int t)
+  + setMirrorUpdateStrategy(MirrorUpdater updater, int t)
+  + setDataUpdateStrategy(UpdateStrategy updateStrategy, int t)
   + timeStep(int t)
 }
 
@@ -28,7 +34,7 @@ class IDGenerator
   + int getNextID()
 }
 
-class Network
+interface Network
 {
   - Properties props
   - int numTargetMirrors
@@ -42,6 +48,21 @@ class Network
   + int getNumMirrors(int m, int t)
   ---
   + void timeStep(int t)
+}
+
+abstract class MirrorUpdater
+{
+  + {abstract} void updateMirrors(Network network)
+}
+
+class PushMirrorUpdater
+{
+  + void updateMirrors(Network network)
+}
+
+class PullMirrorUpdater
+{
+  + void updateMirrors(Network network)
 }
 
 note right of Network::timeStep
@@ -74,6 +95,16 @@ class MirrorProbe
   + int getNumTargetMirrors()
   + double getMirrorRatio()
 }
+
+class DataProbe
+{
+  - double DataRatio
+  + void update(int t)
+  + void print(int t)
+  + int getNewestFlag(int t)
+  - void notifyNetwork()
+}
+
 
 enum MirrorState {
   down
@@ -116,9 +147,28 @@ class DataPackage
 {
   - int fileSize
   - int received
+  - List<String> data
+  - int dirtyFlag
   + int getFileSize()
+  + int getDirtyFlag
+  + List<String> getData
   + void increaseReceived(int amount)
   + boolean isLoaded()
+}
+
+abstract class UpdateStrategy
+{
+  + {abstract} void updateData()
+}
+
+class DeltaUpdateStrategy
+{
+  + void updateData()
+}
+
+class FullUpdateStrategy
+{
+  + void updateData()
 }
 
 class LinkProbe
@@ -147,6 +197,7 @@ VisualizationStrategy <|. GraphVisualization
 TimedRDMSim --> Effector
 TimedRDMSim --> "*" Probe
 Network --> TopologyStrategy
+Network --> MirrorUpdater
 Network <--> Effector
 Network *--> "*" Mirror
 Network *-> "*" Link
@@ -155,12 +206,20 @@ IDGenerator <-- Network
 Mirror -> MirrorState
 Mirror *--> Link
 Mirror --> DataPackage
+Mirror --> UpdateStrategy
 Link -> LinkState
 Link --> "source" Mirror
 Link --> "target" Mirror
 
 Probe <|-- MirrorProbe
 Probe <|-- LinkProbe
+Probe <|-- DataProbe
+
+MirrorUpdater <|-- PushMirrorUpdater
+MirrorUpdater <|-- PullMirrorUpdater
+
+UpdateStrategy <|-- DeltaUpdateStrategy
+UpdateStrategy <|-- FullUpdateStrategy
 
 TimedRDMSim -> Network
 @enduml
