@@ -20,7 +20,7 @@ class Effector
   + setMirrors(int m, int t)
   + setStrategy(TopologyStrategy strategy, int t)
   + setTargetLinksPerMirror(int numTargetedLinks, int t)
-  + setDataPackage(int mirrorId, List<String> data, int t)
+  + setDataPackage(int mirrorId, List<Data> data, int t)
   + setMirrorUpdateStrategy(MirrorUpdater updater, int t)
   + setDataUpdateStrategy(UpdateStrategy updateStrategy, int t)
   + timeStep(int t)
@@ -145,13 +145,21 @@ class Link
 
 class DataPackage
 {
-  - int fileSize
-  - int received
-  - List<String> data
+  - List<Data> data
   - int dirtyFlag
-  + int getFileSize()
   + int getDirtyFlag
   + List<String> getData
+  + boolean isLoaded()
+}
+
+class Data
+{
+  - int fileSize
+  - int received
+  - String data
+  + int getFileSize()
+  + int getDirtyFlag
+  + String getData
   + void increaseReceived(int amount)
   + boolean isLoaded()
 }
@@ -220,6 +228,6 @@ MirrorUpdater <|-- PullMirrorUpdater
 
 UpdateStrategy <|-- DeltaUpdateStrategy
 UpdateStrategy <|-- FullUpdateStrategy
-
+DataPackage -> Data
 TimedRDMSim -> Network
 @enduml

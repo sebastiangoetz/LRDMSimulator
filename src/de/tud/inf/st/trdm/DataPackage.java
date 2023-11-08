@@ -1,30 +1,31 @@
 package de.tud.inf.st.trdm;
 
+import java.util.List;
+
 public class DataPackage {
-    /** the file size of the data package measured in GB*/
-    private final int fileSize; //in GB
-    /** how much data of the file measured in GB is already received. has to be less than fileSize. */
-    private int received; //in GB
 
-    public DataPackage(int fileSize) {
-        this.fileSize = fileSize;
-        received = 0;
+    private List<Data> data;
+    private int dirtyFlag;
+
+    public DataPackage(List<Data> data, int dirtyFlag) {
+        this.data = data;
+        this.dirtyFlag = dirtyFlag;
     }
 
-    public int getFileSize() {
-        return fileSize;
+    public List<Data> getData(){
+        return data;
     }
 
-    public int getReceived() {
-        return received;
-    }
-
-    public void increaseReceived(int amount) {
-        received += amount;
-        if(received > fileSize) received = fileSize;
+    public int getDirtyFlag(){
+        return dirtyFlag;
     }
 
     public boolean isLoaded() {
-        return received == fileSize;
+        for (Data datum : data) {
+            if (!datum.isLoaded()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

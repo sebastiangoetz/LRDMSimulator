@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  */
 public class Mirror {
 	public enum State {
-		DOWN, STARTING, UP, READY, HASDATA, STOPPING, STOPPED
+		DOWN, STARTING, UP, READY, HASDATA, INVALIDFLAG, STOPPING, STOPPED
 	}
 
 	private final int id;

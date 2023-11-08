@@ -1,8 +1,10 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.helper.Pair;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**An effector for the RDM network. Collects requests to change the number of mirrors, links per mirror and topology and triggers these changes at the respective time step.
@@ -18,12 +20,19 @@ public class Effector {
 	private final Map<Integer, TopologyStrategy> setStrategyChanges;
 	/** Map mapping simulation time to desired targeted links per mirror of the network*/
 	private final Map<Integer, Integer> setTargetedLinkChanges;
+
+	private final Map<Integer, Pair<Integer, List<Data>>> setDataPackageChanges;
+
+	private final Map<Integer, MirrorUpdater> setMirrorUpdateStrategy;
+
+	private final map<Integer, UpdateStrategy> setUpdateStrategy;
 	
 	public Effector(Network n) {
 		this.n = n;
 		setMirrorChanges = new HashMap<>();
 		setStrategyChanges = new HashMap<>();
 		setTargetedLinkChanges = new HashMap<>();
+		setDataPackageChanges = new HashMap<>();
 	}
 	
 	/**Specify that at time step <i>t</i> the number of targeted mirrors is to be changed to <i>m</i>.
