@@ -5,9 +5,9 @@ import java.util.List;
 public class DataPackage {
 
     private List<Data> data;
-    private int dirtyFlag;
+    private List<Integer> dirtyFlag;
 
-    public DataPackage(List<Data> data, int dirtyFlag) {
+    public DataPackage(List<Data> data, List<Integer> dirtyFlag) {
         this.data = data;
         this.dirtyFlag = dirtyFlag;
     }
@@ -16,7 +16,7 @@ public class DataPackage {
         return data;
     }
 
-    public int getDirtyFlag(){
+    public List<Integer> getDirtyFlag(){
         return dirtyFlag;
     }
 

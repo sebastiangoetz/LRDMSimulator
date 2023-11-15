@@ -1,5 +1,4 @@
 @startuml
-
 !define ABSTRACT &#123;abstract&#125;
 
 class TimedRDMSim
@@ -34,7 +33,7 @@ class IDGenerator
   + int getNextID()
 }
 
-interface Network
+class Network
 {
   - Properties props
   - int numTargetMirrors
@@ -50,7 +49,7 @@ interface Network
   + void timeStep(int t)
 }
 
-abstract class MirrorUpdater
+abstract class DirtyFlagUpdateStrategy
 {
   + {abstract} void updateMirrors(Network network)
 }
@@ -146,7 +145,7 @@ class Link
 class DataPackage
 {
   - List<Data> data
-  - int dirtyFlag
+  - List<int> dirtyFlag
   + int getDirtyFlag
   + List<String> getData
   + boolean isLoaded()
@@ -156,7 +155,7 @@ class Data
 {
   - int fileSize
   - int received
-  - String data
+  - String content
   + int getFileSize()
   + int getDirtyFlag
   + String getData
@@ -164,7 +163,7 @@ class Data
   + boolean isLoaded()
 }
 
-abstract class UpdateStrategy
+abstract class DataUpdateStrategy
 {
   + {abstract} void updateData()
 }
@@ -194,6 +193,24 @@ interface TopologyStrategy
     + int getNumTargetLinks(Network)
 }
 
+interface Action{
++ void run(Network, t)
+
+}
+
+class DataPackageAction{
+- int mirrorId
+- List<Data> data
+}
+
+class DataUpdateAction{
+- DataUpdateStrategy dataUpdateStrategy
+}
+
+class DirtyFlagUpdateAction{
+- DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy
+}
+
 class BalancedTreeTopologyStrategy
 
 class FullyConnectedTopologyStrategy
@@ -205,7 +222,7 @@ VisualizationStrategy <|. GraphVisualization
 TimedRDMSim --> Effector
 TimedRDMSim --> "*" Probe
 Network --> TopologyStrategy
-Network --> MirrorUpdater
+Network --> DirtyFlagUpdateStrategy
 Network <--> Effector
 Network *--> "*" Mirror
 Network *-> "*" Link
@@ -214,7 +231,7 @@ IDGenerator <-- Network
 Mirror -> MirrorState
 Mirror *--> Link
 Mirror --> DataPackage
-Mirror --> UpdateStrategy
+Mirror --> DataUpdateStrategy
 Link -> LinkState
 Link --> "source" Mirror
 Link --> "target" Mirror
@@ -223,11 +240,15 @@ Probe <|-- MirrorProbe
 Probe <|-- LinkProbe
 Probe <|-- DataProbe
 
-MirrorUpdater <|-- PushMirrorUpdater
-MirrorUpdater <|-- PullMirrorUpdater
+DirtyFlagUpdateStrategy <|-- PushMirrorUpdater
+DirtyFlagUpdateStrategy <|-- PullMirrorUpdater
 
-UpdateStrategy <|-- DeltaUpdateStrategy
-UpdateStrategy <|-- FullUpdateStrategy
-DataPackage -> Data
+DataUpdateStrategy <|-- DeltaUpdateStrategy
+DataUpdateStrategy <|-- FullUpdateStrategy
+DataPackage -> "*" Data
 TimedRDMSim -> Network
+Action <|.. DataPackageAction
+Action <|.. DataUpdateAction
+Action <|.. DirtyFlagUpdateAction
+Effector --> Action
 @enduml

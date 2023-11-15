@@ -1,5 +1,7 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
+import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.DirtyFlagUpdateStrategy;
 import de.tud.inf.st.trdm.probes.Probe;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
@@ -315,5 +317,17 @@ public class Network {
 		float maxLinks = (m*(m-1))/2f;
 		float linkRatio = 100 * (getNumActiveLinks() / maxLinks);
 		activeLinkHistory.put(simTime, Math.round(linkRatio));
+	}
+
+	public void setDataPackage(int mirrorId, List<Data> data, int timeStep){
+
+	}
+
+	public void setDataUpdateStrategy(DataUpdateStrategy dataUpdateStrategy, int timeStep){
+
+	}
+
+	public void setDirtyFlagUpdateStrategy(DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy, int timeStep){
+
 	}
 }

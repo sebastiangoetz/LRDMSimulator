@@ -1,6 +1,10 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.helper.Pair;
+import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
+import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.DirtyFlagUpdateStrategy;
+import de.tud.inf.st.trdm.action.DataPackageAction;
+import de.tud.inf.st.trdm.action.DataUpdateAction;
+import de.tud.inf.st.trdm.action.DirtyFlagUpdateAction;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
 import java.util.HashMap;
@@ -21,11 +25,11 @@ public class Effector {
 	/** Map mapping simulation time to desired targeted links per mirror of the network*/
 	private final Map<Integer, Integer> setTargetedLinkChanges;
 
-	private final Map<Integer, Pair<Integer, List<Data>>> setDataPackageChanges;
+	private final Map<Integer, DataPackageAction> setDataPackageChanges;
 
-	private final Map<Integer, MirrorUpdater> setMirrorUpdateStrategy;
+	private final Map<Integer, DataUpdateAction> setDataUpdateChanges;
 
-	private final map<Integer, UpdateStrategy> setUpdateStrategy;
+	private final Map<Integer, DirtyFlagUpdateAction> setDirtyFlagUpdateChanges;
 	
 	public Effector(Network n) {
 		this.n = n;
@@ -33,6 +37,8 @@ public class Effector {
 		setStrategyChanges = new HashMap<>();
 		setTargetedLinkChanges = new HashMap<>();
 		setDataPackageChanges = new HashMap<>();
+		setDataUpdateChanges = new HashMap<>();
+		setDirtyFlagUpdateChanges = new HashMap<>();
 	}
 	
 	/**Specify that at time step <i>t</i> the number of targeted mirrors is to be changed to <i>m</i>.
@@ -52,6 +58,18 @@ public class Effector {
 	public void setStrategy(TopologyStrategy strategy, int t) { setStrategyChanges.put(t, strategy); }
 
 	public void setTargetLinksPerMirror(int numTargetedLinks, int t) { setTargetedLinkChanges.put(t, numTargetedLinks); }
+
+	public void setDataPackage(int mirrorId, List<Data> data, int t){
+		setDataPackageChanges.put(t, new DataPackageAction(mirrorId, data));
+	}
+
+	public void setDataUpdateStrategy(DataUpdateStrategy dataUpdateStrategy, int t){
+		setDataUpdateChanges.put(t, new DataUpdateAction(dataUpdateStrategy));
+	}
+
+	public void setDirtyFlagStrategy(DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy, int t){
+		setDirtyFlagUpdateChanges.put(t, new DirtyFlagUpdateAction(dirtyFlagUpdateStrategy));
+	}
 	/**Triggers mirror changes at the respective simulation time step.
 	 * 
 	 * @param t current simulation time
@@ -65,6 +83,15 @@ public class Effector {
 		}
 		if(setTargetedLinkChanges.get(t) != null) {
 			n.setNumTargetedLinksPerMirror(setTargetedLinkChanges.get(t), t);
+		}
+		if(setDataPackageChanges.get(t) != null) {
+			setDataPackageChanges.get(t).run(n, t);
+		}
+		if(setDataUpdateChanges.get(t) != null) {
+			setDataUpdateChanges.get(t).run(n, t);
+		}
+		if(setDirtyFlagUpdateChanges.get(t) != null) {
+			setDirtyFlagUpdateChanges.get(t).run(n, t);
 		}
 	}
 }

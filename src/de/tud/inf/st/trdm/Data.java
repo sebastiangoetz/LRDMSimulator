@@ -6,12 +6,12 @@ public class Data {
     /** how much data of the file measured in GB is already received. has to be less than fileSize. */
     private int received; //in GB
 
-    private int data;
+    private int content;
 
-    public Data(int fileSize, int data) {
+    public Data(int fileSize, int content) {
         this.fileSize = fileSize;
         received = 0;
-        this.data =data;
+        this.content =content;
     }
 
     public int getFileSize() {
@@ -23,7 +23,7 @@ public class Data {
     }
 
     public int getData(){
-        return data;
+        return content;
     }
 
     public void increaseReceived(int amount) {
