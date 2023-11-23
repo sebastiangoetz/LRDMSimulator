@@ -30,6 +30,8 @@ public class Network {
 	private final Map<Integer,Integer> bandwidthHistory;
 	/**The history of active links. A map with simulation time as key and the number of active links as value.*/
 	private final Map<Integer,Integer> activeLinkHistory;
+	/**The history of the time to write metric. The map has simulation time as key and the time to write as value.*/
+	private final Map<Integer,Integer> ttwHistory;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
 	 * Uses the TopologyStrategy to interlink the mirrors.
@@ -61,6 +63,7 @@ public class Network {
 
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
+		ttwHistory = new HashMap<>();
 	}
 
 	/**Adds a probe to the network, which will be called at each simulation time step.
@@ -242,6 +245,12 @@ public class Network {
 		return activeLinkHistory;
 	}
 
+	/**Get the history of the time to write metric.
+	 *
+	 * @return a Map with simulation time as key and the time to write metric as value
+	 */
+	public Map<Integer, Integer> getTtwHistory() { return ttwHistory; }
+
 	/**
 	 * Performs a single simulation step. Clears stopped mirrors and delegates
 	 * simulation to all active mirrors. Notifies all probes.
@@ -315,5 +324,12 @@ public class Network {
 		float maxLinks = (m*(m-1))/2f;
 		float linkRatio = 100 * (getNumActiveLinks() / maxLinks);
 		activeLinkHistory.put(simTime, Math.round(linkRatio));
+		//time to write: number of active links * average time to send a packet from one mirror to another
+		int maxBandwidth = Integer.parseInt(props.getProperty("max_bandwidth"));
+		int minBandwidth = Integer.parseInt(props.getProperty("min_bandwidth"));
+		int fileSize = Integer.parseInt(props.getProperty("fileSize"));
+		int ttwPerUnit = fileSize / (maxBandwidth - minBandwidth)/2;
+		int ttw = getNumActiveLinks() * ttwPerUnit;
+		ttwHistory.put(simTime, ttw);
 	}
 }

@@ -27,15 +27,20 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class GraphVisualization implements VisualizationStrategy {
+    private static final int WIDTH = 1000;
+    private static final int HEIGHT = 800;
     private static final String UI_CLASS = "ui.class";
     private static final String BANDWIDTH = "Bandwidth";
     private static final String ACTIVE_LINKS = "% Active Links";
+    private static final String TTW = "Time to Write";
     private Graph graph;
     private JLabel simTimeLabel;
     private XYChart bandwidthChart;
     private XYChart activeLinksChart;
+    private XYChart timeToWriteChart;
     private JPanel chartPanel;
     private JPanel linkChartPanel;
+    private JPanel ttwChartPanel;
 
     @Override
     public void init(Network network) {
@@ -85,10 +90,10 @@ public class GraphVisualization implements VisualizationStrategy {
         gc = new GridBagConstraints();
         gc.gridx=0;
         gc.gridy=1;
-        gc.gridwidth=1;
+        gc.gridwidth=2;
         gc.fill = GridBagConstraints.HORIZONTAL;
         gl.setConstraints(dv, gc);
-        dv.setMinimumSize(new Dimension(600,400));
+        dv.setMinimumSize(new Dimension(WIDTH,HEIGHT/2));
         panel.add(dv);
 
         bandwidthChart = QuickChart.getChart("Bandwidth over Time","Timestep",BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
@@ -100,8 +105,8 @@ public class GraphVisualization implements VisualizationStrategy {
         gc.gridy=2;
         gc.gridwidth=1;
         gl.setConstraints(chartPanel, gc);
-        chartPanel.setMinimumSize(new Dimension(600,200));
-        chartPanel.setMaximumSize(new Dimension(600,200));
+        chartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/4));
+        chartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/4));
         panel.add(chartPanel);
 
         activeLinksChart = QuickChart.getChart("Active Links", "Timestep", ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
@@ -109,16 +114,29 @@ public class GraphVisualization implements VisualizationStrategy {
         activeLinksChart.getStyler().setLegendVisible(false);
         linkChartPanel = new XChartPanel<>(activeLinksChart);
         gc = new GridBagConstraints();
-        gc.gridx=0;
-        gc.gridy=3;
+        gc.gridx=1;
+        gc.gridy=2;
         gc.gridwidth=1;
         gl.setConstraints(linkChartPanel, gc);
-        linkChartPanel.setMinimumSize(new Dimension(600,200));
-        linkChartPanel.setMaximumSize(new Dimension(600,200));
+        linkChartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/4));
+        linkChartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/4));
         panel.add(linkChartPanel);
 
+        timeToWriteChart = QuickChart.getChart("Time To Write", "Timestep", TTW, TTW, List.of(0), List.of(0));
+        timeToWriteChart.getStyler().setTheme(new MatlabTheme());
+        timeToWriteChart.getStyler().setLegendVisible(false);
+        ttwChartPanel = new XChartPanel<>(timeToWriteChart);
+        gc = new GridBagConstraints();
+        gc.gridx=0;
+        gc.gridy=3;
+        gc.gridwidth=2;
+        gl.setConstraints(ttwChartPanel, gc);
+        ttwChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/4));
+        ttwChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/4));
+        panel.add(ttwChartPanel);
+
         frame.setResizable(false);
-        frame.setSize(600,850);
+        frame.setSize(WIDTH,HEIGHT+50);
         frame.setVisible(true);
 
         frame.addWindowListener(new WindowAdapter() {
@@ -144,12 +162,16 @@ public class GraphVisualization implements VisualizationStrategy {
         List<Integer> timeSteps = new ArrayList<>(network.getBandwidthHistory().keySet());
         List<Integer> bandwidthTS = new ArrayList<>(network.getBandwidthHistory().values());
         List<Integer> activeLinksTS = new ArrayList<>(network.getActiveLinksHistory().values());
+        List<Integer> ttwTS = new ArrayList<>(network.getTtwHistory().values());
 
         bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
         chartPanel.repaint();
 
         activeLinksChart.updateXYSeries(ACTIVE_LINKS, timeSteps, activeLinksTS, null);
         linkChartPanel.repaint();
+
+        timeToWriteChart.updateXYSeries(TTW, timeSteps, ttwTS, null);
+        ttwChartPanel.repaint();
     }
 
     private void updateLinks(Network network) {
