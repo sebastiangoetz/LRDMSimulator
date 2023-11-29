@@ -25,6 +25,8 @@ public class Network {
 	private int numTargetMirrors;
 	private int numTargetLinksPerMirror;
 	private TopologyStrategy strategy;
+	private DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy;
+
 
 	private final Logger log;
 
@@ -328,6 +330,6 @@ public class Network {
 	}
 
 	public void setDirtyFlagUpdateStrategy(DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy, int timeStep){
-
+		this.dirtyFlagUpdateStrategy=dirtyFlagUpdateStrategy;
 	}
 }

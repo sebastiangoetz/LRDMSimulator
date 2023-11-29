@@ -1,5 +1,7 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,9 +30,11 @@ public class Mirror {
 
 	private DataPackage data; //the data hosted on this mirror
 
+	private DataUpdateStrategy dataUpdateStrategy;
+
 	private final Map<Integer, Integer> receivedDataPerTimestep;
 
-	public Mirror(int id, int initTime, Properties props) {
+	public Mirror(int id, int initTime, Properties props, DataUpdateStrategy dataUpdateStrategy) {
 		this.id = id;
 		this.initTime = initTime;
 		// get time to startup
@@ -51,6 +55,8 @@ public class Mirror {
 		data = null;
 
 		receivedDataPerTimestep = new HashMap<>();
+
+		this.dataUpdateStrategy= dataUpdateStrategy;
 	}
 
 	public State getState() {
@@ -87,6 +93,20 @@ public class Mirror {
 			if(l.getActivationTime() > max) max = l.getActivationTime();
 		}
 		maxLinkActiveTime = max;
+	}
+
+	public void setDataUpdateStrategy(DataUpdateStrategy dataUpdateStrategy){
+		this.dataUpdateStrategy = dataUpdateStrategy;
+	}
+
+	public void setDataPackage(List<Data> data, List<Integer> dirtyFlag){
+		DataPackage dataPackage = new DataPackage(data, dirtyFlag);
+		this.data = dataPackage;
+	}
+
+	public void setInvalidFlagState(){
+		state = State.INVALIDFLAG;
+		data.setInvalid(true);
 	}
 	
 	public Set<Link> getLinks() {
@@ -126,7 +146,7 @@ public class Mirror {
 	 */
 	public void timeStep(int currentSimTime) {
 		if (state != State.STOPPING) {
-			if (data != null && data.isLoaded()) {
+			if (data != null && data.isLoaded() && state == State.INVALIDFLAG) {
 				state = State.HASDATA;
 			} else if (currentSimTime - initTime >= readyTime+startupTime+maxLinkActiveTime - 1) {
 				state = State.READY;
@@ -143,20 +163,10 @@ public class Mirror {
 		handleDataTransfer(currentSimTime);
 	}
 
+	//versionsnummer mit benutzen um zu schauen ob geupdatet werden muss
 	private void handleDataTransfer(int currentSimTime) {
 		if(state == State.READY && (data == null || !data.isLoaded())) {
-			//try to fetch data from linked mirrors if necessary
-			//find all ready partners
-			int received = 0;
-			for(Link l : links) {
-				Mirror sourceMirror = getActiveMirrorForLink(l);
-				if(sourceMirror != null) {
-					if (data == null) data = new DataPackage(sourceMirror.getData().getFileSize());
-					data.increaseReceived(l.getCurrentBandwidth());
-					received += l.getCurrentBandwidth();
-				}
-			}
-			receivedDataPerTimestep.put(currentSimTime, received);
+			dataUpdateStrategy.updateData(links, this);
 		}
 	}
 

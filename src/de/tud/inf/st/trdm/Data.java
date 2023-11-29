@@ -22,8 +22,12 @@ public class Data {
         return received;
     }
 
-    public int getData(){
+    public int getContent(){
         return content;
+    }
+
+    public void setContent(int content){
+        this.content = content;
     }
 
     public void increaseReceived(int amount) {
