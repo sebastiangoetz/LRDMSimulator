@@ -13,6 +13,7 @@ public class Mirror {
 	public enum State {
 		DOWN, STARTING, UP, READY, HASDATA, STOPPING, STOPPED
 	}
+	private boolean isRoot;
 
 	private final int id;
 	private State state = State.DOWN;
@@ -20,7 +21,7 @@ public class Mirror {
 	
 	private int shutdownTime = -1;
 
-	private final int initTime; // simulation time when the mirror was started
+	private int initTime; // simulation time when the mirror was started
 	private final int startupTime; // time required to start the container
 	private final int readyTime; // time required to get the data transfered
 	private final int stopTime; // time required to stop the container
@@ -51,10 +52,20 @@ public class Mirror {
 		data = null;
 
 		receivedDataPerTimestep = new HashMap<>();
+
+		isRoot = false;
 	}
 
 	public State getState() {
 		return state;
+	}
+
+	public void setRoot(boolean isRoot) {
+		this.isRoot = isRoot;
+	}
+
+	public boolean isRoot() {
+		return isRoot;
 	}
 
 	public int getID() {
@@ -69,7 +80,16 @@ public class Mirror {
 		links.add(l);
 		if(l.getActivationTime() > maxLinkActiveTime) maxLinkActiveTime = l.getActivationTime();
 	}
-	
+
+	public void crash(int simTime) {
+		if(this.getData() != null) this.getData().reset();
+		this.state = State.STARTING;
+		this.initTime = simTime;
+		for(Link l : links) {
+			l.crash(simTime);
+		}
+	}
+
 	public void removeLink(Link l) {
 		Link toRemove = null;
 		for(Link x : links) {

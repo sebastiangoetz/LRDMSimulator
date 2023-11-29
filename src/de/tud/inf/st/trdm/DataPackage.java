@@ -27,4 +27,8 @@ public class DataPackage {
     public boolean isLoaded() {
         return received == fileSize;
     }
+
+    public void reset() {
+        this.received = 0;
+    }
 }

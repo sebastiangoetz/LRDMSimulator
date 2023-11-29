@@ -24,6 +24,9 @@ public class Network {
 	private int numTargetLinksPerMirror;
 	private TopologyStrategy strategy;
 
+	private double faultProbability = 0.01;
+	private final Random random;
+
 	private final Logger log;
 
 	/**The history of used bandwidth. A map with simulation time as key and the used bandwidth as value.*/
@@ -53,6 +56,7 @@ public class Network {
 		for (int i = 0; i < numMirrors; i++) {
 			mirrors.add(new Mirror(i, 0, props));
 		}
+		mirrors.get(0).setRoot(true);
 		// create the links - default strategy: spanning tree
 		links = strategy.initNetwork(this, props);
 		log = Logger.getLogger(this.getClass().getName());
@@ -60,6 +64,8 @@ public class Network {
 		DataPackage initialData = new DataPackage(fileSize);
 		initialData.increaseReceived(fileSize);
 		mirrors.get(0).setDataPackage(initialData);
+		faultProbability = Double.parseDouble(props.getProperty("fault_probability"));
+		random = new Random();
 
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
@@ -282,10 +288,14 @@ public class Network {
 		//find stopped mirrors to remove them or invoke timeStep on the active mirrors
 		List<Mirror> stoppedMirrors = new ArrayList<>();
 		for (Mirror m : mirrors) {
-			if (m.getState() == Mirror.State.STOPPED)
+			if (m.getState() == Mirror.State.STOPPED) {
 				stoppedMirrors.add(m);
-			else
+			} else {
+				if(random.nextDouble() < faultProbability && !m.isRoot()) {
+					m.crash(simTime);
+				}
 				m.timeStep(simTime);
+			}
 		}
 		mirrors.removeAll(stoppedMirrors);
 	}
@@ -319,17 +329,19 @@ public class Network {
 	 * @param simTime current simulation time
 	 */
 	private void collectMetrics(int simTime) {
-		bandwidthHistory.put(simTime, getBandwidthUsed(simTime));
+		int maxBandwidth = Integer.parseInt(props.getProperty("max_bandwidth"));
+		int minBandwidth = Integer.parseInt(props.getProperty("min_bandwidth"));
+		int fileSize = Integer.parseInt(props.getProperty("fileSize"));
+		int maxTotalBandwidth = strategy.getNumTargetLinks(this) * maxBandwidth;
+		bandwidthHistory.put(simTime, 100*getBandwidthUsed(simTime) / maxTotalBandwidth);
 		int m = getNumTargetMirrors();
 		float maxLinks = (m*(m-1))/2f;
 		float linkRatio = 100 * (getNumActiveLinks() / maxLinks);
 		activeLinkHistory.put(simTime, Math.round(linkRatio));
 		//time to write: number of active links * average time to send a packet from one mirror to another
-		int maxBandwidth = Integer.parseInt(props.getProperty("max_bandwidth"));
-		int minBandwidth = Integer.parseInt(props.getProperty("min_bandwidth"));
-		int fileSize = Integer.parseInt(props.getProperty("fileSize"));
 		int ttwPerUnit = fileSize / (maxBandwidth - minBandwidth)/2;
 		int ttw = getNumActiveLinks() * ttwPerUnit;
-		ttwHistory.put(simTime, ttw);
+		int maxTTW = strategy.getNumTargetLinks(this) * ttwPerUnit;
+		ttwHistory.put(simTime, 100*ttw/maxTTW);
 	}
 }

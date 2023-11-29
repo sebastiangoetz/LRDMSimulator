@@ -30,9 +30,10 @@ public class GraphVisualization implements VisualizationStrategy {
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 800;
     private static final String UI_CLASS = "ui.class";
-    private static final String BANDWIDTH = "Bandwidth";
+    private static final String BANDWIDTH = "% Bandwidth";
     private static final String ACTIVE_LINKS = "% Active Links";
-    private static final String TTW = "Time to Write";
+    private static final String TTW = "% Time to Write";
+    private static final String TIMESTEP = "Timestep";
     private Graph graph;
     private JLabel simTimeLabel;
     private XYChart bandwidthChart;
@@ -96,7 +97,7 @@ public class GraphVisualization implements VisualizationStrategy {
         dv.setMinimumSize(new Dimension(WIDTH,HEIGHT/2));
         panel.add(dv);
 
-        bandwidthChart = QuickChart.getChart("Bandwidth over Time","Timestep",BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
+        bandwidthChart = QuickChart.getChart("Bandwidth over Time",TIMESTEP,BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
         bandwidthChart.getStyler().setTheme(new MatlabTheme());
         bandwidthChart.getStyler().setLegendVisible(false);
         chartPanel = new XChartPanel<>(bandwidthChart);
@@ -109,7 +110,7 @@ public class GraphVisualization implements VisualizationStrategy {
         chartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/4));
         panel.add(chartPanel);
 
-        activeLinksChart = QuickChart.getChart("Active Links", "Timestep", ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
+        activeLinksChart = QuickChart.getChart("Active Links", TIMESTEP, ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
         activeLinksChart.getStyler().setTheme(new MatlabTheme());
         activeLinksChart.getStyler().setLegendVisible(false);
         linkChartPanel = new XChartPanel<>(activeLinksChart);
@@ -122,7 +123,7 @@ public class GraphVisualization implements VisualizationStrategy {
         linkChartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/4));
         panel.add(linkChartPanel);
 
-        timeToWriteChart = QuickChart.getChart("Time To Write", "Timestep", TTW, TTW, List.of(0), List.of(0));
+        timeToWriteChart = QuickChart.getChart("Time To Write", TIMESTEP, TTW, TTW, List.of(0), List.of(0));
         timeToWriteChart.getStyler().setTheme(new MatlabTheme());
         timeToWriteChart.getStyler().setLegendVisible(false);
         ttwChartPanel = new XChartPanel<>(timeToWriteChart);

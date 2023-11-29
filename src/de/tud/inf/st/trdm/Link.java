@@ -15,7 +15,7 @@ public class Link {
 	private final Mirror source;
 	private final Mirror target;
 	
-	private final int initTime;
+	private int initTime;
 	private final int minBandwidth;
 	private final int maxBandwidth;
 	private int endsActiveTime = -1;
@@ -69,6 +69,12 @@ public class Link {
 	
 	public void shutdown() {
 		state = State.CLOSED;
+	}
+
+	public void crash(int simTime) {
+		this.state = State.INACTIVE;
+		this.initTime = simTime;
+		this.endsActiveTime = -1;
 	}
 	
 	public void timeStep(int t) {
