@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * Created: 14.05.2023
  */
 public class TimedRDMSim {
-	private Logger log;
+	private final Logger log;
 	private int lastTimeStep;
 	private Network network;
 	private final Properties props;
