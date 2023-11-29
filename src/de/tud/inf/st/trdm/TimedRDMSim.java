@@ -41,10 +41,9 @@ public class TimedRDMSim {
 
 	public TimedRDMSim(String conf) {
 		props = new Properties();
+		log = Logger.getLogger(TimedRDMSim.class.getName());
 		try(FileReader fr = new FileReader(conf)) {
 			System.setProperty("org.graphstream.ui", "swing");
-			log = Logger.getLogger(TimedRDMSim.class.getName());
-
 			props.load(fr);
 			probes = new ArrayList<>();
 			debug = Boolean.parseBoolean(props.getProperty("debug"));
@@ -119,6 +118,7 @@ public class TimedRDMSim {
 	 * all probes and timeStep on the effector.
 	 */
 	public void run() {
+		lastTimeStep = -1;
 		for (int t = 0; t < simTime; t++) {
 			if (debug)
 				for (Probe p : probes)

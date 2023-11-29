@@ -11,6 +11,8 @@ import org.graphstream.ui.view.Viewer;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYSeries;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 import org.knowm.xchart.style.theme.MatlabTheme;
 
 import javax.swing.*;
@@ -18,10 +20,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -100,6 +100,9 @@ public class GraphVisualization implements VisualizationStrategy {
         bandwidthChart = QuickChart.getChart("Bandwidth over Time",TIMESTEP,BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
         bandwidthChart.getStyler().setTheme(new MatlabTheme());
         bandwidthChart.getStyler().setLegendVisible(false);
+        XYSeries targetBW = bandwidthChart.addSeries("Target",List.of(0),List.of(0));
+        targetBW.setMarker(SeriesMarkers.NONE);
+
         chartPanel = new XChartPanel<>(bandwidthChart);
         gc = new GridBagConstraints();
         gc.gridx=0;
@@ -113,6 +116,8 @@ public class GraphVisualization implements VisualizationStrategy {
         activeLinksChart = QuickChart.getChart("Active Links", TIMESTEP, ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
         activeLinksChart.getStyler().setTheme(new MatlabTheme());
         activeLinksChart.getStyler().setLegendVisible(false);
+        XYSeries targetAL = activeLinksChart.addSeries("Target Active Links",List.of(0),List.of(0));
+        targetAL.setMarker(SeriesMarkers.NONE);
         linkChartPanel = new XChartPanel<>(activeLinksChart);
         gc = new GridBagConstraints();
         gc.gridx=1;
@@ -126,6 +131,8 @@ public class GraphVisualization implements VisualizationStrategy {
         timeToWriteChart = QuickChart.getChart("Time To Write", TIMESTEP, TTW, TTW, List.of(0), List.of(0));
         timeToWriteChart.getStyler().setTheme(new MatlabTheme());
         timeToWriteChart.getStyler().setLegendVisible(false);
+        XYSeries targetTTW = timeToWriteChart.addSeries("Target Time To Write",List.of(0),List.of(0));
+        targetTTW.setMarker(SeriesMarkers.NONE);
         ttwChartPanel = new XChartPanel<>(timeToWriteChart);
         gc = new GridBagConstraints();
         gc.gridx=0;
@@ -162,16 +169,22 @@ public class GraphVisualization implements VisualizationStrategy {
 
         List<Integer> timeSteps = new ArrayList<>(network.getBandwidthHistory().keySet());
         List<Integer> bandwidthTS = new ArrayList<>(network.getBandwidthHistory().values());
+        List<Integer> bandwidthGoalTS = Collections.nCopies(network.getBandwidthHistory().size(),40);
         List<Integer> activeLinksTS = new ArrayList<>(network.getActiveLinksHistory().values());
+        List<Integer> activeLinksGoalTS = Collections.nCopies(network.getActiveLinksHistory().size(),35);
         List<Integer> ttwTS = new ArrayList<>(network.getTtwHistory().values());
+        List<Integer> ttwGoalTS = Collections.nCopies(network.getTtwHistory().size(), 45);
 
         bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
+        bandwidthChart.updateXYSeries("Target", timeSteps, bandwidthGoalTS,null);
         chartPanel.repaint();
 
         activeLinksChart.updateXYSeries(ACTIVE_LINKS, timeSteps, activeLinksTS, null);
+        activeLinksChart.updateXYSeries("Target Active Links", timeSteps, activeLinksGoalTS,null);
         linkChartPanel.repaint();
 
         timeToWriteChart.updateXYSeries(TTW, timeSteps, ttwTS, null);
+        timeToWriteChart.updateXYSeries("Target Time To Write", timeSteps, ttwGoalTS,null);
         ttwChartPanel.repaint();
     }
 

@@ -7,7 +7,10 @@ import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.FullyConnectedTopology;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +29,10 @@ class AppTest {
     int link_activation_time_max;
 
     public void initSimulator() throws IOException {
+        initSimulator(config);
+    }
+
+    public void initSimulator(String config) throws IOException {
         loadProperties(config);
         startup_time_min = Integer.parseInt(props.get("startup_time_min").toString());
         startup_time_max = Integer.parseInt(props.get("startup_time_max").toString());
@@ -36,6 +43,36 @@ class AppTest {
         sim = new TimedRDMSim(config);
         sim.setHeadless(false);
     }
+
+    @Test
+    void testMissingConfig() {
+        assertDoesNotThrow(() -> new TimedRDMSim("does-not-exist.conf"));
+    }
+
+    @Test
+    void testUnreadableConfig() throws IOException {
+        try (RandomAccessFile f = new RandomAccessFile(config,"rw")) {
+            FileChannel channel = f.getChannel();
+            channel.lock();
+            assertDoesNotThrow(() -> new TimedRDMSim(config));
+        }
+    }
+
+    @Test
+    void testHeadlessNoDebug() throws IOException {
+        initSimulator("resources/sim-test-short.conf");
+        sim.setHeadless(true);
+        sim.initialize(null);
+        assertDoesNotThrow(() -> sim.run());
+    }
+
+    @Test
+    void testWrongUsageOfRunStep() throws IOException {
+        initSimulator();
+        sim.initialize(null);
+        assertDoesNotThrow(() -> sim.runStep(5));
+    }
+
     @Test()
     void testInitializeHasToBeCalled() throws IOException {
         initSimulator();
@@ -61,7 +98,7 @@ class AppTest {
         for(int t = 1; t < sim.getSimTime(); t++) {
             System.out.println("timestep: "+t+" mirrors: "+mp.getNumMirrors());
             sim.runStep(t);
-            if(t < 10) assertEquals(5, mp.getNumMirrors());
+            if(t < 10) assertEquals(10, mp.getNumMirrors());
             else if(t >= 30) assertEquals(20, mp.getNumMirrors());
             assertFalse(mp.getMirrors().isEmpty());
             assertTrue(mp.getNumReadyMirrors() <= mp.getNumTargetMirrors());
@@ -78,7 +115,7 @@ class AppTest {
         assert(mp != null);
         for(int t = 1; t < sim.getSimTime(); t++) {
             sim.runStep(t);
-            if(t < 10) assertEquals(5, mp.getNumMirrors());
+            if(t < 10) assertEquals(10, mp.getNumMirrors());
             else if(t >= 15) assertEquals(2, mp.getNumMirrors());
         }
     }
