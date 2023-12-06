@@ -13,7 +13,7 @@ import java.util.*;
  *
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  */
-public class BalancedTreeTopologyStrategy implements TopologyStrategy {
+public class BalancedTreeTopologyStrategy extends TopologyStrategy {
 
     /**Initializes the network already having the amount of mirrors as specified in the properties and
      * connects these mirrors forming a balanced tree.
@@ -146,11 +146,7 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
      */
     @Override
     public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
-        List<Mirror> mirrorsToAdd = new ArrayList<>();
-        for(int i = 0; i < newMirrors; i++) {
-            Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props);
-            mirrorsToAdd.add(m);
-        }
+        List<Mirror> mirrorsToAdd = createMirrors(newMirrors, simTime, props);
         //add links by filling up existing nodes with less than the max amount of links per node
         List<Link> linksToAdd = new ArrayList<>();
         List<Mirror> mirrorsToLink = new ArrayList<>(mirrorsToAdd);

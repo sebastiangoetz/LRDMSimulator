@@ -12,7 +12,7 @@ import java.util.*;
  *
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  */
-public class FullyConnectedTopology implements TopologyStrategy {
+public class FullyConnectedTopology extends TopologyStrategy {
     /**Initializes the network by connecting all mirrors to one another.
      *
      * @param n the {@link Network}
@@ -67,11 +67,7 @@ public class FullyConnectedTopology implements TopologyStrategy {
      */
     @Override
     public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
-        List<Mirror> addedMirrors = new ArrayList<>();
-        for(int i = 0; i < newMirrors; i++) {
-            Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props);
-            addedMirrors.add(m);
-        }
+        List<Mirror> addedMirrors = createMirrors(newMirrors, simTime, props);
         n.getMirrors().addAll(addedMirrors);
         for(Mirror m : addedMirrors) {
             List<Link> links = connectMirrorToAllOthers(n, props, simTime, m);
@@ -98,22 +94,6 @@ public class FullyConnectedTopology implements TopologyStrategy {
             }
         }
         return links;
-    }
-
-    /**Remove the requested amount of links from the network.
-     * The mirrors with the highest ID will be removed first.
-     * Does not directly remove the mirrors, but calls {@link Mirror#shutdown(int)}.
-     *
-     * @param n the {@link Network}
-     * @param removeMirrors the number of {@link Mirror}s to remove
-     * @param props {@link Properties} of the simulation
-     * @param simTime current simulation time
-     */
-    @Override
-    public void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime) {
-        for(int i = 0; i < removeMirrors; i++) {
-            n.getMirrorsSortedById().get(n.getNumMirrors()-1-i).shutdown(simTime);
-        }
     }
 
     /**Returns the number of links expected for the overall network according to this strategy.

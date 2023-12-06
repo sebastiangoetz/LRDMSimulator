@@ -129,6 +129,11 @@ public class Mirror {
 		return links.stream().filter(l -> l.getState() != Link.State.CLOSED).count();
 	}
 
+	/**Checks of this mirror is linked with the other mirror either as a source or target mirror.
+	 *
+	 * @param m The potentielly linked mirror.
+	 * @return True if there is a link, else false.
+	 */
 	public boolean isLinkedWith(Mirror m) {
 		boolean linked = false;
 		for(Link l : links) {

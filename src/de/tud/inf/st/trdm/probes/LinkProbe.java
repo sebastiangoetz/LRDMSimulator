@@ -23,6 +23,14 @@ public class LinkProbe extends Probe {
 		return n.getLinks();
 	}
 
+	public int getActiveLinkMetric(int simTime) {
+		return n.getActiveLinksHistory().get(simTime);
+	}
+
+	public double getLinkRatio() {
+		return ratio;
+	}
+
 	@Override
 	public void print(int simTime) {
 		Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Links ] NC/Active/Target/Ratio:  {1} | {2} | {3} | {4}",new Object[]{simTime, n.getNumLinks(),n.getNumActiveLinks(),n.getNumTargetLinks(),NumberFormat.getInstance().format(ratio)});

@@ -90,7 +90,7 @@ public class TimedRDMSim {
 	}
 
 	/**
-	 * @return the current simulation time
+	 * @return the simulation time
 	 */
 	public int getSimTime() {
 		return simTime;
