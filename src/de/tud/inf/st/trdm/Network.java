@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.effectors.Effector;
 import de.tud.inf.st.trdm.probes.Probe;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
@@ -70,6 +71,10 @@ public class Network {
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
 		ttwHistory = new HashMap<>();
+	}
+
+	public Properties getProps() {
+		return props;
 	}
 
 	/**Adds a probe to the network, which will be called at each simulation time step.

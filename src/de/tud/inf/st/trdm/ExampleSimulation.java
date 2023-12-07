@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.effectors.Effector;
 import de.tud.inf.st.trdm.probes.Probe;
 import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.FullyConnectedTopology;

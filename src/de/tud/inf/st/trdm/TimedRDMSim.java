@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.effectors.Effector;
 import de.tud.inf.st.trdm.probes.LinkProbe;
 import de.tud.inf.st.trdm.probes.MirrorProbe;
 import de.tud.inf.st.trdm.probes.Probe;

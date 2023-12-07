@@ -1,7 +1,10 @@
-package de.tud.inf.st.trdm;
+package de.tud.inf.st.trdm.effectors;
 
+import de.tud.inf.st.trdm.Network;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
+import de.tud.inf.st.trdm.util.IDGenerator;
 
+import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +16,11 @@ import java.util.Map;
 public class Effector {
 	private final Network n;
 	/** Map mapping simulation time to desired mirrors (sim_time -> num_mirrors)*/
-	private final Map<Integer, Integer> setMirrorChanges;
+	private final Map<Integer, ChangeMirrorAction> setMirrorChanges;
 	/** Map mapping simulation time to desired topology strategy */
 	private final Map<Integer, TopologyStrategy> setStrategyChanges;
 	/** Map mapping simulation time to desired targeted links per mirror of the network*/
-	private final Map<Integer, Integer> setTargetedLinkChanges;
+	private final Map<Integer, TargetLinkChange> setTargetedLinkChanges;
 	
 	public Effector(Network n) {
 		this.n = n;
@@ -31,8 +34,16 @@ public class Effector {
 	 * @param m number of mirrors
 	 * @param t time step when to apply this effect
 	 */
-	public void setMirrors(int m, int t) {
-		setMirrorChanges.put(t, m);
+	public Action setMirrors(int m, int t) {
+		ChangeMirrorAction a = new ChangeMirrorAction(n, IDGenerator.getInstance().getNextID(), t, m);
+		setMirrorChanges.put(t, a);
+		return a;
+	}
+
+	public void removeAction(Action a) {
+		if(a instanceof ChangeMirrorAction) {
+			setMirrorChanges.remove(a.getTime(),a);
+		}
 	}
 
 	/**Specify that at time step <i>t</i> the topology strategy shall be changed to the one given as parameter.
@@ -42,7 +53,11 @@ public class Effector {
 	 */
 	public void setStrategy(TopologyStrategy strategy, int t) { setStrategyChanges.put(t, strategy); }
 
-	public void setTargetLinksPerMirror(int numTargetedLinks, int t) { setTargetedLinkChanges.put(t, numTargetedLinks); }
+	public TargetLinkChange setTargetLinksPerMirror(int numTargetedLinks, int t) {
+		TargetLinkChange tlc = new TargetLinkChange(n, IDGenerator.getInstance().getNextID(), t, numTargetedLinks);
+		setTargetedLinkChanges.put(t, tlc);
+		return tlc;
+	}
 	/**Triggers mirror changes at the respective simulation time step.
 	 * 
 	 * @param t current simulation time
@@ -52,10 +67,10 @@ public class Effector {
 			n.setTopologyStrategy(setStrategyChanges.get(t), t);
 		}
 		if(setMirrorChanges.get(t) != null) {
-			n.setNumMirrors(setMirrorChanges.get(t), t);
+			n.setNumMirrors(setMirrorChanges.get(t).getNewMirrors(), t);
 		}
 		if(setTargetedLinkChanges.get(t) != null) {
-			n.setNumTargetedLinksPerMirror(setTargetedLinkChanges.get(t), t);
+			n.setNumTargetedLinksPerMirror(setTargetedLinkChanges.get(t).getNewLinksPerMirror(), t);
 		}
 	}
 }

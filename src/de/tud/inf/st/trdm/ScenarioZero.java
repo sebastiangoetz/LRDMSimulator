@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm;
 
+import de.tud.inf.st.trdm.effectors.Action;
 import de.tud.inf.st.trdm.probes.LinkProbe;
 import de.tud.inf.st.trdm.probes.MirrorProbe;
 import de.tud.inf.st.trdm.probes.Probe;
@@ -27,6 +28,7 @@ public class ScenarioZero {
         }
 
         int mirrors = mp.getNumMirrors();
+        int lpm = mp.getNumTargetMirrors(); //check
         int epsilon = 2;
         //rules:
         // bandwidth     <= 40%
@@ -39,11 +41,16 @@ public class ScenarioZero {
                 if (lp.getActiveLinkMetric(t) < 35-epsilon) {
                     Logger.getLogger(ScenarioZero.class.getName()).info("\t-> removing a mirror to increase AL%");
                     mirrors--;
-                    sim.getEffector().setMirrors(mirrors, t + 1);
-                } else if(lp.getActiveLinkMetric(t) > 35+epsilon) {
-                    Logger.getLogger(ScenarioZero.class.getName()).info("\t-> adding a mirror to decrease AL%");
-                    mirrors += 2;
-                    sim.getEffector().setMirrors(mirrors, t + 1);
+                    lpm++;
+                    Action a = sim.getEffector().setMirrors(mirrors, t + 1);
+                    Action b = sim.getEffector().setTargetLinksPerMirror(lpm, t + 1);
+                    if(a.getEffect().getLatency() > b.getEffect().getLatency()) {
+                        sim.getEffector().removeAction(a);
+                        mirrors++;
+                    } else {
+                        sim.getEffector().removeAction(b);
+                        lpm--;
+                    }
                 }
             }
         }
