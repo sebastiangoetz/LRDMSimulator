@@ -80,6 +80,10 @@ class AppTest {
     void testExampleSimulator() {
         assertDoesNotThrow(()->ExampleSimulation.main(new String[]{}));
     }
+    @Test
+    void testSzenarioZero() {
+        assertDoesNotThrow(()->ScenarioZero.main(new String[]{}));
+    }
 
     @Test
     void testMirrorChange() throws IOException {

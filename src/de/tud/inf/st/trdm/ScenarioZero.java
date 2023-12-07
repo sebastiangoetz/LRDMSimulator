@@ -5,6 +5,7 @@ import de.tud.inf.st.trdm.probes.MirrorProbe;
 import de.tud.inf.st.trdm.probes.Probe;
 import de.tud.inf.st.trdm.topologies.NConnectedTopology;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ScenarioZero {
@@ -33,7 +34,7 @@ public class ScenarioZero {
         // active links  >= 35%
         for(int t = 1; t < sim.getSimTime(); t++) {
             sim.runStep(t);
-            Logger.getLogger(ScenarioZero.class.getName()).info("Active Links: " + lp.getActiveLinkMetric(t) + "%  Startup Ratio: " + lp.getLinkRatio());
+            Logger.getLogger(ScenarioZero.class.getName()).log(Level.INFO,"Active Links: {0}%  Startup Ratio: {1}",new Object[] {lp.getActiveLinkMetric(t),lp.getLinkRatio()});
             if(lp.getLinkRatio() > 0.75) {
                 if (lp.getActiveLinkMetric(t) < 35-epsilon) {
                     Logger.getLogger(ScenarioZero.class.getName()).info("\t-> removing a mirror to increase AL%");
