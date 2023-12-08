@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm.topologies;
 
+import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
 import de.tud.inf.st.trdm.Link;
 import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;
@@ -145,10 +146,10 @@ public class BalancedTreeTopologyStrategy implements TopologyStrategy {
      * @param simTime current simulation time
      */
     @Override
-    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
+    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime, DataUpdateStrategy dataUpdateStrategy) {
         List<Mirror> mirrorsToAdd = new ArrayList<>();
         for(int i = 0; i < newMirrors; i++) {
-            Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props);
+            Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props, dataUpdateStrategy);
             mirrorsToAdd.add(m);
         }
         //add links by filling up existing nodes with less than the max amount of links per node

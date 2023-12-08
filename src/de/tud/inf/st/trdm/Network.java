@@ -3,6 +3,7 @@ package de.tud.inf.st.trdm;
 import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
 import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.DirtyFlagUpdateStrategy;
 import de.tud.inf.st.trdm.probes.Probe;
+import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
 import java.util.*;
@@ -27,6 +28,10 @@ public class Network {
 	private TopologyStrategy strategy;
 	private DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy;
 
+	private DataUpdateStrategy dataUpdateStrategy;
+
+	private static Network instance;
+
 
 	private final Logger log;
 
@@ -43,28 +48,34 @@ public class Network {
 	 * @param numLinks the number of links each mirror should have
 	 * @param props the properties of the simulation
 	 */
-	public Network(TopologyStrategy strategy, int numMirrors, int numLinks, int fileSize, Properties props) {
+	//default-UpdateStrategy speichern und z.B. an topologyStrategy weitergeben
+	public Network(TopologyStrategy strategy, int numMirrors, int numLinks, DataPackage dataPackage, Properties props, DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy, DataUpdateStrategy dataUpdateStrategy) {
 		numTargetMirrors = numMirrors;
 		numTargetLinksPerMirror = numLinks;
 		this.props = props;
 		mirrors = new ArrayList<>();
 		probes = new ArrayList<>();
 		this.strategy = strategy;
+		this.dirtyFlagUpdateStrategy = dirtyFlagUpdateStrategy;
+		this.dataUpdateStrategy = dataUpdateStrategy;
 
 		// create the mirrors
 		for (int i = 0; i < numMirrors; i++) {
-			mirrors.add(new Mirror(i, 0, props));
+			mirrors.add(new Mirror(i, 0, props, dataUpdateStrategy));
 		}
 		// create the links - default strategy: spanning tree
 		links = strategy.initNetwork(this, props);
 		log = Logger.getLogger(this.getClass().getName());
 		//put a new data package on the first mirror
-		DataPackage initialData = new DataPackage(fileSize);
-		initialData.increaseReceived(fileSize);
-		mirrors.get(0).setDataPackage(initialData);
+		mirrors.get(0).setDataPackage(dataPackage);
 
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
+		instance = this;
+	}
+
+	public static Network getInstance(){
+		return instance;
 	}
 
 	/**Adds a probe to the network, which will be called at each simulation time step.
@@ -116,7 +127,7 @@ public class Network {
 	public void setNumMirrors(int newMirrors, int simTime) {
 		log.log(Level.INFO, "setNumMirrors({0},{1})",  new Object[] {newMirrors, simTime});
 		if (newMirrors > mirrors.size()) { // create new mirrors
-			strategy.handleAddNewMirrors(this, newMirrors - mirrors.size(), props, simTime);
+			strategy.handleAddNewMirrors(this, newMirrors - mirrors.size(), props, simTime, dataUpdateStrategy);
 		} else if (newMirrors < mirrors.size()) { // send shutdown signal to mirrors being too much
 			strategy.handleRemoveMirrors(this, mirrors.size() - newMirrors, props, simTime);
 		}
@@ -321,15 +332,22 @@ public class Network {
 		activeLinkHistory.put(simTime, Math.round(linkRatio));
 	}
 
-	public void setDataPackage(int mirrorId, List<Data> data, int timeStep){
-
+	public void setDataPackage(int mirrorId, DataPackage data, int timeStep){
+		for(Mirror m:mirrors){
+			if(m.getID()==mirrorId){
+				m.setDataPackage(data);
+			}
+		}
 	}
 
 	public void setDataUpdateStrategy(DataUpdateStrategy dataUpdateStrategy, int timeStep){
-
+		for(Mirror m: mirrors){
+			m.setDataUpdateStrategy(dataUpdateStrategy);
+		}
 	}
 
 	public void setDirtyFlagUpdateStrategy(DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy, int timeStep){
 		this.dirtyFlagUpdateStrategy=dirtyFlagUpdateStrategy;
 	}
+
 }

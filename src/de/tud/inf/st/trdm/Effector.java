@@ -59,7 +59,7 @@ public class Effector {
 
 	public void setTargetLinksPerMirror(int numTargetedLinks, int t) { setTargetedLinkChanges.put(t, numTargetedLinks); }
 
-	public void setDataPackage(int mirrorId, List<Data> data, int t){
+	public void setDataPackage(int mirrorId, DataPackage data, int t){
 		setDataPackageChanges.put(t, new DataPackageAction(mirrorId, data));
 	}
 

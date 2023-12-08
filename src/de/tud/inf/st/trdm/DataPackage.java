@@ -30,6 +30,18 @@ public class DataPackage {
         return dirtyFlag;
     }
 
+    public boolean equalDirtyFlag(List<Integer> otherDirtyFlag){
+        if(dirtyFlag.size() != otherDirtyFlag.size()){
+            return false;
+        }
+        for(int i=0;i<dirtyFlag.size();i++){
+            if(dirtyFlag.get(i)!= otherDirtyFlag.get(i)){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean isLoaded() {
         for (Data datum : data) {
             if (!datum.isLoaded()) {

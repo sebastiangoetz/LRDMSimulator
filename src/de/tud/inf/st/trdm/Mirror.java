@@ -166,7 +166,10 @@ public class Mirror {
 	//versionsnummer mit benutzen um zu schauen ob geupdatet werden muss
 	private void handleDataTransfer(int currentSimTime) {
 		if(state == State.READY && (data == null || !data.isLoaded())) {
-			dataUpdateStrategy.updateData(links, this);
+			Network n = Network.getInstance();
+			if(dataUpdateStrategy.updateRequired(this, n)) {
+				dataUpdateStrategy.updateData(this, n);
+			}
 		}
 	}
 

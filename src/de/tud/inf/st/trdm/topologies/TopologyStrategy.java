@@ -1,5 +1,7 @@
 package de.tud.inf.st.trdm.topologies;
 
+import de.tud.inf.st.trdm.Data;
+import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
 import de.tud.inf.st.trdm.Link;
 import de.tud.inf.st.trdm.Network;
 
@@ -13,7 +15,7 @@ import java.util.Set;
 public interface TopologyStrategy {
 	Set<Link> initNetwork(Network n, Properties props);
 	void restartNetwork(Network n, Properties props, int simTime);
-	void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime);
+	void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime, DataUpdateStrategy dataUpdateStrategy);
 	void handleRemoveMirrors(Network n, int removeMirrors, Properties props, int simTime);
 	int getNumTargetLinks(Network n);
 }

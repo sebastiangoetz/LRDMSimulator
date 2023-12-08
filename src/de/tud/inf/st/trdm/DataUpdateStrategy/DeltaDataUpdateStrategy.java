@@ -3,13 +3,14 @@ package de.tud.inf.st.trdm.DataUpdateStrategy;
 import de.tud.inf.st.trdm.DataPackage;
 import de.tud.inf.st.trdm.Link;
 import de.tud.inf.st.trdm.Mirror;
+import de.tud.inf.st.trdm.Network;
 
 import java.util.Set;
 
 public class DeltaDataUpdateStrategy implements DataUpdateStrategy{
     @Override
-    public void updateData(Set<Link> links, Mirror m) {
-        for(Link l:links){
+    public void updateData(Mirror m, Network n) {
+        for(Link l:m.getLinks()){
             if(!l.getSource().getData().getInvalid()){
                 DeltaUpdate(m, l.getSource(), l);
                 break;
@@ -19,6 +20,18 @@ public class DeltaDataUpdateStrategy implements DataUpdateStrategy{
                 break;
             }
         }
+    }
+
+    @Override
+    public boolean updateRequired(Mirror m, Network n){
+        for(Link l: m.getLinks()){
+            if(l.getSource().getData().getInvalid()!= l.getTarget().getData().getInvalid()){
+                if(l.getSource().getData().equalDirtyFlag(l.getTarget().getData().getDirtyFlag())){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void DeltaUpdate(Mirror m, Mirror m2, Link l){
