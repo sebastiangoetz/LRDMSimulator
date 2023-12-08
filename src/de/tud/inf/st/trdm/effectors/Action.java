@@ -2,6 +2,11 @@ package de.tud.inf.st.trdm.effectors;
 
 import de.tud.inf.st.trdm.Network;
 
+/**Represents an adaptation action to be performed at a specific point in simulation time.
+ * Refers to an {@link Effect}, which is able to predict the effect on selected non-functional requirements and the latency of this action.
+ *
+ * @author Sebastian Götz (sebastian.goetz@acm.org)
+ */
 public class Action {
     private final int id;
     private final int time;

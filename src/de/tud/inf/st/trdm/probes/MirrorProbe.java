@@ -62,6 +62,13 @@ public class MirrorProbe extends Probe {
 	public int getNumTargetMirrors() {
 		return n.getNumTargetMirrors();
 	}
+
+	/**
+	 * @return the number of links per mirror
+	 */
+	public int getNumTargetLinksPerMirror() {
+		return n.getNumTargetLinksPerMirror();
+	}
 	
 	/**
 	 * @return (double) 0..1 ratio between ready mirrors and mirrors which shall be ready. 1.0 means all are ready.

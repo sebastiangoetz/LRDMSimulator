@@ -28,7 +28,7 @@ public class ScenarioZero {
         }
 
         int mirrors = mp.getNumMirrors();
-        int lpm = mp.getNumTargetMirrors(); //check
+        int lpm = mp.getNumTargetLinksPerMirror();
         int epsilon = 2;
         //rules:
         // bandwidth     <= 40%
@@ -39,15 +39,16 @@ public class ScenarioZero {
             Logger.getLogger(ScenarioZero.class.getName()).log(Level.INFO,"Active Links: {0}%  Startup Ratio: {1}",new Object[] {lp.getActiveLinkMetric(t),lp.getLinkRatio()});
             if(lp.getLinkRatio() > 0.75) {
                 if (lp.getActiveLinkMetric(t) < 35-epsilon) {
-                    Logger.getLogger(ScenarioZero.class.getName()).info("\t-> removing a mirror to increase AL%");
                     mirrors--;
                     lpm++;
                     Action a = sim.getEffector().setMirrors(mirrors, t + 1);
                     Action b = sim.getEffector().setTargetLinksPerMirror(lpm, t + 1);
                     if(a.getEffect().getLatency() > b.getEffect().getLatency()) {
+                        Logger.getLogger(ScenarioZero.class.getName()).info("\t-> increasing the links per mirror to increase AL%");
                         sim.getEffector().removeAction(a);
                         mirrors++;
                     } else {
+                        Logger.getLogger(ScenarioZero.class.getName()).info("\t-> removing a mirror to increase AL%");
                         sim.getEffector().removeAction(b);
                         lpm--;
                     }
