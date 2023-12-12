@@ -20,6 +20,7 @@ import java.util.logging.Logger;
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  */
 public class TimedRDMSim {
+	private static final String DEFAULT_CONFIG_NAME = "sim.conf";
 	private final Logger log;
 	private int lastTimeStep;
 	private Network network;
@@ -56,21 +57,20 @@ public class TimedRDMSim {
 
 	private String initConfigFile(String conf) {
 		if(conf == null) {
-			if(!new File("sim.conf").exists()) {
-				try(InputStream in = getClass().getResourceAsStream("/sim.conf");
+			if(!new File(DEFAULT_CONFIG_NAME).exists()) {
+				try(InputStream in = getClass().getResourceAsStream("/"+DEFAULT_CONFIG_NAME);
 					BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-					FileWriter out = new FileWriter(new File("sim.conf"))) {
+					FileWriter out = new FileWriter(new File(DEFAULT_CONFIG_NAME))) {
 						String line;
 						while((line = reader.readLine()) != null) {
 							out.write(line+System.lineSeparator());
-							System.out.println(line);
 						}
-						return "sim.conf";
+						return DEFAULT_CONFIG_NAME;
 				} catch(IOException ioe) {
 					log.warning("Could not read configuration.");
 				}
 			} else {
-				return "sim.conf";
+				return DEFAULT_CONFIG_NAME;
 			}
 		}
 		return conf;

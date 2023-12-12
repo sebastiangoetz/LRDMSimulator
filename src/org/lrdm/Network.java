@@ -376,11 +376,11 @@ public class Network {
 		boolean newMirrorsFound = true;
 		while(newMirrorsFound) {
 			newMirrorsFound = false;
-			Set<Link> links = new HashSet<>();
+			Set<Link> alllinks = new HashSet<>();
 			for(Mirror m : visitedMirrors) {
-				links.addAll(m.getLinks());
+				alllinks.addAll(m.getLinks());
 			}
-			for (Link l : links) {
+			for (Link l : alllinks) {
 				boolean srcAdded = visitedMirrors.add(l.getSource());
 				boolean tgtAdded = visitedMirrors.add(l.getTarget());
 				if(srcAdded || tgtAdded) newMirrorsFound = true;
