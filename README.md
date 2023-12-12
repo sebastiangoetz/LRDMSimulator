@@ -20,7 +20,7 @@ To write your own optimizer setup a new Java project in your favorite IDE and ad
 A simple example looks as follows:
 
 ```java
-import org.lrdm.TimedRDMSim
+import org.lrdm.TimedRDMSim;
 
 class Example {
     public static void main(String args[]) {
