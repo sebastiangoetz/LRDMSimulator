@@ -15,7 +15,6 @@ public class ExampleOptimizer {
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         TimedRDMSim sim = new TimedRDMSim();
         sim.initialize(new NConnectedTopology());
-        //sim.initialize(new FullyConnectedTopology());
 
         LinkProbe lp = sim.getLinkProbe();
         MirrorProbe mp = sim.getMirrorProbe();
@@ -29,7 +28,7 @@ public class ExampleOptimizer {
         // active links  >= 35%
         for (int t = 1; t < sim.getSimTime(); t++) {
             sim.runStep(t);
-            Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO, "Active Links: {0}%  Startup Ratio: {1}", new Object[]{lp.getActiveLinkMetric(t), lp.getLinkRatio()});
+            Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO, "[t={0}] Active Links: {1}%  Startup Ratio: {2}", new Object[]{t,lp.getActiveLinkMetric(t), lp.getLinkRatio()});
             if (lp.getLinkRatio() > 0.75 && lp.getActiveLinkMetric(t) < 35 - epsilon) {
                 mirrors--;
                 lpm++;
@@ -37,12 +36,10 @@ public class ExampleOptimizer {
                 Action b = sim.getEffector().setTargetLinksPerMirror(lpm, t + 1);
                 if (a.getEffect().getLatency() > b.getEffect().getLatency()) {
                     Logger.getLogger(ExampleOptimizer.class.getName()).info("\t-> increasing the links per mirror to increase AL%");
-                    Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO, "\t   -> This will increase AL by {0}%.", new Object[]{b.getEffect().getDeltaActiveLinks()});
                     sim.getEffector().removeAction(a);
                     mirrors++;
                 } else {
                     Logger.getLogger(ExampleOptimizer.class.getName()).info("\t-> removing a mirror to increase AL%");
-                    Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO, "\t   -> This will increase AL by {0}%.", new Object[]{a.getEffect().getDeltaActiveLinks()});
                     sim.getEffector().removeAction(b);
                     lpm--;
                 }

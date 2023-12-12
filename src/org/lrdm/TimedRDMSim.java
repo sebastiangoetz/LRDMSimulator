@@ -7,9 +7,7 @@ import org.lrdm.probes.Probe;
 import org.lrdm.topologies.BalancedTreeTopologyStrategy;
 import org.lrdm.topologies.TopologyStrategy;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -35,12 +33,13 @@ public class TimedRDMSim {
 	private boolean headless; //no visualization
 
 	public TimedRDMSim() {
-		this("resources/sim.conf");
+		this(null);
 	}
 
 	public TimedRDMSim(String conf) {
-		props = new Properties();
 		log = Logger.getLogger(TimedRDMSim.class.getName());
+		conf = initConfigFile(conf);
+		props = new Properties();
 		try(FileReader fr = new FileReader(conf)) {
 			System.setProperty("org.graphstream.ui", "swing");
 			props.load(fr);
@@ -53,6 +52,28 @@ public class TimedRDMSim {
 		} catch (IOException e) {
 			log.warning("I cannot access the sim.conf in your current folder.");
 		}
+	}
+
+	private String initConfigFile(String conf) {
+		if(conf == null) {
+			if(!new File("sim.conf").exists()) {
+				try(InputStream in = getClass().getResourceAsStream("/sim.conf");
+					BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+					FileWriter out = new FileWriter(new File("sim.conf"))) {
+						String line;
+						while((line = reader.readLine()) != null) {
+							out.write(line+System.lineSeparator());
+							System.out.println(line);
+						}
+						return "sim.conf";
+				} catch(IOException ioe) {
+					log.warning("Could not read configuration.");
+				}
+			} else {
+				return "sim.conf";
+			}
+		}
+		return conf;
 	}
 
 	public void setHeadless(boolean headless) {

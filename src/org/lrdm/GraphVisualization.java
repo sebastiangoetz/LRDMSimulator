@@ -267,7 +267,8 @@ public class GraphVisualization implements VisualizationStrategy {
     }
 
     private String loadGraphCSS() {
-        try(BufferedReader br = new BufferedReader(new FileReader("resources/graph.css"))) {
+        try(InputStream in = getClass().getResourceAsStream("/graph.css");
+            BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
             StringBuilder ret = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {
