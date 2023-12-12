@@ -357,7 +357,11 @@ public class Network {
 		int ttw = getNumHops() * ttwPerUnit;
 		int minTTW = ttwPerUnit;
 		int maxTTW = ttwPerUnit * Math.round(m / 2f);
-		ttwHistory.put(simTime, 100 - 100*(ttw-minTTW)/(maxTTW-minTTW));
+		if(maxTTW == minTTW) {
+			ttwHistory.put(simTime, 100);
+		} else {
+			ttwHistory.put(simTime, 100 - 100 * (ttw - minTTW) / (maxTTW - minTTW));
+		}
 	}
 
 	private int getNumHops() {
