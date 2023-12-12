@@ -10,12 +10,12 @@ interface VisualizationStrategy {
     void updateGraph(Network network, long timeStep)
 }
 
-interface TopologyStrategy
+abstract class TopologyStrategy
 {
-    + Set<Link> initNetwork(Network,Properties)
-    + void handleAddNewMirrors(Network,newMirrors,Properties)
-    + void handleRemoveMirrors(Network,removeMirrors,Properties)
-    + int getNumTargetLinks(Network)
+    + initNetwork(Network,Properties) : Set<Link>
+    + handleAddNewMirrors(Network,newMirrors,Properties) : void
+    + handleRemoveMirrors(Network,removeMirrors,Properties) :void
+    + getNumTargetLinks(Network) : int
 }
 
 abstract class Probe

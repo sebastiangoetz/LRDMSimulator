@@ -1,9 +1,9 @@
 @startuml
 class TimedRDMSim
 {
-  + int getSimTime()
-  + void run()
-  + void runStep(int t)
+  + getSimTime() : int
+  + run() : void
+  + runStep(int t) : void
 }
 
 class Effector
@@ -11,6 +11,7 @@ class Effector
   + setMirrors(int m, int t) : Action
   + setStrategy(TopologyStrategy strategy, int t) : Action
   + setTargetLinksPerMirror(int numTargetedLinks, int t) : Action
+  + removeAction(a : Action) : void
   + timeStep(int t)
 }
 
@@ -21,10 +22,10 @@ class Action
 }
 
 class Effect {
-    + deltaActiveLinks() : int
-    + deltaBandwidth() : int
-    + deltaTimeToWrite() : int
-    + requiredTimeSteps() : int
+    + getDeltaActiveLinks() : int
+    + getDeltaBandwidth() : int
+    + getDeltaTimeToWrite() : int
+    + getLatency() : int
 }
 
 class MirrorChange {

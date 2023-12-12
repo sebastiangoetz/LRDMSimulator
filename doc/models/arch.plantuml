@@ -8,9 +8,9 @@ class TimedRDMSim
 
 class Effector
 {
-  + setMirrors(int m, int t)
-  + setStrategy(TopologyStrategy strategy, int t)
-  + setTargetLinksPerMirror(int numTargetedLinks, int t)
+  + setMirrors(int m, int t) : Action
+  + setStrategy(TopologyStrategy strategy, int t) : Action
+  + setTargetLinksPerMirror(int numTargetedLinks, int t) : Action
   + timeStep(int t)
 }
 
@@ -34,4 +34,6 @@ Probe <|-- MirrorProbe
 Probe <|-- LinkProbe
 
 TimedRDMSim -> Network
+
+Network <-- Probe
 @enduml
