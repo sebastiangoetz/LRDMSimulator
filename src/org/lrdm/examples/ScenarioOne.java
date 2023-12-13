@@ -10,8 +10,10 @@ public class ScenarioOne {
         TimedRDMSim sim = new TimedRDMSim("resources/sim-test-2.conf");
         sim.initialize(new NConnectedTopology());
         int t = 10;
+        sim.getEffector().setTargetLinksPerMirror(8, 10);
         for(int m = 20; m < 100; m+=10) {
             sim.getEffector().setMirrors(m, t);
+
             t += 10;
         }
         sim.run();

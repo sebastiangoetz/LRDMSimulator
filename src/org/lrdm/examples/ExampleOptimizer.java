@@ -34,12 +34,14 @@ public class ExampleOptimizer {
                 lpm++;
                 Action a = sim.getEffector().setMirrors(mirrors, t + 1);
                 Action b = sim.getEffector().setTargetLinksPerMirror(lpm, t + 1);
-                if (a.getEffect().getLatency() > b.getEffect().getLatency()) {
+                if (a.getEffect().getLatency() < b.getEffect().getLatency()) {
                     Logger.getLogger(ExampleOptimizer.class.getName()).info("\t-> increasing the links per mirror to increase AL%");
+                    Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO,"\t   -> BW change: {0}%",new Object[] {b.getEffect().getDeltaBandwidth(sim.getProps())});
                     sim.getEffector().removeAction(a);
                     mirrors++;
                 } else {
                     Logger.getLogger(ExampleOptimizer.class.getName()).info("\t-> removing a mirror to increase AL%");
+                    Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO,"\t   -> BW change: {0}%",new Object[] {a.getEffect().getDeltaBandwidth(sim.getProps())});
                     sim.getEffector().removeAction(b);
                     lpm--;
                 }

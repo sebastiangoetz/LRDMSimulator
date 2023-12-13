@@ -116,6 +116,10 @@ public class TimedRDMSim {
 		return simTime;
 	}
 
+	public Properties getProps() {
+		return props;
+	}
+
 	/**
 	 * Get the probes of the network observing it.
 	 * 

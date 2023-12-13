@@ -5,6 +5,8 @@ import org.lrdm.topologies.FullyConnectedTopology;
 import org.lrdm.topologies.NConnectedTopology;
 import org.lrdm.topologies.TopologyStrategy;
 
+import java.util.Properties;
+
 /**Represents the effect of an adaptation action. Enables to retrieve the effect on the three metrics: active links, bandwidth and time to write.
  * Additionally provides latency information on the adaptation action.
  *
@@ -73,12 +75,21 @@ public class Effect {
     }
 
     /**Returns the change of the relative bandwidth metric which will be introduced by performing the action.
+     * That is the difference of the current relative bandwidth after {@link #getLatency()} timesteps.
      *
      * @return the change in percent (0..1)
      */
-    public int getDeltaBandwidth() {
-        //TODO how will the relative bandwidth change in the next timestep due to the adaptation?
-        return 0;
+    public int getDeltaBandwidth(Properties props) {
+        //how will the relative bandwidth change if the adaptation action is applied (i.e., after latency time steps)
+        int currentRelativeBandwidth = action.getNetwork().getBandwidthHistory().get(action.getTime()-1);
+        int maxBandwidthPerLink = Integer.parseInt(props.getProperty("max_bandwidth"));
+        int maxTotalBandwidth = action.getNetwork().getTopologyStrategy().getNumTargetLinks(action.getNetwork()) * maxBandwidthPerLink;
+        int predictedTotalBandwidth = action.getNetwork().getPredictedBandwidth(action.getTime() + getLatency() - 1);
+        int newRelativeBandwidth = 100 * predictedTotalBandwidth / maxTotalBandwidth;
+        System.out.println("Current: "+action.getNetwork().getBandwidthUsed(action.getTime()-1));
+        System.out.println("Predicted: "+predictedTotalBandwidth);
+        System.out.println("Latency: "+getLatency());
+        return currentRelativeBandwidth - newRelativeBandwidth;
     }
 
     /**Returns the change of the relative time to write metric which will be introduced by performing the action.
@@ -86,7 +97,7 @@ public class Effect {
      * @return the change in percent (0..1)
      */
     public int getDeltaTimeToWrite() {
-        //TODO how will ttc change in the next timestep?
+
         return 0;
     }
 

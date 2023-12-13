@@ -39,6 +39,11 @@ public class Network {
 	/**The history of the time to write metric. The map has simulation time as key and the time to write as value.*/
 	private final Map<Integer,Integer> ttwHistory;
 
+	/** History of sending links. */
+	private final Map<Integer, Integer> sendingLinksHistory;
+
+	private int currentTimeStep = 0;
+
 	/**Creates a new network. Uses parameters for number of mirrors and links.
 	 * Uses the TopologyStrategy to interlink the mirrors.
 	 *
@@ -73,7 +78,8 @@ public class Network {
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
 		ttwHistory = new HashMap<>();
-	}
+		sendingLinksHistory = new HashMap<>();
+    }
 
 	public Properties getProps() {
 		return props;
@@ -291,6 +297,7 @@ public class Network {
 		}
 
 		collectMetrics(simTime);
+		currentTimeStep = simTime;
 	}
 
 	/**Inspect the network for mirrors in STOPPED state to remove them from the network.
@@ -362,6 +369,7 @@ public class Network {
 		} else {
 			ttwHistory.put(simTime, 100 - 100 * (ttw - minTTW) / (maxTTW - minTTW));
 		}
+		sendingLinksHistory.put(simTime, getCurrentSendingLinks());
 	}
 
 	private int getNumHops() {
@@ -388,5 +396,70 @@ public class Network {
 			if(newMirrorsFound) hops++;
 		}
 		return hops;
+	}
+
+	/**Returns the number of sending links at the current time or a future timestep.
+	 *
+	 * @param timeStep the timestep of the simulation for which you want to know the number of sending links
+	 * @return the number of sending links
+	 */
+    public int getSendingLinks(int timeStep) {
+		if(timeStep == currentTimeStep) {
+			return getCurrentSendingLinks();
+		} else if(timeStep > currentTimeStep) {
+			int nsend = 0;
+			int steps = timeStep - currentTimeStep;
+			for(Link l : links) {
+				if(l.isSending()) {
+					Mirror rec = l.getReceiver();
+					int remaining = rec.getData().getFileSize() - rec.getData().getReceived();
+					if(remaining / l.getCurrentBandwidth() > steps) {
+						nsend++; //this is the case where the mirror will still receive data after steps timesteps
+					} else {
+						//the mirror received the data and starts to send it to the mirrors connected to it
+						for(Link l2 : rec.getLinks()) {
+							if(l2 == l) continue;
+							nsend++; //assumption: we do not predict further in the future than a couple of steps, else we need a recursive approach for this
+						}
+					}
+				}
+			}
+			return nsend;
+		} else {
+			return sendingLinksHistory.get(timeStep);
+		}
+    }
+
+	private int getCurrentSendingLinks() {
+		int nsend = 0;
+		for(Link l : links) {
+			if(l.isSending()) {
+				nsend++;
+			}
+		}
+		return nsend;
+	}
+
+	public int getPredictedBandwidth(int timeStep) {
+		if(timeStep <= currentTimeStep) return getBandwidthUsed(timeStep);
+		else {
+			int bwused = 0;
+			int steps = timeStep - currentTimeStep;
+			for(Link l : links) {
+				if(l.isSending()) {
+					Mirror rec = l.getReceiver();
+					int remaining = rec.getData().getFileSize() - rec.getData().getReceived();
+					if(remaining / l.getCurrentBandwidth() > steps) {
+						bwused += l.getCurrentBandwidth(); //this is the case where the mirror will still receive data after steps timesteps
+					} else {
+						for(Link l2 : rec.getLinks()) {
+							if(l2 == l) continue;
+							bwused += l2.getCurrentBandwidth();
+						}
+					}
+				}
+			}
+			return bwused;
+		}
 	}
 }
