@@ -23,7 +23,7 @@ A simple example looks as follows:
 import org.lrdm.TimedRDMSim;
 
 class Example {
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         TimedRDMSim sim = new TimedRDMSim("sim.conf");
         sim.initialize(new BalancedTreeTopologyStrategy());
         Effector effector = sim.getEffector();
