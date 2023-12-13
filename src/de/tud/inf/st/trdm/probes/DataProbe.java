@@ -1,5 +1,6 @@
 package de.tud.inf.st.trdm.probes;
 
+import de.tud.inf.st.trdm.DirtyFlag;
 import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;
 
@@ -13,9 +14,9 @@ public class DataProbe extends Probe{
     //aktuellste Version
     //wie viele Versionen gibt es
     //ratio zwischen aktuellste Version und Rest
-    private List<List<Integer>> dirtyFlagList;
+    private List<DirtyFlag> dirtyFlagList;
 
-    private List<Integer> newest;
+    private DirtyFlag newest;
 
     private double ratio;
 
@@ -28,32 +29,35 @@ public class DataProbe extends Probe{
     public void update(int simTime) {
         List<Mirror> mirrorList = n.getMirrors();
         dirtyFlagList = new ArrayList<>();
-        newest = new ArrayList<>();
+        newest = new DirtyFlag(new ArrayList<>());
         ratio = 0;
         updateParameters(mirrorList);
     }
 
     @Override
     public void print(int simTime) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,flagToString(newest), dirtyFlagList.size(), ratio});
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,flagToString(newest.getDirtyFlag()), dirtyFlagList.size(), ratio});
     }
 
     private void updateParameters(List<Mirror> mirrorList){
         int newestPackage=0;
-        newest.add(0);
-        newest.add(0);
-        newest.add(0);
-        List<Integer> dirtyFlag;
+        List<Integer> helper = new ArrayList<>();
+        helper.set(0,1);
+        helper.set(0,1);
+        helper.set(0,1);
+        newest.setDirtyFlag(helper);
+        DirtyFlag dirtyFlag;
         for(Mirror m:mirrorList){
             dirtyFlag = m.getData().getDirtyFlag();
             if(!inDirtyFlagList(dirtyFlag)){
                 dirtyFlagList.add(dirtyFlag);
             }
-            switch (compareFlag(dirtyFlag, newest)) {
+            switch (dirtyFlag.compareFlag(newest.getDirtyFlag())) {
                 case 1 -> {
-                    newest.set(0, dirtyFlag.get(0));
-                    newest.set(1, dirtyFlag.get(1));
-                    newest.set(2, dirtyFlag.get(2));
+                    helper.set(0, dirtyFlag.getDirtyFlag().get(0));
+                    helper.set(1, dirtyFlag.getDirtyFlag().get(1));
+                    helper.set(2, dirtyFlag.getDirtyFlag().get(2));
+                    newest.setDirtyFlag(helper);
                     newestPackage = 1;
                 }
                 case 2 -> newestPackage++;
@@ -62,30 +66,15 @@ public class DataProbe extends Probe{
         ratio = (double) newestPackage/ (double)n.getNumTargetMirrors();
     }
 
-    private boolean inDirtyFlagList(List<Integer> newDirtyFlag){
-        for(List<Integer> dirtyFlag:dirtyFlagList){
-            for(int i = 0;i<dirtyFlag.size();i++){
-                if(dirtyFlag.get(i)!= newDirtyFlag.get(i)){
-                    break;
-                }
-                if(i==2){
+    private boolean inDirtyFlagList(DirtyFlag newDirtyFlag){
+        for(DirtyFlag dirtyFlag:dirtyFlagList){
+            for(int i = 0;i<dirtyFlag.getDirtyFlag().size();i++){
+                if(dirtyFlag.equalDirtyFlag(newDirtyFlag.getDirtyFlag())){
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    private int compareFlag(List<Integer> dirtyFlag, List<Integer> newest){
-        for(int i=0;i<dirtyFlag.size();i++){
-            if(dirtyFlag.get(i) < newest.get(i)){
-                return 0;
-            }
-            if(dirtyFlag.get(i) > newest.get(i)){
-                return 1;
-            }
-        }
-        return 2;
     }
 
     private String flagToString(List<Integer> dirtyFlag){

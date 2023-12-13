@@ -5,10 +5,10 @@ import java.util.List;
 public class DataPackage {
 
     private List<Data> data;
-    private List<Integer> dirtyFlag;
+    private DirtyFlag dirtyFlag;
     boolean invalid= false;
 
-    public DataPackage(List<Data> data, List<Integer> dirtyFlag) {
+    public DataPackage(List<Data> data, DirtyFlag dirtyFlag) {
         this.data = data;
         this.dirtyFlag = dirtyFlag;
     }
@@ -26,20 +26,8 @@ public class DataPackage {
         return data;
     }
 
-    public List<Integer> getDirtyFlag(){
+    public DirtyFlag getDirtyFlag(){
         return dirtyFlag;
-    }
-
-    public boolean equalDirtyFlag(List<Integer> otherDirtyFlag){
-        if(dirtyFlag.size() != otherDirtyFlag.size()){
-            return false;
-        }
-        for(int i=0;i<dirtyFlag.size();i++){
-            if(dirtyFlag.get(i)!= otherDirtyFlag.get(i)){
-                return false;
-            }
-        }
-        return true;
     }
 
     public boolean isLoaded() {

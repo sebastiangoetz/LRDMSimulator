@@ -30,6 +30,8 @@ public class Mirror {
 
 	private DataPackage data; //the data hosted on this mirror
 
+	private DirtyFlag lookingFlag;
+
 	private DataUpdateStrategy dataUpdateStrategy;
 
 	private final Map<Integer, Integer> receivedDataPerTimestep;
@@ -57,6 +59,14 @@ public class Mirror {
 		receivedDataPerTimestep = new HashMap<>();
 
 		this.dataUpdateStrategy= dataUpdateStrategy;
+	}
+
+	public DirtyFlag getLookingFlag() {
+		return lookingFlag;
+	}
+
+	public void setLookingFlag(DirtyFlag lookingFlag){
+		this.lookingFlag = lookingFlag;
 	}
 
 	public State getState() {
@@ -99,9 +109,10 @@ public class Mirror {
 		this.dataUpdateStrategy = dataUpdateStrategy;
 	}
 
-	public void setDataPackage(List<Data> data, List<Integer> dirtyFlag){
+	public void setDataPackage(List<Data> data, DirtyFlag dirtyFlag){
 		DataPackage dataPackage = new DataPackage(data, dirtyFlag);
 		this.data = dataPackage;
+		this.lookingFlag = dataPackage.getDirtyFlag();
 	}
 
 	public void setInvalidFlagState(){

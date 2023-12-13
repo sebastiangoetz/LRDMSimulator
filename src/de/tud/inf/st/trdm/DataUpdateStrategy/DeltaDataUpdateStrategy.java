@@ -26,7 +26,7 @@ public class DeltaDataUpdateStrategy implements DataUpdateStrategy{
     public boolean updateRequired(Mirror m, Network n){
         for(Link l: m.getLinks()){
             if(l.getSource().getData().getInvalid()!= l.getTarget().getData().getInvalid()){
-                if(l.getSource().getData().equalDirtyFlag(l.getTarget().getData().getDirtyFlag())){
+                if(l.getSource().getData().getDirtyFlag().equalDirtyFlag(l.getTarget().getData().getDirtyFlag().getDirtyFlag())){
                     return true;
                 }
             }
