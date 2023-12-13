@@ -63,4 +63,13 @@ fault_probability=0.005
 
 Exemplary configuration files can be found within the release in the ``resources`` folder.
 
-To get an overview of the framework, have a look at the Javadoc (to found in folder doc/javadoc).
+To get an overview of the framework, have a look at the Javadoc (to be found in folder doc/javadoc).
+
+## Developer Setup
+
+To extend the simulator framework, just clone the repository and import it in your IDE as a Maven project.
+
+You can build the framework using ``mvn package``, which will run all tests, too. This will take quite a while. If you do this on a machine without screen, you need to skip the tests: ``mvn package -DskipTests=true``. This is, because the visualization code is tested, too. 
+
+This project is preconfigured to work with [SonarQube](https://www.sonarsource.com/products/sonarqube/) and JaCoCo. If you want to get an overview with a local SonarQube use:
+``mvn clean verify jacoco:report sonar:sonar -Dsonar.projectKey=<<YourName>> -Dsonar.host.url=http://localhost:9000 -Dsonar.token=<<YourToken>> -f pom.xml``
