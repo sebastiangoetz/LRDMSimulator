@@ -1,5 +1,6 @@
 package org.lrdm;
 
+import org.lrdm.effectors.Action;
 import org.lrdm.examples.ExampleOptimizer;
 import org.lrdm.examples.ExampleSimulation;
 import org.lrdm.probes.LinkProbe;
@@ -8,6 +9,7 @@ import org.lrdm.probes.Probe;
 import org.lrdm.topologies.BalancedTreeTopologyStrategy;
 import org.lrdm.topologies.FullyConnectedTopology;
 import org.junit.jupiter.api.Test;
+import org.lrdm.topologies.NConnectedTopology;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -107,6 +109,33 @@ class AppTest {
             assertFalse(mp.getMirrors().isEmpty());
             assertTrue(mp.getNumReadyMirrors() <= mp.getNumTargetMirrors());
             assertEquals(mp.getMirrorRatio(), (double) mp.getNumReadyMirrors() / mp.getNumTargetMirrors());
+        }
+    }
+
+    @Test
+    void testDeltaEffects() throws IOException {
+        initSimulator();
+        sim.initialize(new NConnectedTopology());
+        MirrorProbe mp = null;
+        for(Probe p : sim.getProbes()) {
+            if(p instanceof  MirrorProbe) {
+                mp = (MirrorProbe) p;
+            }
+        }
+        for(int t = 1; t < sim.getSimTime(); t++) {
+            System.out.println("timestep: "+t+" mirrors: "+mp.getNumMirrors());
+            sim.runStep(t);
+            Action a = sim.getEffector().setMirrors(mp.getNumMirrors()+1, t+1);
+            int ttw = a.getEffect().getDeltaTimeToWrite();
+            int bw = a.getEffect().getDeltaBandwidth(sim.getProps());
+            double al = a.getEffect().getDeltaActiveLinks();
+            assertTrue(ttw >= -100);
+            assertTrue(ttw <= 100);
+            assertTrue(bw >= -100);
+            assertTrue(bw <= 100);
+            assertTrue(al >= -100);
+            assertTrue(al <= 100);
+            assertDoesNotThrow(() -> a.getEffect().getLatency());
         }
     }
 
