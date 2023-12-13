@@ -29,11 +29,11 @@ public class Effect {
         int m = action.getNetwork().getNumMirrors();
         int lpm = action.getNetwork().getNumTargetLinksPerMirror();
         if(action instanceof MirrorChange a) {
-            return getDeltaActiveLinksForMirrorChange(a, topo, m, lpm);
+            return -1*getDeltaActiveLinksForMirrorChange(a, topo, m, lpm);
         } else if(action instanceof TargetLinkChange a) {
-            return getDeltaActiveLinksForTargetLinkChange(a, topo, m, lpm);
+            return -1*getDeltaActiveLinksForTargetLinkChange(a, topo, m, lpm);
         } else {
-            return getDeltaActiveLinksForTopologyChange((TopologyChange) action, topo, m, lpm);
+            return -1*getDeltaActiveLinksForTopologyChange((TopologyChange) action, topo, m, lpm);
         }
     }
 
@@ -83,12 +83,9 @@ public class Effect {
         //how will the relative bandwidth change if the adaptation action is applied (i.e., after latency time steps)
         int currentRelativeBandwidth = action.getNetwork().getBandwidthHistory().get(action.getTime()-1);
         int maxBandwidthPerLink = Integer.parseInt(props.getProperty("max_bandwidth"));
-        int maxTotalBandwidth = action.getNetwork().getTopologyStrategy().getNumTargetLinks(action.getNetwork()) * maxBandwidthPerLink;
+        int predictedMaxTotalBandwidth = action.getNetwork().getTopologyStrategy().getPredictedNumTargetLinks(action) * maxBandwidthPerLink;
         int predictedTotalBandwidth = action.getNetwork().getPredictedBandwidth(action.getTime() + getLatency() - 1);
-        int newRelativeBandwidth = 100 * predictedTotalBandwidth / maxTotalBandwidth;
-        System.out.println("Current: "+action.getNetwork().getBandwidthUsed(action.getTime()-1));
-        System.out.println("Predicted: "+predictedTotalBandwidth);
-        System.out.println("Latency: "+getLatency());
+        int newRelativeBandwidth = 100 * predictedTotalBandwidth / predictedMaxTotalBandwidth;
         return currentRelativeBandwidth - newRelativeBandwidth;
     }
 

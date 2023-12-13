@@ -3,6 +3,8 @@ package org.lrdm.topologies;
 import org.lrdm.Link;
 import org.lrdm.Mirror;
 import org.lrdm.Network;
+import org.lrdm.effectors.Action;
+import org.lrdm.effectors.MirrorChange;
 import org.lrdm.util.IDGenerator;
 
 import java.util.*;
@@ -185,5 +187,12 @@ public class BalancedTreeTopologyStrategy extends TopologyStrategy {
     @Override
     public int getNumTargetLinks(Network n) {
         return n.getMirrors().size() - 1;
+    }
+
+    @Override
+    public int getPredictedNumTargetLinks(Action a) {
+        int m = a.getNetwork().getNumMirrors();
+        if(a instanceof MirrorChange mc) m += mc.getNewMirrors();
+        return m - 1;
     }
 }

@@ -51,6 +51,10 @@ public class Link {
 		return state;
 	}
 
+	/**Returns a random bandwidth between the min and max values specified in the simulation properties.
+	 *
+	 * @return random bandwidth between min and max
+	 */
 	public int getCurrentBandwidth() {
 		return rand.nextInt(minBandwidth,maxBandwidth);
 	}
@@ -123,5 +127,9 @@ public class Link {
 
 	public int getActivationTime() {
 		return activationTime;
+	}
+
+	public int getAverageBandwidth() {
+		return (maxBandwidth-minBandwidth)/2;
 	}
 }

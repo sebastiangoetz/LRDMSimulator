@@ -3,6 +3,8 @@ package org.lrdm.topologies;
 import org.lrdm.Link;
 import org.lrdm.Mirror;
 import org.lrdm.Network;
+import org.lrdm.effectors.Action;
+import org.lrdm.effectors.MirrorChange;
 import org.lrdm.util.IDGenerator;
 
 import java.util.*;
@@ -104,5 +106,14 @@ public class FullyConnectedTopology extends TopologyStrategy {
     @Override
     public int getNumTargetLinks(Network n) {
         return (n.getNumMirrors() * (n.getNumMirrors() - 1)) / 2;
+    }
+
+    @Override
+    public int getPredictedNumTargetLinks(Action a) {
+        int m = a.getNetwork().getNumMirrors() ;
+        if(a instanceof MirrorChange mc) {
+            m += mc.getNewMirrors();
+        }
+        return (m*(m-1))/2;
     }
 }

@@ -449,12 +449,12 @@ public class Network {
 				if(l.isSending()) {
 					Mirror rec = l.getReceiver();
 					int remaining = rec.getData().getFileSize() - rec.getData().getReceived();
-					if(remaining / l.getCurrentBandwidth() > steps) {
-						bwused += l.getCurrentBandwidth(); //this is the case where the mirror will still receive data after steps timesteps
+					if(remaining / l.getAverageBandwidth() > steps) {
+						bwused += l.getAverageBandwidth(); //this is the case where the mirror will still receive data after steps timesteps
 					} else {
 						for(Link l2 : rec.getLinks()) {
 							if(l2 == l) continue;
-							bwused += l2.getCurrentBandwidth();
+							bwused += l2.getAverageBandwidth();
 						}
 					}
 				}

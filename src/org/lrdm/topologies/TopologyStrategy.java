@@ -3,6 +3,7 @@ package org.lrdm.topologies;
 import org.lrdm.Link;
 import org.lrdm.Mirror;
 import org.lrdm.Network;
+import org.lrdm.effectors.Action;
 import org.lrdm.util.IDGenerator;
 
 import java.util.ArrayList;
@@ -43,6 +44,13 @@ public abstract class TopologyStrategy {
 	 * @return number of total links expected for the network
 	 */
 	public abstract int getNumTargetLinks(Network n);
+
+	/**Is meant to return the expected number of total links in the network if the action would be executed.
+	 *
+	 * @param a the {@link Action} which might be executed
+	 * @return number of predicted total links
+	 */
+	public abstract int getPredictedNumTargetLinks(Action a);
 
 	/**Creates the given amount of mirrors and adds them to the network.
 	 *
