@@ -63,4 +63,4 @@ fault_probability=0.005
 
 Exemplary configuration files can be found within the release in the ``resources`` folder.
 
-To get an overview of the framework, have a look at the [Javadoc](https://sebastiangoetz.github.io/TimedRDMSimulator/doc/javadoc/).
+To get an overview of the framework, have a look at the Javadoc (to found in folder doc/javadoc).
