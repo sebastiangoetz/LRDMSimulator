@@ -39,9 +39,6 @@ public class Network {
 	/**The history of the time to write metric. The map has simulation time as key and the time to write as value.*/
 	private final Map<Integer,Integer> ttwHistory;
 
-	/** History of sending links. */
-	private final Map<Integer, Integer> sendingLinksHistory;
-
 	private int currentTimeStep = 0;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
@@ -78,7 +75,6 @@ public class Network {
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
 		ttwHistory = new HashMap<>();
-		sendingLinksHistory = new HashMap<>();
     }
 
 	public int getCurrentTimeStep() {
@@ -369,7 +365,6 @@ public class Network {
 		} else {
 			ttwHistory.put(simTime, 100 - 100 * (ttw - 1) / (maxTTW - 1));
 		}
-		sendingLinksHistory.put(simTime, getCurrentSendingLinks());
 	}
 
 	private int getNumHops() {
@@ -396,16 +391,6 @@ public class Network {
 			if(newMirrorsFound) hops++;
 		}
 		return hops;
-	}
-
-	private int getCurrentSendingLinks() {
-		int nsend = 0;
-		for(Link l : links) {
-			if(l.isSending()) {
-				nsend++;
-			}
-		}
-		return nsend;
 	}
 
 	public int getPredictedBandwidth(int timeStep) {
