@@ -61,7 +61,9 @@ max_bandwidth=8
 fault_probability=0.005
 ```
 
-Exemplary configuration files can be found within the release in the ``resources`` folder.
+If you do not provide this file, predefined values will be used and the file will be created for you. Once created, this file will be used instead of the predefined version. Thus, you can start the example from the paper on most systems by simply executing the jar. 
+
+Further exemplary configuration files used, e.g., for testing, can be found within the release in the ``resources`` folder.
 
 To get an overview of the framework, have a look at the Javadoc (to be found in folder doc/javadoc).
 
