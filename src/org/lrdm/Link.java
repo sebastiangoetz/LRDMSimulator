@@ -64,7 +64,8 @@ public class Link {
 	}
 
 	public boolean isSending() {
-		return isActive() && (source.getState() == Mirror.State.HASDATA || target.getState() == Mirror.State.HASDATA);
+		return isActive() && ((source.getState() == Mirror.State.HASDATA && target.getState() != Mirror.State.HASDATA)
+				|| (target.getState() == Mirror.State.HASDATA && source.getState() != Mirror.State.HASDATA));
 	}
 
 	public Mirror getReceiver() {

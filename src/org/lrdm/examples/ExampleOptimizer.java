@@ -36,21 +36,14 @@ public class ExampleOptimizer {
                 Action b = sim.getEffector().setTargetLinksPerMirror(lpm, t + 1);
                 if (a.getEffect().getLatency() > b.getEffect().getLatency()) {
                     Logger.getLogger(ExampleOptimizer.class.getName()).info("\t-> increasing the links per mirror to increase AL%");
-                    logDeltas(b, sim);
                     sim.getEffector().removeAction(a);
                     mirrors++;
                 } else {
                     Logger.getLogger(ExampleOptimizer.class.getName()).info("\t-> removing a mirror to increase AL%");
-                    logDeltas(a, sim);
                     sim.getEffector().removeAction(b);
                     lpm--;
                 }
             }
         }
-    }
-
-    private static void logDeltas(Action b, TimedRDMSim sim) {
-        Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO,"\t   -> AL change: {0}%",new Object[] {100*b.getEffect().getDeltaActiveLinks()});
-        Logger.getLogger(ExampleOptimizer.class.getName()).log(Level.INFO,"\t   -> BW change: {0}%",new Object[] {b.getEffect().getDeltaBandwidth(sim.getProps())});
     }
 }

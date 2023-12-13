@@ -81,7 +81,7 @@ public class Effect {
      */
     public int getDeltaBandwidth(Properties props) {
         //how will the relative bandwidth change if the adaptation action is applied (i.e., after latency time steps)
-        int currentRelativeBandwidth = action.getNetwork().getBandwidthHistory().get(action.getTime()-1);
+        int currentRelativeBandwidth = action.getNetwork().getBandwidthHistory().get(action.getNetwork().getCurrentTimeStep());
         int maxBandwidthPerLink = Integer.parseInt(props.getProperty("max_bandwidth"));
         int predictedMaxTotalBandwidth = action.getNetwork().getTopologyStrategy().getPredictedNumTargetLinks(action) * maxBandwidthPerLink;
         int predictedTotalBandwidth = action.getNetwork().getPredictedBandwidth(action.getTime() + getLatency() - 1);
@@ -94,8 +94,32 @@ public class Effect {
      * @return the change in percent (0..1)
      */
     public int getDeltaTimeToWrite() {
+        int currentRelativeTTW = action.getNetwork().getTtwHistory().get(action.getNetwork().getCurrentTimeStep());
+        int m = action.getNetwork().getNumTargetMirrors();
+        int lpm = action.getNetwork().getNumTargetLinksPerMirror();
+        //the time to write can be computed for the fully connected topology and for the balance tree topology.
+        if(action instanceof TopologyChange tc && tc.getNewTopology() instanceof FullyConnectedTopology ||
+           !(action instanceof TopologyChange) && action.getNetwork().getTopologyStrategy() instanceof FullyConnectedTopology) {
+            //for the fully connected topology the time to write is considered 100% (fastest, just one hop)
+            return 100 - currentRelativeTTW;
+        } else if (action instanceof TopologyChange tc && tc.getNewTopology() instanceof BalancedTreeTopologyStrategy) {
+            return getDeltaTimeToWriteForBalancedTrees(m, currentRelativeTTW, lpm);
+        } else if (action instanceof MirrorChange mc && action.getNetwork().getTopologyStrategy() instanceof BalancedTreeTopologyStrategy) {
+            m = mc.getNewMirrors();
+        } else if (action instanceof TargetLinkChange tlc && tlc.getNetwork().getTopologyStrategy() instanceof BalancedTreeTopologyStrategy) {
+            lpm = tlc.getNewLinksPerMirror();
+        } else {
+            //other combinations are subject to future work
+            return 0;
+        }
+        return getDeltaTimeToWriteForBalancedTrees(m, currentRelativeTTW, lpm);
+    }
 
-        return 0;
+    private static int getDeltaTimeToWriteForBalancedTrees(int m, int currentRelativeTTW, int lpm) {
+        int maxTTW = Math.round(m / 2f);
+        if(maxTTW == 1) return 100 - currentRelativeTTW;
+        else
+            return currentRelativeTTW - (100 - 100 * ((int) (Math.round(Math.log((m + 1) / 2f) / Math.log(lpm))) - 1) / (maxTTW - 1));
     }
 
     /**Returns the latency of the adaptation action associated to this effect.
