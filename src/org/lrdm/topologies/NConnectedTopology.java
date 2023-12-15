@@ -13,7 +13,7 @@ import java.util.*;
 /**A {@link TopologyStrategy} which connects each mirror with exactly n other mirrors.
  * If n is the number of all mirrors - 1 this strategy equals the {@link FullyConnectedTopology}.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class NConnectedTopology extends TopologyStrategy {
     /**Returns the next mirror from the network except for the mirror passed as self.

@@ -4,7 +4,7 @@ import org.lrdm.Network;
 
 /**An adaptation action representing the change of the number of mirrors.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class MirrorChange extends Action {
     private final int newMirrors;

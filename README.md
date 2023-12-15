@@ -43,22 +43,22 @@ class Example {
 In addition, you need to provide a configuration file (sim.conf) with the following parameters:
 
 ```properties
-debug=true
-sim_time=500
-num_mirrors=50
-num_links_per_mirror=2
-startup_time_min=5
-startup_time_max=10
-ready_time_min=2
-ready_time_max=20
-stop_time_min=2
-stop_time_max=5
-link_activation_time_min=5
-link_activation_time_max=10
-fileSize=80
-min_bandwidth=2
-max_bandwidth=8
-fault_probability=0.005
+debug=true              
+sim_time=500                  //how many timesteps shall be simulated
+num_mirrors=50                //number of mirrors
+num_links_per_mirror=2        //number of links per mirror
+startup_time_min=5            //minimum startup time of mirrors
+startup_time_max=10           //maximum startup time of mirrors
+ready_time_min=2              //minimum ready time of mirrors
+ready_time_max=20             //maximum ready time of mirrors
+stop_time_min=2               //minimum stop time of mirrors
+stop_time_max=5               //maximum stop time of mirrors
+link_activation_time_min=5    //minimum activation time of links
+link_activation_time_max=10   //maximum activation time of links 
+fileSize=80                   //size of the data package
+min_bandwidth=2               //minimum bandwidth per link 
+max_bandwidth=8               //maximum bandwidth per link
+fault_probability=0.005       //probability of mirror crashes at each timestep in percent
 ```
 
 If you do not provide this file, predefined values will be used and the file will be created for you. Once created, this file will be used instead of the predefined version. Thus, you can start the example from the paper on most systems by simply executing the jar. 

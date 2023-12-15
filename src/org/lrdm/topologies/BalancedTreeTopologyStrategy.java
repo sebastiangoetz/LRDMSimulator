@@ -13,7 +13,7 @@ import java.util.*;
  * single root {@link Mirror}. Each Mirror will have at most {@link Network#getNumTargetLinksPerMirror()} children.
  * The strategy aims to create a tree structure where each branch has the same number of ancestors (if possible).
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class BalancedTreeTopologyStrategy extends TopologyStrategy {
 

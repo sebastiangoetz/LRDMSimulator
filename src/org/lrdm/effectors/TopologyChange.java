@@ -5,7 +5,7 @@ import org.lrdm.topologies.TopologyStrategy;
 
 /**An adaptation action representing the change of the topology.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class TopologyChange extends Action {
     private TopologyStrategy newTopology;

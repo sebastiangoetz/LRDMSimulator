@@ -12,7 +12,7 @@ import java.util.*;
 /**A {@link TopologyStrategy} which links each {@link Mirror} of the {@link Network} with each other mirror.
  * Links are considered undirected, i.e., there will be exactly one link between each pair of mirrors of the network.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class FullyConnectedTopology extends TopologyStrategy {
     /**Initializes the network by connecting all mirrors to one another.

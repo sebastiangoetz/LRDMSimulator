@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**Interface to be used by all Topology strategies. Specifies methods to be used for initializing a network, handling added and removed mirrors as well as to compute the number of target links.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public abstract class TopologyStrategy {
 	public abstract Set<Link> initNetwork(Network n, Properties props);

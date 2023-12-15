@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 
 /**Graphical visualisation of the simulator using the GraphStream library.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class GraphVisualization implements VisualizationStrategy {
-    private static final int WIDTH = 1000;
-    private static final int HEIGHT = 800;
+    private static final int WIDTH = Math.round(Toolkit.getDefaultToolkit().getScreenSize().width * 0.9f);
+    private static final int HEIGHT = Math.round(Toolkit.getDefaultToolkit().getScreenSize().height * 0.9f);
     private static final String UI_CLASS = "ui.class";
     private static final String BANDWIDTH = "% Bandwidth";
     private static final String ACTIVE_LINKS = "% Active Links";
@@ -99,6 +99,7 @@ public class GraphVisualization implements VisualizationStrategy {
         gc.fill = GridBagConstraints.HORIZONTAL;
         gl.setConstraints(dv, gc);
         dv.setMinimumSize(new Dimension(WIDTH,HEIGHT/2));
+        dv.setPreferredSize(new Dimension(WIDTH, HEIGHT/2));
         panel.add(dv);
 
         bandwidthChart = QuickChart.getChart("Bandwidth over Time",TIMESTEP,BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
@@ -113,8 +114,8 @@ public class GraphVisualization implements VisualizationStrategy {
         gc.gridy=2;
         gc.gridwidth=1;
         gl.setConstraints(chartPanel, gc);
-        chartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/4));
-        chartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/4));
+        chartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/5));
+        chartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/5));
         panel.add(chartPanel);
 
         activeLinksChart = QuickChart.getChart("Active Links", TIMESTEP, ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
@@ -128,8 +129,8 @@ public class GraphVisualization implements VisualizationStrategy {
         gc.gridy=2;
         gc.gridwidth=1;
         gl.setConstraints(linkChartPanel, gc);
-        linkChartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/4));
-        linkChartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/4));
+        linkChartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/5));
+        linkChartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/5));
         panel.add(linkChartPanel);
 
         timeToWriteChart = QuickChart.getChart("Time To Write", TIMESTEP, TTW, TTW, List.of(0), List.of(0));
@@ -143,12 +144,12 @@ public class GraphVisualization implements VisualizationStrategy {
         gc.gridy=3;
         gc.gridwidth=2;
         gl.setConstraints(ttwChartPanel, gc);
-        ttwChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/4));
-        ttwChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/4));
+        ttwChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/5));
+        ttwChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/5));
         panel.add(ttwChartPanel);
 
         frame.setResizable(false);
-        frame.setSize(WIDTH,HEIGHT+50);
+        frame.setSize(WIDTH,HEIGHT);
         frame.setVisible(true);
 
         frame.addWindowListener(new WindowAdapter() {

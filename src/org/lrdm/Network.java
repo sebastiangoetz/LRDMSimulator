@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * methods to change the number of mirrors and initiates the change. Mirrors
  * take time to start up and get ready.
  * 
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class Network {
 	private final Properties props;

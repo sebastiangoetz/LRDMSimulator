@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 /**A probe observing links.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class LinkProbe extends Probe {
 	private double ratio;

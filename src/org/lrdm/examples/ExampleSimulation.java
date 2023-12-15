@@ -10,7 +10,7 @@ import java.util.List;
 
 /**Simple simulation runner.
  * 
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  *
  */
 public class ExampleSimulation {

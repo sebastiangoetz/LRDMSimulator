@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 /**A probe to observe mirrors in an RDM network.
  * 
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  *
  */
 public class MirrorProbe extends Probe {

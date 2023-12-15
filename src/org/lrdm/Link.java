@@ -6,7 +6,7 @@ import java.util.Random;
 
 /**A link between two mirrors. Initially is inactive. Gets active after <i>activation_time</i> as soon as both mirrors are <i>ready</i>.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class Link {
 	private final int id;

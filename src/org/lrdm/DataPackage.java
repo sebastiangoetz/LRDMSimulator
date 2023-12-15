@@ -2,7 +2,7 @@ package org.lrdm;
 
 /**Represents a single data package to be held by mirrors.
  *
- * @author Sebastian Götz (sebastian.goetz@acm.org)
+ * @author Anonymous
  */
 public class DataPackage {
     /** the file size of the data package measured in GB*/
