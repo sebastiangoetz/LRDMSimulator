@@ -78,15 +78,12 @@ public class GraphVisualization implements VisualizationStrategy {
         GridBagConstraints gc = new GridBagConstraints();
         panel.setLayout(gl);
 
-        frame.add(panel);
-        frame.setTitle("Timed RDM Simulator");
-
         simTimeLabel = new JLabel();
         simTimeLabel.setText("Simulation Time: 0");
         simTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gc.gridx=0;
         gc.gridy=0;
-        gc.gridwidth=2;
+        gc.gridwidth=1;
         gc.gridheight=1;
         gc.fill = GridBagConstraints.HORIZONTAL;
         gl.setConstraints(simTimeLabel, gc);
@@ -95,7 +92,7 @@ public class GraphVisualization implements VisualizationStrategy {
         gc = new GridBagConstraints();
         gc.gridx=0;
         gc.gridy=1;
-        gc.gridwidth=2;
+        gc.gridwidth=1;
         gc.fill = GridBagConstraints.HORIZONTAL;
         gl.setConstraints(dv, gc);
         dv.setMinimumSize(new Dimension(WIDTH,HEIGHT/2));
@@ -114,8 +111,8 @@ public class GraphVisualization implements VisualizationStrategy {
         gc.gridy=2;
         gc.gridwidth=1;
         gl.setConstraints(chartPanel, gc);
-        chartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/5));
-        chartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/5));
+        chartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
+        chartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
         panel.add(chartPanel);
 
         activeLinksChart = QuickChart.getChart("Active Links", TIMESTEP, ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
@@ -125,12 +122,12 @@ public class GraphVisualization implements VisualizationStrategy {
         targetAL.setMarker(SeriesMarkers.NONE);
         linkChartPanel = new XChartPanel<>(activeLinksChart);
         gc = new GridBagConstraints();
-        gc.gridx=1;
-        gc.gridy=2;
+        gc.gridx=0;
+        gc.gridy=3;
         gc.gridwidth=1;
         gl.setConstraints(linkChartPanel, gc);
-        linkChartPanel.setMinimumSize(new Dimension(WIDTH/2,HEIGHT/5));
-        linkChartPanel.setMaximumSize(new Dimension(WIDTH/2,HEIGHT/5));
+        linkChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
+        linkChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
         panel.add(linkChartPanel);
 
         timeToWriteChart = QuickChart.getChart("Time To Write", TIMESTEP, TTW, TTW, List.of(0), List.of(0));
@@ -141,16 +138,25 @@ public class GraphVisualization implements VisualizationStrategy {
         ttwChartPanel = new XChartPanel<>(timeToWriteChart);
         gc = new GridBagConstraints();
         gc.gridx=0;
-        gc.gridy=3;
-        gc.gridwidth=2;
+        gc.gridy=4;
+        gc.gridwidth=1;
         gl.setConstraints(ttwChartPanel, gc);
-        ttwChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/5));
-        ttwChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/5));
+        ttwChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
+        ttwChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
+        ttwChartPanel.setPreferredSize(new Dimension(WIDTH,HEIGHT/6));
         panel.add(ttwChartPanel);
 
-        frame.setResizable(false);
+        JScrollPane scrollPane = new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setMinimumSize(new Dimension(WIDTH, HEIGHT));
+        panel.setBackground(Color.WHITE);
+
+        frame.add(scrollPane);
+        frame.setTitle("Timed RDM Simulator");
+
+        //frame.setResizable(false);
         frame.setSize(WIDTH,HEIGHT);
         frame.setVisible(true);
+        frame.setBackground(Color.WHITE);
 
         frame.addWindowListener(new WindowAdapter() {
             @Override

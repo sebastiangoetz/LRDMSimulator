@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.tud.inf.st</groupId>
-	<artifactId>TimedRDMSimulator</artifactId>
+	<groupId>org.lrdm</groupId>
+	<artifactId>LRDMSim</artifactId>
 	<version>1.0.0</version>
-	<name>TimedRDMSimulator</name>
-	<description>Time-aware Remote Data Mirroring Simulator</description>
+	<name>Latency-aware RDMSim</name>
+	<description>Latency-aware Remote Data Mirroring Simulator</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.graphstream</groupId>
