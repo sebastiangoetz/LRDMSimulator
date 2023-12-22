@@ -30,8 +30,6 @@ public class Network {
 
 	private DataUpdateStrategy dataUpdateStrategy;
 
-	private static Network instance;
-
 
 	private final Logger log;
 
@@ -71,12 +69,8 @@ public class Network {
 
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
-		instance = this;
 	}
 
-	public static Network getInstance(){
-		return instance;
-	}
 
 	/**Adds a probe to the network, which will be called at each simulation time step.
 	 *
@@ -280,10 +274,11 @@ public class Network {
 	}
 
 	/**Inspect the network for mirrors in STOPPED state to remove them from the network.
-	 * Else calls {@link Mirror#timeStep(int)}
+	 * Else calls {@link Mirror#timeStep(int, Network)}
 	 *
 	 * @param simTime current simulation time
 	 */
+	//Beispiel durchführen , in welchem geschaut wird ob dirtyFlags vor oder nach timestep durchgeführt werden soll
 	private void handleMirrors(int simTime) {
 		//find stopped mirrors to remove them or invoke timeStep on the active mirrors
 		List<Mirror> stoppedMirrors = new ArrayList<>();
@@ -291,9 +286,10 @@ public class Network {
 			if (m.getState() == Mirror.State.STOPPED)
 				stoppedMirrors.add(m);
 			else
-				m.timeStep(simTime);
+				m.timeStep(simTime, this);
 		}
 		mirrors.removeAll(stoppedMirrors);
+		dirtyFlagUpdateStrategy.updateDirtyFlag(mirrors, this);
 	}
 
 	/**Remove all links from the network which are in CLOSED state and

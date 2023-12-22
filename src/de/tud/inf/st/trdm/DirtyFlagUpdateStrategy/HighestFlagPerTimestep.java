@@ -17,19 +17,20 @@ public class HighestFlagPerTimestep extends DirtyFlagUpdateStrategy{
         Map<Integer, DirtyFlag> updateMirrors = new HashMap<>();
         for(Mirror m :mirrors){
             for(Link l:m.getLinks()){
-                switch (l.getSource().getLookingFlag().compareFlag(l.getTarget().getLookingFlag().getDirtyFlag())) {
+                switch (l.getSource().getData().getDirtyFlag().compareFlag(l.getTarget().getData().getDirtyFlag().getDirtyFlag())) {
                     case 0 -> {
-                        updateMirrors = updateMap(l.getSource(), updateMirrors,l.getTarget().getLookingFlag());
+                        updateMirrors = updateMap(l.getSource(), updateMirrors,l.getTarget().getData().getDirtyFlag());
                     }
                     case 1 -> {
-                        updateMirrors = updateMap(l.getTarget(), updateMirrors, l.getSource().getLookingFlag());
+                        updateMirrors = updateMap(l.getTarget(), updateMirrors, l.getSource().getData().getDirtyFlag());
                     }
                 }
             }
         }
         for(Mirror m:mirrors){
             if(updateMirrors.containsKey(m.getID())){
-                m.setLookingFlag(updateMirrors.get(m.getID()));
+                m.setInvalidFlagState();
+                m.getData().setDirtyFlag(updateMirrors.get(m.getID()));
             }
         }
 

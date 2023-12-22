@@ -48,4 +48,16 @@ class MirrorTest {
             assertTrue(m.getStartupTime() >= startup_time_min && m.getStartupTime() < startup_time_max);
         }
     }
+
+    @Test
+    void testDataPackage() throws IOException{
+        loadProperties("resources/sim-test-1.conf");
+        Mirror m1 = new Mirror(1, 0, props, new DeltaDataUpdateStrategy());
+        Mirror m2 = new Mirror(2,0, props, new DeltaDataUpdateStrategy());
+        Link l = new Link(3,m1,m2,0,props);
+        m1.addLink(l);
+        m2.addLink(l);
+        assertTrue(m1.isLinkedWith(m2));
+        assertTrue(m2.isLinkedWith(m1));
+    }
 }

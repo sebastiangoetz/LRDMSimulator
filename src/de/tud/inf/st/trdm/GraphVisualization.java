@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+//in visulation: welche version wo vorhanden
 public class GraphVisualization implements VisualizationStrategy {
     private static final String UI_CLASS = "ui.class";
     private static final String BANDWIDTH = "Bandwidth";

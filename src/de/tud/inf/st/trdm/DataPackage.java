@@ -6,7 +6,7 @@ public class DataPackage {
 
     private List<Data> data;
     private DirtyFlag dirtyFlag;
-    boolean invalid= false;
+    boolean invalid = false;
 
     public DataPackage(List<Data> data, DirtyFlag dirtyFlag) {
         this.data = data;
@@ -26,6 +26,10 @@ public class DataPackage {
         return data;
     }
 
+    public void setDirtyFlag(DirtyFlag dirtyFlag){
+        this.dirtyFlag = dirtyFlag;
+    }
+
     public DirtyFlag getDirtyFlag(){
         return dirtyFlag;
     }
@@ -36,6 +40,7 @@ public class DataPackage {
                 return false;
             }
         }
+        invalid = false;
         return true;
     }
 }

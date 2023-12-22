@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class Mirror {
 	public enum State {
-		DOWN, STARTING, UP, READY, HASDATA, INVALIDFLAG, STOPPING, STOPPED
+		DOWN, STARTING, UP, READY, HASDATA, INVALID, STOPPING, STOPPED
 	}
 
 	private final int id;
@@ -30,7 +30,6 @@ public class Mirror {
 
 	private DataPackage data; //the data hosted on this mirror
 
-	private DirtyFlag lookingFlag;
 
 	private DataUpdateStrategy dataUpdateStrategy;
 
@@ -59,14 +58,6 @@ public class Mirror {
 		receivedDataPerTimestep = new HashMap<>();
 
 		this.dataUpdateStrategy= dataUpdateStrategy;
-	}
-
-	public DirtyFlag getLookingFlag() {
-		return lookingFlag;
-	}
-
-	public void setLookingFlag(DirtyFlag lookingFlag){
-		this.lookingFlag = lookingFlag;
 	}
 
 	public State getState() {
@@ -112,7 +103,6 @@ public class Mirror {
 	public void setDataPackage(List<Data> data, DirtyFlag dirtyFlag){
 		DataPackage dataPackage = new DataPackage(data, dirtyFlag);
 		this.data = dataPackage;
-		this.lookingFlag = dataPackage.getDirtyFlag();
 	}
 
 	public void setInvalidFlagState(){
@@ -155,7 +145,7 @@ public class Mirror {
 	 * 
 	 * @param currentSimTime (int) current simulation time
 	 */
-	public void timeStep(int currentSimTime) {
+	public void timeStep(int currentSimTime, Network n) {
 		if (state != State.STOPPING) {
 			if (data != null && data.isLoaded() && state == State.INVALIDFLAG) {
 				state = State.HASDATA;
@@ -171,13 +161,11 @@ public class Mirror {
 				state = State.STOPPED;
 			}
 		}
-		handleDataTransfer(currentSimTime);
+		handleDataTransfer(currentSimTime, n);
 	}
 
-	//versionsnummer mit benutzen um zu schauen ob geupdatet werden muss
-	private void handleDataTransfer(int currentSimTime) {
+	private void handleDataTransfer(int currentSimTime, Network n) {
 		if(state == State.READY && (data == null || !data.isLoaded())) {
-			Network n = Network.getInstance();
 			if(dataUpdateStrategy.updateRequired(this, n)) {
 				dataUpdateStrategy.updateData(this, n);
 			}
