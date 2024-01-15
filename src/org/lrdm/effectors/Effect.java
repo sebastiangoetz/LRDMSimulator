@@ -10,7 +10,7 @@ import java.util.Properties;
 /**Represents the effect of an adaptation action. Enables to retrieve the effect on the three metrics: active links, bandwidth and time to write.
  * Additionally provides latency information on the adaptation action.
  *
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
 public class Effect {
     /**The action for which the effect is predicted. */

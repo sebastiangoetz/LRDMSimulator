@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 /**A single mirror in an RDM network. Can have the following states: down -&gt; starting -&gt; up -&gt; ready -&gt; stopping -&gt; stopped.
  * Each state change requires time. These times are fetched from the properties, which specify min/max ranges for them. Each mirror will randomlöy  
  * 
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  *
  */
 public class Mirror {

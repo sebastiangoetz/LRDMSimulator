@@ -4,7 +4,7 @@ import org.lrdm.Network;
 
 /**A Probe to observer an RDM Network. Concrete observations are to be implemented in subclasses.
  * 
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  *
  */
 public abstract class Probe {

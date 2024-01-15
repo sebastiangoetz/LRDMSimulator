@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Latency-aware simulator for remote data mirroring (Latency-aware RDM). Requires a sim.conf
  * file in a resources directory located in the current working directory.
  * 
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
 public class TimedRDMSim {
 	private static final String DEFAULT_CONFIG_NAME = "sim.conf";

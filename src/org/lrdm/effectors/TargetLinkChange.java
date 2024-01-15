@@ -4,7 +4,7 @@ import org.lrdm.Network;
 
 /**An adaptation action representing the change of the number of links per mirror.
  *
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
 public class TargetLinkChange extends Action {
     int newLinksPerMirror;

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**An effector for the RDM network. Collects requests to change the number of mirrors, links per mirror and topology and triggers these changes at the respective time step.
  * 
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  *
  */
 public class Effector {

@@ -3,7 +3,7 @@ package org.lrdm.util;
 /**Simple ID generator, which will provide increasing numbers as ID. 
  * Realized as singleton, it provides unique IDs for a single session.
  * 
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  *
  */
 public class IDGenerator {

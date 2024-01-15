@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 /**Graphical visualisation of the simulator using the GraphStream library.
  *
- * @author Anonymous
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
 public class GraphVisualization implements VisualizationStrategy {
     private static final int WIDTH = Math.round(Toolkit.getDefaultToolkit().getScreenSize().width * 0.9f);
