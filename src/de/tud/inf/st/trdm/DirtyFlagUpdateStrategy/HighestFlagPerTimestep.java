@@ -1,9 +1,6 @@
 package de.tud.inf.st.trdm.DirtyFlagUpdateStrategy;
 
-import de.tud.inf.st.trdm.DirtyFlag;
-import de.tud.inf.st.trdm.Link;
-import de.tud.inf.st.trdm.Mirror;
-import de.tud.inf.st.trdm.Network;
+import de.tud.inf.st.trdm.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +13,40 @@ public class HighestFlagPerTimestep extends DirtyFlagUpdateStrategy{
     public void updateDirtyFlag(List<Mirror> mirrors, Network n){
         Map<Integer, DirtyFlag> updateMirrors = new HashMap<>();
         for(Mirror m :mirrors){
+            if(m.getState() != Mirror.State.READY && m.getState() != Mirror.State.HASDATA && m.getState() != Mirror.State.UP){
+                break;
+            }
             for(Link l:m.getLinks()){
+                if(l.getState() != Link.State.ACTIVE){
+                    continue;
+                }
+                if(l.getSource().getData() == null && l.getTarget().getData() == null){
+                    continue;
+                }
+                if(l.getSource().getData() == null){
+                    Data d = new Data(0, 0);
+                    List<Data> dataList = new ArrayList<>();
+                    dataList.add(d);
+                    List<Integer> dirtyFlag = new ArrayList<>();
+                    dirtyFlag.add(0);
+                    dirtyFlag.add(0);
+                    dirtyFlag.add(0);
+                    DirtyFlag dirty = new DirtyFlag(dirtyFlag);
+                    DataPackage data = new DataPackage(dataList,dirty );
+                    l.getSource().setDataPackage(data);
+                }
+                if(l.getTarget().getData() == null){
+                    Data d = new Data(0, 0);
+                    List<Data> dataList = new ArrayList<>();
+                    dataList.add(d);
+                    List<Integer> dirtyFlag = new ArrayList<>();
+                    dirtyFlag.add(0);
+                    dirtyFlag.add(0);
+                    dirtyFlag.add(0);
+                    DirtyFlag dirty = new DirtyFlag(dirtyFlag);
+                    DataPackage data = new DataPackage(dataList,dirty );
+                    l.getTarget().setDataPackage(data);
+                }
                 switch (l.getSource().getData().getDirtyFlag().compareFlag(l.getTarget().getData().getDirtyFlag().getDirtyFlag())) {
                     case 0 -> {
                         updateMirrors = updateMap(l.getSource(), updateMirrors,l.getTarget().getData().getDirtyFlag());

@@ -26,17 +26,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-//in visulation: welche version wo vorhanden
+//Id's mit Versionsnummer beschriften oder außen anzeigen
+// Diagramm mit Ratio wird nicht benötigt
+// INVALID-Flag nicht als Zustand ( sondern Boolean + Versionsnummer)
+//Border verändern, und nicht blau färben
 public class GraphVisualization implements VisualizationStrategy {
     private static final String UI_CLASS = "ui.class";
     private static final String BANDWIDTH = "Bandwidth";
     private static final String ACTIVE_LINKS = "% Active Links";
+
+    private static final String RATIO = "% Ratio";
     private Graph graph;
     private JLabel simTimeLabel;
     private XYChart bandwidthChart;
     private XYChart activeLinksChart;
+
+    private XYChart ratioChart;
     private JPanel chartPanel;
     private JPanel linkChartPanel;
+
+    private JPanel ratioChartPanel;
 
     @Override
     public void init(Network network) {
@@ -118,8 +127,21 @@ public class GraphVisualization implements VisualizationStrategy {
         linkChartPanel.setMaximumSize(new Dimension(600,200));
         panel.add(linkChartPanel);
 
+        ratioChart = QuickChart.getChart("Ratio of newest Package", "Timestep", RATIO, RATIO, List.of(0), List.of(0));
+        ratioChart.getStyler().setTheme(new MatlabTheme());
+        ratioChart.getStyler().setLegendVisible(false);
+        ratioChartPanel = new XChartPanel<>(ratioChart);
+        gc = new GridBagConstraints();
+        gc.gridx=0;
+        gc.gridy=4;
+        gc.gridwidth=1;
+        gl.setConstraints(ratioChartPanel, gc);
+        ratioChartPanel.setMinimumSize(new Dimension(600,200));
+        ratioChartPanel.setMaximumSize(new Dimension(600,200));
+        panel.add(ratioChartPanel);
+
         frame.setResizable(false);
-        frame.setSize(600,850);
+        frame.setSize(600,1050);
         frame.setVisible(true);
 
         frame.addWindowListener(new WindowAdapter() {
@@ -151,6 +173,9 @@ public class GraphVisualization implements VisualizationStrategy {
 
         activeLinksChart.updateXYSeries(ACTIVE_LINKS, timeSteps, activeLinksTS, null);
         linkChartPanel.repaint();
+
+        ratioChart.updateXYSeries(RATIO, timeSteps, activeLinksTS, null);
+        ratioChartPanel.repaint();
     }
 
     private void updateLinks(Network network) {
@@ -218,11 +243,21 @@ public class GraphVisualization implements VisualizationStrategy {
             if (n == null)
                 n = graph.addNode(String.valueOf(m.getID()));
             n.setAttribute("ui.label", m.getID());
+            String invalid = "notinvalid";
+            if(m.getData() != null) {
+                //n.setAttribute("ui.label", m.getData().getDirtyFlag().toString());
+                if (m.getData().getInvalid()) {
+                    invalid = "invalid";
+                } else {
+                    invalid = "notinvalid";
+                }
+            }
+
             switch (m.getState()) {
-                case HASDATA -> n.setAttribute(UI_CLASS, "hasdata");
-                case READY -> n.setAttribute(UI_CLASS, "running");
-                case STOPPING -> n.setAttribute(UI_CLASS, "stopping");
-                default -> n.setAttribute(UI_CLASS,"starting");
+                case HASDATA -> n.setAttribute(UI_CLASS, invalid, "hasdata");
+                case READY -> n.setAttribute(UI_CLASS, invalid, "running");
+                case STOPPING -> n.setAttribute(UI_CLASS, invalid,"stopping");
+                default -> n.setAttribute(UI_CLASS,invalid,"starting");
             }
         }
     }

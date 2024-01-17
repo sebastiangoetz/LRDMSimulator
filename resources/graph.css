@@ -2,6 +2,15 @@ node {
 	shape: box;
 }
 
+node.notinvalid {
+    shape: box;
+}
+
+
+node.invalid {
+    shape: circle;
+}
+
 node.hasdata {
 	fill-color: #ee5cdd;
 }

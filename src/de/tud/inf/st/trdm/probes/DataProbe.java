@@ -6,6 +6,7 @@ import de.tud.inf.st.trdm.Network;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,11 +15,11 @@ public class DataProbe extends Probe{
     //aktuellste Version
     //wie viele Versionen gibt es
     //ratio zwischen aktuellste Version und Rest
-    private List<DirtyFlag> dirtyFlagList;
+    private List<DirtyFlag> dirtyFlagList = new ArrayList<>();;
 
-    private DirtyFlag newest;
+    private DirtyFlag newest = new DirtyFlag(new ArrayList<>());
 
-    private double ratio;
+    private double ratio = 0;
 
     public DataProbe(Network n) {
         super(n);
@@ -36,18 +37,18 @@ public class DataProbe extends Probe{
 
     @Override
     public void print(int simTime) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,flagToString(newest.getDirtyFlag()), dirtyFlagList.size(), ratio});
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data  ] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,flagToString(newest.getDirtyFlag()), dirtyFlagList.size(), ratio});
     }
 
     private void updateParameters(List<Mirror> mirrorList){
         int newestPackage=0;
-        List<Integer> helper = new ArrayList<>();
-        helper.set(0,1);
-        helper.set(0,1);
-        helper.set(0,1);
+        List<Integer> helper = new ArrayList<>(Arrays.asList(0,0,0));
         newest.setDirtyFlag(helper);
         DirtyFlag dirtyFlag;
         for(Mirror m:mirrorList){
+            if(m.getData() == null){
+                continue;
+            }
             dirtyFlag = m.getData().getDirtyFlag();
             if(!inDirtyFlagList(dirtyFlag)){
                 dirtyFlagList.add(dirtyFlag);
@@ -82,7 +83,9 @@ public class DataProbe extends Probe{
         for(Integer i:dirtyFlag){
             answer.append(i).append(".");
         }
-        answer.deleteCharAt(answer.length());
+        if(!answer.isEmpty()) {
+            answer.deleteCharAt(answer.length()-1);
+        }
         return answer.toString();
     }
 }

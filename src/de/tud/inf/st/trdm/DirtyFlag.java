@@ -17,6 +17,7 @@ public class DirtyFlag {
         this.dirtyFlag = dirtyFlag;
     }
 
+    // 0: kleiner, 1: größer, 2: gleich
     public int compareFlag(List<Integer> newest){
         for(int i=0;i<dirtyFlag.size();i++){
             if(dirtyFlag.get(i) < newest.get(i)){
@@ -34,10 +35,22 @@ public class DirtyFlag {
             return false;
         }
         for(int i=0;i<dirtyFlag.size();i++){
-            if(dirtyFlag.get(i)!= otherDirtyFlag.get(i)){
+            if(dirtyFlag.get(i) != otherDirtyFlag.get(i)){
                 return false;
             }
         }
         return true;
+    }
+
+
+    public String toString(){
+        StringBuilder answer = new StringBuilder();
+        for(Integer i:dirtyFlag){
+            answer.append(i).append(".");
+        }
+        if(!answer.isEmpty()) {
+            answer.deleteCharAt(answer.length()-1);
+        }
+        return answer.toString();
     }
 }

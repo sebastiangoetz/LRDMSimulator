@@ -65,7 +65,9 @@ public class Network {
 		links = strategy.initNetwork(this, props);
 		log = Logger.getLogger(this.getClass().getName());
 		//put a new data package on the first mirror
-		mirrors.get(0).setDataPackage(dataPackage);
+		Optional<Mirror> firstMirror = mirrors.stream().filter(n->n.getID() == 0).findAny();
+		firstMirror.get().setDataPackage(dataPackage);
+		//mirrors.get(0).setDataPackage(dataPackage);
 
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();

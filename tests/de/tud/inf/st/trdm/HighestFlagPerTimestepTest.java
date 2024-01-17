@@ -21,11 +21,21 @@ public class HighestFlagPerTimestepTest {
         Mirror m1 = new Mirror(1,0,TestUtils.props,new DeltaDataUpdateStrategy());
         Mirror m2 = new Mirror(2,0, TestUtils.props, new DeltaDataUpdateStrategy());
 
+        DirtyFlag dirty1 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,2,4)));
+        DirtyFlag dirty2 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(2,5,4)));
+        Data d = new Data(10, 3);
+
+        DataPackage package1 = new DataPackage(new ArrayList<>(List.of(d)), dirty2);
+
+        m1.setDataPackage(package1);
+
         Map<Integer, DirtyFlag> testMap= new HashMap<>();
+        testMap.put(m1.getID(), m1.getData().getDirtyFlag());
 
-        testMap = new HighestFlagPerTimestep().updateMap(m1, testMap, m2.getData().getDirtyFlag());
+        testMap = new HighestFlagPerTimestep().updateMap(m1, testMap, dirty1);
+        System.out.println();
 
-        assertEquals(testMap.get(0), m2.getData().getDirtyFlag());
+        assertEquals(testMap.get(1).compareFlag(dirty1.getDirtyFlag()),1);
     }
 
     @Test
@@ -51,15 +61,47 @@ public class HighestFlagPerTimestepTest {
         Mirror m1 = new Mirror(1,0,TestUtils.props,new DeltaDataUpdateStrategy());
         Mirror m2 = new Mirror(2,0, TestUtils.props, new DeltaDataUpdateStrategy());
         Mirror m3 = new Mirror(3,0,TestUtils.props, new DeltaDataUpdateStrategy());
+        Mirror m4 = new Mirror(7,0,TestUtils.props,new DeltaDataUpdateStrategy());
+
+        Link l1 = new Link(4,m1,m2,0,TestUtils.props);
+        Link l2 = new Link(5,m2,m3,0,TestUtils.props);
+        //Link l3 = new Link(6,m1,m3,0,TestUtils.props);
+        //Link l4 = new Link(8,m3,m4,0,TestUtils.props);
+
+        //new List<Integer> flag1 = new ArrayList<Integer>(Arrays.asList(1,2,4));
+        DirtyFlag dirty1 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,2,4)));
+        DirtyFlag dirty2 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(2,5,4)));
+        DirtyFlag dirty3 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,8,4)));
+        Data d = new Data(10, 3);
+
+        DataPackage package1 = new DataPackage(new ArrayList<>(List.of(d)), dirty1);
+        DataPackage package4 = new DataPackage(new ArrayList<>(List.of(d)), dirty1);
+        DataPackage package2 = new DataPackage(new ArrayList<>(List.of(d)), dirty2);
+        DataPackage package3 = new DataPackage(new ArrayList<>(List.of(d)), dirty3);
+
+        m1.setDataPackage(package2);
+        m2.setDataPackage(package1);
+        m3.setDataPackage(package3);
+        m4.setDataPackage(package3);
 
         List<Mirror> mirrors = new ArrayList<>();
         mirrors.add(m1);
         mirrors.add(m2);
         mirrors.add(m3);
+        //mirrors.add(m4);
 
+        //assertEquals(m2.getData().getDirtyFlag().compareFlag(m3.getData().getDirtyFlag().getDirtyFlag()), 2);
+        //assertEquals(m1.getData().getDirtyFlag().compareFlag(m2.getData().getDirtyFlag().getDirtyFlag()),2);
+        System.out.println(m1.getData().getDirtyFlag().toString());
+        System.out.println(m2.getData().getDirtyFlag().toString());
+        System.out.println(m3.getData().getDirtyFlag().toString());
+        System.out.println(m4.getData().getDirtyFlag().toString());
         new HighestFlagPerTimestep().updateDirtyFlag(mirrors, network);
-
-        assertEquals(mirrors.get(0).getData().getDirtyFlag(), m2.getData().getDirtyFlag());
-        assertEquals(mirrors.get(2).getData().getDirtyFlag(), m3.getData().getDirtyFlag());
+        System.out.println(m1.getData().getDirtyFlag().toString());
+        System.out.println(m2.getData().getDirtyFlag().toString());
+        System.out.println(m3.getData().getDirtyFlag().toString());
+        System.out.println(m4.getData().getDirtyFlag().toString());
+        assertEquals(m3.getData().getDirtyFlag().compareFlag(m2.getData().getDirtyFlag().getDirtyFlag()), 2);
+        assertEquals(m1.getData().getDirtyFlag().compareFlag(m3.getData().getDirtyFlag().getDirtyFlag()),2);
     }
 }

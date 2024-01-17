@@ -22,6 +22,11 @@ public class Data {
         return received;
     }
 
+    public void setReceived(int received){
+        this.received = received;
+    }
+
+
     public int getContent(){
         return content;
     }
@@ -30,9 +35,11 @@ public class Data {
         this.content = content;
     }
 
-    public void increaseReceived(int amount) {
+    public int increaseReceived(int amount) {
         received += amount;
-        if(received > fileSize) received = fileSize;
+        int difference = fileSize - received;
+        if(received >= fileSize) received = fileSize;
+        return difference;
     }
 
     public boolean isLoaded() {

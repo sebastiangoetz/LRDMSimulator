@@ -8,8 +8,7 @@ import de.tud.inf.st.trdm.topologies.FullyConnectedTopology;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static de.tud.inf.st.trdm.TestUtils.loadProperties;
 import static de.tud.inf.st.trdm.TestUtils.props;
@@ -34,7 +33,35 @@ class AppTest {
         link_activation_time_min = Integer.parseInt(props.get("link_activation_time_min").toString());
         link_activation_time_max = Integer.parseInt(props.get("link_activation_time_max").toString());
         sim = new TimedRDMSim(config);
-        sim.setHeadless(false);
+        //sim.setHeadless(false);
+    }
+
+    @Test
+    void PackageTest() throws IOException{
+        TimedRDMSim sim = new TimedRDMSim();
+        sim.initialize(new BalancedTreeTopologyStrategy());
+        Effector effector = sim.getEffector();
+        int mirrors = 10;
+        effector.setMirrors(mirrors, 0);
+        //effector.setStrategy(new FullyConnectedTopology(), 20);
+        //effector.setStrategy(new BalancedTreeTopologyStrategy(), 40);
+        //effector.setStrategy(new FullyConnectedTopology(), 60);
+        //effector.setStrategy(new BalancedTreeTopologyStrategy(), 80);
+        DirtyFlag dirty1 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,2,4)));
+        Data d = new Data(10, 3);
+
+        DataPackage package1 = new DataPackage(new ArrayList<>(Arrays.asList(d,d,d)), dirty1);
+
+        //use this code to manually run the simulation step by step
+        effector.setDataPackage(4,package1,10 );
+        List<Probe> probes = sim.getProbes();
+        int simTime = sim.getSimTime();
+        for (int t = 1; t <= simTime; t++) {
+            for(Probe p : probes) p.print(t);
+
+            sim.runStep(t);
+        }
+        sim.plotLinks();
     }
     @Test()
     void testInitializeHasToBeCalled() throws IOException {

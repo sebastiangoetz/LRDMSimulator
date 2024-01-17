@@ -11,9 +11,12 @@ import java.util.stream.Collectors;
  * @author Sebastian Götz (sebastian.goetz@acm.org)
  *
  */
+
+//Zugriff auf DatePackage mit If vorher abfragen ob DataPackage vorhanden
+//INVALID State entfernen und mit Invalid bool ersetzen
 public class Mirror {
 	public enum State {
-		DOWN, STARTING, UP, READY, HASDATA, INVALID, STOPPING, STOPPED
+		DOWN, STARTING, UP, READY, HASDATA, STOPPING, STOPPED
 	}
 
 	private final int id;
@@ -101,12 +104,11 @@ public class Mirror {
 	}
 
 	public void setDataPackage(List<Data> data, DirtyFlag dirtyFlag){
-		DataPackage dataPackage = new DataPackage(data, dirtyFlag);
-		this.data = dataPackage;
+		this.data = new DataPackage(data, dirtyFlag);
 	}
 
 	public void setInvalidFlagState(){
-		state = State.INVALIDFLAG;
+		//state = State.INVALID;
 		data.setInvalid(true);
 	}
 	
@@ -146,8 +148,26 @@ public class Mirror {
 	 * @param currentSimTime (int) current simulation time
 	 */
 	public void timeStep(int currentSimTime, Network n) {
+		if(id == 4){
+			if(data != null) {
+				for (int j = 0; j < data.getData().size(); j++) {
+					System.out.println(data.getData().get(j).getContent());
+					System.out.println(data.getData().get(j).getReceived());
+					System.out.println(data.getData().get(j).getFileSize());
+				}
+			}
+		}
+		if(id == 3){
+			if(data != null) {
+				for (int j = 0; j < data.getData().size(); j++) {
+					System.out.println(data.getData().get(j).getContent());
+					System.out.println(data.getData().get(j).getReceived());
+					System.out.println(data.getData().get(j).getFileSize());
+				}
+			}
+		}
 		if (state != State.STOPPING) {
-			if (data != null && data.isLoaded() && state == State.INVALIDFLAG) {
+			if (data != null && data.isLoaded() && !data.getInvalid()) {
 				state = State.HASDATA;
 			} else if (currentSimTime - initTime >= readyTime+startupTime+maxLinkActiveTime - 1) {
 				state = State.READY;
@@ -165,9 +185,11 @@ public class Mirror {
 	}
 
 	private void handleDataTransfer(int currentSimTime, Network n) {
-		if(state == State.READY && (data == null || !data.isLoaded())) {
+		if(state == State.READY && data != null && data.getInvalid()) {
 			if(dataUpdateStrategy.updateRequired(this, n)) {
-				dataUpdateStrategy.updateData(this, n);
+				int received = dataUpdateStrategy.updateData(this, n);
+				data.isLoaded();
+				receivedDataPerTimestep.put(currentSimTime, received);
 			}
 		}
 	}

@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface DataUpdateStrategy {
 
-    void updateData(Mirror m, Network n);
+    int updateData(Mirror m, Network n);
 
     boolean updateRequired(Mirror m, Network n);
 

@@ -2,6 +2,7 @@ package de.tud.inf.st.trdm;
 
 import de.tud.inf.st.trdm.DataUpdateStrategy.DeltaDataUpdateStrategy;
 import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.HighestFlagPerTimestep;
+import de.tud.inf.st.trdm.probes.DataProbe;
 import de.tud.inf.st.trdm.probes.LinkProbe;
 import de.tud.inf.st.trdm.probes.MirrorProbe;
 import de.tud.inf.st.trdm.probes.Probe;
@@ -79,6 +80,9 @@ public class TimedRDMSim {
 		Data data1 = new Data(fileSize, 34);
 		Data data2 = new Data(fileSize, 100);
 		Data data3 = new Data(fileSize, 45);
+		data1.increaseReceived(fileSize);
+		data2.increaseReceived(fileSize);
+		data3.increaseReceived(fileSize);
 
 		DataPackage dataPackage = new DataPackage(Arrays.asList(data1,data2,data3), dirtyFlag);
 
@@ -89,10 +93,13 @@ public class TimedRDMSim {
 		probes = new ArrayList<>();
 		Probe mprobe = new MirrorProbe(network);
 		Probe lprobe = new LinkProbe(network);
+		Probe dprobe = new DataProbe(network);
 		probes.add(mprobe);
 		probes.add(lprobe);
+		probes.add(dprobe);
 		network.registerProbe(mprobe);
 		network.registerProbe(lprobe);
+		network.registerProbe(dprobe);
 		network.setEffector(effector);
 
 		if(!headless)
