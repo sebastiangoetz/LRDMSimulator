@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class TimedRDMSim {
+    runStep(t)
+}
+
+class CausalConnection {
+    run()
+}
+
+class NetworkModel {
+    int numMirrors;
+    Topology topo;
+    --
+    time_numMirrors(pre,post,preHasData)
+    time_topo(mirrors,topo)
+    ..
+    update()
+    execute()
+}
+
+enum Topology {
+    BalancedTree,
+    FullyConnected
+}
+
+NetworkModel -[hidden]> "topo" Topology
+
+CausalConnection --> TimedRDMSim
+NetworkModel <-- CausalConnection
+CausalConnection <-- NetworkModel
+@enduml

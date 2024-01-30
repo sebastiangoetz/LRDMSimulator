@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.tud.inf.st</groupId>
-	<artifactId>TimedRDMSimulator</artifactId>
+	<groupId>org.lrdm</groupId>
+	<artifactId>LRDMSim</artifactId>
 	<version>1.0.0</version>
-	<name>TimedRDMSimulator</name>
-	<description>Time-aware Remote Data Mirroring Simulator</description>
+	<name>Latency-aware RDMSim</name>
+	<description>Latency-aware Remote Data Mirroring Simulator</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.graphstream</groupId>
@@ -35,6 +35,11 @@
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>tests</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>resources</directory>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -52,6 +57,30 @@
           				<show>public</show>
         			</configuration>
       			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>org.lrdm.examples.ExampleOptimizer</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>assemble-all</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>

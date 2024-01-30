@@ -6,3 +6,5 @@
 /.settings
 /target
 /.project
+*.eps
+/sim.conf

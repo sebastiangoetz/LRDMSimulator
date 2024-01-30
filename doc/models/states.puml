@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+start
+fork
+:Mirror N is started;
+:Mirror N is up;
+fork again
+:..;
+:..;
+fork again
+:Mirror M is started;
+:Mirror M is up;
+end fork
+:Link between Mirror N and Mirror M is initiated;
+:Link is active;
+fork
+:Mirror N is ready;
+fork again
+:Mirror M is ready;
+end fork
+:Mirror M has the data;
+note right
+    At least one mirror has
+    to have the data initially
+end note
+while (received < fileSize)
+    :Mirror M sends part of
+    the data to Mirror N;
+endwhile
+:Mirror N has the data;
+@enduml

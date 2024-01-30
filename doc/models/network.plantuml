@@ -48,10 +48,10 @@ class DataPackage
   + boolean isLoaded()
 }
 
-Network *--> "*" Mirror
-Network *-> "*" Link
+Network --> "*" Mirror
+Network -> "*" Link
 Mirror -> MirrorState
-Mirror *--> Link
+Mirror --> "*" Link
 DataPackage <- Mirror
 Link -> LinkState
 Link --> "source" Mirror

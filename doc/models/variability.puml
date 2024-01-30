@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class TimedRDMSim
+
+class Network
+
+interface VisualizationStrategy {
+    void init(Network network)
+    void updateGraph(Network network, long timeStep)
+}
+
+abstract class TopologyStrategy
+{
+    + initNetwork(Network,Properties) : Set<Link>
+    + handleAddNewMirrors(Network,newMirrors,Properties) : void
+    + handleRemoveMirrors(Network,removeMirrors,Properties) :void
+    + getNumTargetLinks(Network) : int
+}
+
+abstract class Probe
+{
+  + {abstract} void update(int t)
+  + {abstract} void print(int t)
+}
+
+TimedRDMSim -> Network
+Network --> TopologyStrategy
+VisualizationStrategy <-- TimedRDMSim
+TimedRDMSim --> "*" Probe
+Network <--> "*" Probe
+@enduml
