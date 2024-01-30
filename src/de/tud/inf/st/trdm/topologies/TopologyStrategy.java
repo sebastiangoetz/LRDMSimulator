@@ -1,7 +1,6 @@
 package de.tud.inf.st.trdm.topologies;
 
-import de.tud.inf.st.trdm.Data;
-import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
+import de.tud.inf.st.trdm.data_update_strategy.DataUpdateStrategy;
 import de.tud.inf.st.trdm.Link;
 import de.tud.inf.st.trdm.Network;
 

@@ -1,10 +1,7 @@
-package de.tud.inf.st.trdm.DataUpdateStrategy;
+package de.tud.inf.st.trdm.data_update_strategy;
 
-import de.tud.inf.st.trdm.Link;
 import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;
-
-import java.util.Set;
 
 public interface DataUpdateStrategy {
 

@@ -18,10 +18,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -36,6 +34,8 @@ public class GraphVisualization implements VisualizationStrategy {
     private static final String ACTIVE_LINKS = "% Active Links";
 
     private static final String RATIO = "% Ratio";
+
+    private static final String TIME_STEP = "Timestep";
     private Graph graph;
     private JLabel simTimeLabel;
     private XYChart bandwidthChart;
@@ -101,7 +101,7 @@ public class GraphVisualization implements VisualizationStrategy {
         dv.setMinimumSize(new Dimension(600,400));
         panel.add(dv);
 
-        bandwidthChart = QuickChart.getChart("Bandwidth over Time","Timestep",BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
+        bandwidthChart = QuickChart.getChart("Bandwidth over Time",TIME_STEP,BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
         bandwidthChart.getStyler().setTheme(new MatlabTheme());
         bandwidthChart.getStyler().setLegendVisible(false);
         chartPanel = new XChartPanel<>(bandwidthChart);
@@ -114,7 +114,7 @@ public class GraphVisualization implements VisualizationStrategy {
         chartPanel.setMaximumSize(new Dimension(600,200));
         panel.add(chartPanel);
 
-        activeLinksChart = QuickChart.getChart("Active Links", "Timestep", ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
+        activeLinksChart = QuickChart.getChart("Active Links", TIME_STEP, ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
         activeLinksChart.getStyler().setTheme(new MatlabTheme());
         activeLinksChart.getStyler().setLegendVisible(false);
         linkChartPanel = new XChartPanel<>(activeLinksChart);
@@ -127,7 +127,7 @@ public class GraphVisualization implements VisualizationStrategy {
         linkChartPanel.setMaximumSize(new Dimension(600,200));
         panel.add(linkChartPanel);
 
-        ratioChart = QuickChart.getChart("Ratio of newest Package", "Timestep", RATIO, RATIO, List.of(0), List.of(0));
+        ratioChart = QuickChart.getChart("Ratio of newest Package", TIME_STEP, RATIO, RATIO, List.of(0), List.of(0));
         ratioChart.getStyler().setTheme(new MatlabTheme());
         ratioChart.getStyler().setLegendVisible(false);
         ratioChartPanel = new XChartPanel<>(ratioChart);
@@ -245,7 +245,8 @@ public class GraphVisualization implements VisualizationStrategy {
             n.setAttribute("ui.label", m.getID());
             String invalid = "notinvalid";
             if(m.getData() != null) {
-                //n.setAttribute("ui.label", m.getData().getDirtyFlag().toString());
+                String label = m.getID() + ": " + m.getData().getDirtyFlag().toString();
+                n.setAttribute("ui.label", label);
                 if (m.getData().getInvalid()) {
                     invalid = "invalid";
                 } else {

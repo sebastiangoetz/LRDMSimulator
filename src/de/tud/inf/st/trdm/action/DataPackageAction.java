@@ -1,10 +1,7 @@
 package de.tud.inf.st.trdm.action;
 
-import de.tud.inf.st.trdm.Data;
 import de.tud.inf.st.trdm.DataPackage;
 import de.tud.inf.st.trdm.Network;
-
-import java.util.List;
 
 public class DataPackageAction implements Action{
     private int mirrorId;
@@ -16,6 +13,6 @@ public class DataPackageAction implements Action{
     }
 
     public void run(Network n, int t){
-        n.setDataPackage(mirrorId, data , t);
+        n.setDataPackage(mirrorId, data ,t);
     }
 }

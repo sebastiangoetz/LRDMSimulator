@@ -1,7 +1,7 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.DataUpdateStrategy.DeltaDataUpdateStrategy;
-import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.HighestFlagPerTimestep;
+import de.tud.inf.st.trdm.data_update_strategy.DeltaDataUpdateStrategy;
+import de.tud.inf.st.trdm.dirty_flag_update_strategy.HighestFlagPerTimestep;
 import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 import org.junit.jupiter.api.Test;

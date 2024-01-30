@@ -1,7 +1,7 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.DataUpdateStrategy.DeltaDataUpdateStrategy;
-import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.HighestFlagPerTimestep;
+import de.tud.inf.st.trdm.data_update_strategy.DeltaDataUpdateStrategy;
+import de.tud.inf.st.trdm.dirty_flag_update_strategy.HighestFlagPerTimestep;
 import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ public class HighestFlagPerTimestepTest {
         testMap = new HighestFlagPerTimestep().updateMap(m1, testMap, dirty1);
         System.out.println();
 
-        assertEquals(testMap.get(1).compareFlag(dirty1.getDirtyFlag()),1);
+        assertEquals(testMap.get(1).compareFlag(dirty1.getFlag()),1);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class HighestFlagPerTimestepTest {
         System.out.println(m2.getData().getDirtyFlag().toString());
         System.out.println(m3.getData().getDirtyFlag().toString());
         System.out.println(m4.getData().getDirtyFlag().toString());
-        assertEquals(m3.getData().getDirtyFlag().compareFlag(m2.getData().getDirtyFlag().getDirtyFlag()), 2);
-        assertEquals(m1.getData().getDirtyFlag().compareFlag(m3.getData().getDirtyFlag().getDirtyFlag()),2);
+        assertEquals(m3.getData().getDirtyFlag().compareFlag(m2.getData().getDirtyFlag().getFlag()), 2);
+        assertEquals(m1.getData().getDirtyFlag().compareFlag(m3.getData().getDirtyFlag().getFlag()),2);
     }
 }

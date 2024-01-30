@@ -1,7 +1,7 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.DataUpdateStrategy.DeltaDataUpdateStrategy;
-import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.HighestFlagPerTimestep;
+import de.tud.inf.st.trdm.data_update_strategy.DeltaDataUpdateStrategy;
+import de.tud.inf.st.trdm.dirty_flag_update_strategy.HighestFlagPerTimestep;
 import de.tud.inf.st.trdm.probes.DataProbe;
 import de.tud.inf.st.trdm.probes.LinkProbe;
 import de.tud.inf.st.trdm.probes.MirrorProbe;
@@ -154,7 +154,7 @@ public class TimedRDMSim {
 	 */
 	public void runStep(int timeStep) {
 		try {
-			Thread.sleep(250);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}

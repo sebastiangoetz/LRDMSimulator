@@ -4,7 +4,6 @@ import de.tud.inf.st.trdm.DirtyFlag;
 import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,7 @@ public class DataProbe extends Probe{
     //aktuellste Version
     //wie viele Versionen gibt es
     //ratio zwischen aktuellste Version und Rest
-    private List<DirtyFlag> dirtyFlagList = new ArrayList<>();;
+    private List<DirtyFlag> dirtyFlagList = new ArrayList<>();
 
     private DirtyFlag newest = new DirtyFlag(new ArrayList<>());
 
@@ -37,14 +36,15 @@ public class DataProbe extends Probe{
 
     @Override
     public void print(int simTime) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data  ] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,flagToString(newest.getDirtyFlag()), dirtyFlagList.size(), ratio});
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data  ] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,flagToString(newest.getFlag()), dirtyFlagList.size(), ratio});
     }
 
     private void updateParameters(List<Mirror> mirrorList){
         int newestPackage=0;
         List<Integer> helper = new ArrayList<>(Arrays.asList(0,0,0));
-        newest.setDirtyFlag(helper);
+        newest.setFlag(helper);
         DirtyFlag dirtyFlag;
+        int answer;
         for(Mirror m:mirrorList){
             if(m.getData() == null){
                 continue;
@@ -53,15 +53,17 @@ public class DataProbe extends Probe{
             if(!inDirtyFlagList(dirtyFlag)){
                 dirtyFlagList.add(dirtyFlag);
             }
-            switch (dirtyFlag.compareFlag(newest.getDirtyFlag())) {
-                case 1 -> {
-                    helper.set(0, dirtyFlag.getDirtyFlag().get(0));
-                    helper.set(1, dirtyFlag.getDirtyFlag().get(1));
-                    helper.set(2, dirtyFlag.getDirtyFlag().get(2));
-                    newest.setDirtyFlag(helper);
-                    newestPackage = 1;
+            answer = dirtyFlag.compareFlag(newest.getFlag());
+            if(answer == 1){
+                helper.set(0, dirtyFlag.getFlag().get(0));
+                helper.set(1, dirtyFlag.getFlag().get(1));
+                helper.set(2, dirtyFlag.getFlag().get(2));
+                newest.setFlag(helper);
+                newestPackage = 1;
+            } else{
+                if (answer == 2){
+                    newestPackage++;
                 }
-                case 2 -> newestPackage++;
             }
         }
         ratio = (double) newestPackage/ (double)n.getNumTargetMirrors();
@@ -69,8 +71,8 @@ public class DataProbe extends Probe{
 
     private boolean inDirtyFlagList(DirtyFlag newDirtyFlag){
         for(DirtyFlag dirtyFlag:dirtyFlagList){
-            for(int i = 0;i<dirtyFlag.getDirtyFlag().size();i++){
-                if(dirtyFlag.equalDirtyFlag(newDirtyFlag.getDirtyFlag())){
+            for(int i = 0; i<dirtyFlag.getFlag().size(); i++){
+                if(dirtyFlag.equalDirtyFlag(newDirtyFlag.getFlag())){
                     return true;
                 }
             }

@@ -1,4 +1,4 @@
-package de.tud.inf.st.trdm.DirtyFlagUpdateStrategy;
+package de.tud.inf.st.trdm.dirty_flag_update_strategy;
 
 import de.tud.inf.st.trdm.Mirror;
 import de.tud.inf.st.trdm.Network;

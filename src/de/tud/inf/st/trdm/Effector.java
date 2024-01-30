@@ -1,14 +1,13 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
-import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.DirtyFlagUpdateStrategy;
+import de.tud.inf.st.trdm.data_update_strategy.DataUpdateStrategy;
+import de.tud.inf.st.trdm.dirty_flag_update_strategy.DirtyFlagUpdateStrategy;
 import de.tud.inf.st.trdm.action.DataPackageAction;
 import de.tud.inf.st.trdm.action.DataUpdateAction;
 import de.tud.inf.st.trdm.action.DirtyFlagUpdateAction;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**An effector for the RDM network. Collects requests to change the number of mirrors, links per mirror and topology and triggers these changes at the respective time step.

@@ -1,6 +1,6 @@
 package de.tud.inf.st.trdm.action;
 
-import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
+import de.tud.inf.st.trdm.data_update_strategy.DataUpdateStrategy;
 import de.tud.inf.st.trdm.Network;
 
 public class DataUpdateAction implements Action{

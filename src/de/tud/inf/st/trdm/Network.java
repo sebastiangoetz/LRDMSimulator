@@ -1,9 +1,8 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.DataUpdateStrategy.DataUpdateStrategy;
-import de.tud.inf.st.trdm.DirtyFlagUpdateStrategy.DirtyFlagUpdateStrategy;
+import de.tud.inf.st.trdm.data_update_strategy.DataUpdateStrategy;
+import de.tud.inf.st.trdm.dirty_flag_update_strategy.DirtyFlagUpdateStrategy;
 import de.tud.inf.st.trdm.probes.Probe;
-import de.tud.inf.st.trdm.topologies.BalancedTreeTopologyStrategy;
 import de.tud.inf.st.trdm.topologies.TopologyStrategy;
 
 import java.util.*;
@@ -66,8 +65,7 @@ public class Network {
 		log = Logger.getLogger(this.getClass().getName());
 		//put a new data package on the first mirror
 		Optional<Mirror> firstMirror = mirrors.stream().filter(n->n.getID() == 0).findAny();
-		firstMirror.get().setDataPackage(dataPackage);
-		//mirrors.get(0).setDataPackage(dataPackage);
+		firstMirror.ifPresent(mirror -> mirror.setDataPackage(dataPackage));
 
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
@@ -331,6 +329,7 @@ public class Network {
 	}
 
 	public void setDataPackage(int mirrorId, DataPackage data, int timeStep){
+		log.log(Level.INFO, "(setDataPackage{0},{1},{2})",  new Object[] {mirrorId, data.getDirtyFlag(), timeStep});
 		for(Mirror m:mirrors){
 			if(m.getID()==mirrorId){
 				m.setDataPackage(data);
@@ -339,12 +338,14 @@ public class Network {
 	}
 
 	public void setDataUpdateStrategy(DataUpdateStrategy dataUpdateStrategy, int timeStep){
+		log.log(Level.INFO, "(setDataUpdateStrategy{0},{1})",  new Object[] {dataUpdateStrategy.getClass().getName(), timeStep});
 		for(Mirror m: mirrors){
 			m.setDataUpdateStrategy(dataUpdateStrategy);
 		}
 	}
 
 	public void setDirtyFlagUpdateStrategy(DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy, int timeStep){
+		log.log(Level.INFO, "(setDirtyFlagUpdateStrategy{0},{1})",  new Object[] {dirtyFlagUpdateStrategy.getClass().getName(), timeStep});
 		this.dirtyFlagUpdateStrategy=dirtyFlagUpdateStrategy;
 	}
 

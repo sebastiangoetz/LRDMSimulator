@@ -52,8 +52,7 @@ public class Link {
 	}
 
 	public int getCurrentBandwidth() {
-		return minBandwidth;
-		//return rand.nextInt(minBandwidth,maxBandwidth);
+		return rand.nextInt(minBandwidth,maxBandwidth);
 	}
 
 	public boolean isActive() {

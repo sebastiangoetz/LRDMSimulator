@@ -1,6 +1,6 @@
 package de.tud.inf.st.trdm;
 
-import de.tud.inf.st.trdm.DataUpdateStrategy.DeltaDataUpdateStrategy;
+import de.tud.inf.st.trdm.data_update_strategy.DeltaDataUpdateStrategy;
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 

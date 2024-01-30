@@ -49,11 +49,27 @@ class AppTest {
         //effector.setStrategy(new BalancedTreeTopologyStrategy(), 80);
         DirtyFlag dirty1 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,2,4)));
         Data d = new Data(10, 3);
+        Data d2 = new Data(10, 5);
+        Data d3 = new Data(10, 6);
+        d.increaseReceived(10);
+        d2.increaseReceived(10);
+        d3.increaseReceived(10);
 
-        DataPackage package1 = new DataPackage(new ArrayList<>(Arrays.asList(d,d,d)), dirty1);
+        DataPackage package1 = new DataPackage(new ArrayList<>(Arrays.asList(d,d2,d3)), dirty1);
+
+        DirtyFlag dirty2 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(5,8,9)));
+        Data d4 = new Data(10, 50);
+        Data d5 = new Data(10, 80);
+        Data d6 = new Data(10, 60);
+        d4.increaseReceived(10);
+        d5.increaseReceived(10);
+        d6.increaseReceived(10);
+
+        DataPackage package2 = new DataPackage(new ArrayList<>(Arrays.asList(d4,d5,d6)), dirty2);
 
         //use this code to manually run the simulation step by step
         effector.setDataPackage(4,package1,10 );
+        effector.setDataPackage(9,package2,100 );
         List<Probe> probes = sim.getProbes();
         int simTime = sim.getSimTime();
         for (int t = 1; t <= simTime; t++) {
