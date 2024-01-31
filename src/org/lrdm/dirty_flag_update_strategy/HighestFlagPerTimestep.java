@@ -1,6 +1,6 @@
-package de.tud.inf.st.trdm.dirty_flag_update_strategy;
+package org.lrdm.dirty_flag_update_strategy;
 
-import de.tud.inf.st.trdm.*;
+import org.lrdm.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,19 +38,24 @@ public class HighestFlagPerTimestep extends DirtyFlagUpdateStrategy{
         }
     }
 
+    public boolean readyCheckMirror(Link l){
+        if(l.getState() != Link.State.ACTIVE){
+            return false;
+        }
+        if(l.getSource().getData() == null && l.getTarget().getData() == null){
+            return false;
+        }
+        return (l.getSource().getState() == Mirror.State.READY || l.getSource().getState() == Mirror.State.HASDATA)
+                && (l.getTarget().getState() == Mirror.State.READY || l.getTarget().getState() == Mirror.State.HASDATA);
+    }
+
 
     @Override
     public void updateDirtyFlag(List<Mirror> mirrors, Network n){
         Map<Integer, DirtyFlag> updateMirrors = new HashMap<>();
         for(Mirror m :mirrors){
-            if(m.getState() != Mirror.State.READY && m.getState() != Mirror.State.HASDATA && m.getState() != Mirror.State.UP){
-                break;
-            }
             for(Link l:m.getLinks()){
-                if(l.getState() != Link.State.ACTIVE){
-                    continue;
-                }
-                if(l.getSource().getData() == null && l.getTarget().getData() == null){
+                if(!readyCheckMirror(l)){
                     continue;
                 }
                 readyCheck(l);

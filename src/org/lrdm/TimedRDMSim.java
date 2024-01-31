@@ -1,6 +1,9 @@
 package org.lrdm;
 
+import org.lrdm.data_update_strategy.DeltaDataUpdateStrategy;
+import org.lrdm.dirty_flag_update_strategy.HighestFlagPerTimestep;
 import org.lrdm.effectors.Effector;
+import org.lrdm.probes.DataProbe;
 import org.lrdm.probes.LinkProbe;
 import org.lrdm.probes.MirrorProbe;
 import org.lrdm.probes.Probe;

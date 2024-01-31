@@ -1,4 +1,4 @@
-package de.tud.inf.st.trdm;
+package org.lrdm;
 
 import java.util.List;
 import java.util.Objects;

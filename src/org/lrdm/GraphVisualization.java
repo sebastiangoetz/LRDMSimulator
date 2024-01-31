@@ -161,8 +161,6 @@ public class GraphVisualization implements VisualizationStrategy {
         frame.add(scrollPane);
         frame.setTitle("Timed RDM Simulator");
 
-        //frame.setResizable(false);
-        frame.setSize(WIDTH,HEIGHT);
         ratioChart = QuickChart.getChart("Ratio of newest Package", TIME_STEP, RATIO, RATIO, List.of(0), List.of(0));
         ratioChart.getStyler().setTheme(new MatlabTheme());
         ratioChart.getStyler().setLegendVisible(false);
@@ -176,8 +174,8 @@ public class GraphVisualization implements VisualizationStrategy {
         ratioChartPanel.setMaximumSize(new Dimension(600,200));
         panel.add(ratioChartPanel);
 
-        frame.setResizable(false);
-        frame.setSize(600,1050);
+        //frame.setResizable(false);
+        frame.setSize(WIDTH,HEIGHT);
         frame.setVisible(true);
         frame.setBackground(Color.WHITE);
 

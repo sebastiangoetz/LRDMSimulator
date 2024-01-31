@@ -1,5 +1,7 @@
 package org.lrdm;
 
+import org.lrdm.data_update_strategy.DataUpdateStrategy;
+import org.lrdm.dirty_flag_update_strategy.DirtyFlagUpdateStrategy;
 import org.lrdm.effectors.Effector;
 import org.lrdm.probes.Probe;
 import org.lrdm.topologies.BalancedTreeTopologyStrategy;
@@ -26,9 +28,9 @@ public class Network {
 	private int numTargetMirrors;
 	private int numTargetLinksPerMirror;
 	private TopologyStrategy strategy;
-	private de.tud.inf.st.trdm.dirty_flag_update_strategy.DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy;
+	private DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy;
 
-	private de.tud.inf.st.trdm.data_update_strategy.DataUpdateStrategy dataUpdateStrategy;
+	private DataUpdateStrategy dataUpdateStrategy;
 
 
 	private double faultProbability = 0.01;
@@ -73,9 +75,6 @@ public class Network {
 		links = strategy.initNetwork(this, props);
 		log = Logger.getLogger(this.getClass().getName());
 		//put a new data package on the first mirror
-		DataPackage initialData = new DataPackage(fileSize);
-		initialData.increaseReceived(fileSize);
-		mirrors.get(0).setDataPackage(initialData);
 		faultProbability = Double.parseDouble(props.getProperty("fault_probability"));
 		random = new Random();
 		Optional<Mirror> firstMirror = mirrors.stream().filter(n->n.getID() == 0).findAny();
@@ -316,6 +315,7 @@ public class Network {
 	 */
 	private void handleMirrors(int simTime) {
 		//find stopped mirrors to remove them or invoke timeStep on the active mirrors
+		dirtyFlagUpdateStrategy.updateDirtyFlag(mirrors, this);
 		List<Mirror> stoppedMirrors = new ArrayList<>();
 		for (Mirror m : mirrors) {
 			if (m.getState() == Mirror.State.STOPPED) {
@@ -328,7 +328,6 @@ public class Network {
 			}
 		}
 		mirrors.removeAll(stoppedMirrors);
-		dirtyFlagUpdateStrategy.updateDirtyFlag(mirrors, this);
 	}
 
 	/**Remove all links from the network which are in CLOSED state and

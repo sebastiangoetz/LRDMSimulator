@@ -1,10 +1,10 @@
-package de.tud.inf.st.trdm.data_update_strategy;
+package org.lrdm.data_update_strategy;
 
-import de.tud.inf.st.trdm.*;
+import org.lrdm.*;
 
 import java.util.List;
 
-public class DeltaDataUpdateStrategy implements DataUpdateStrategy{
+public class DeltaDataUpdateStrategy implements DataUpdateStrategy {
     @Override
     public int updateData(Mirror m, Network n) {
         /**
@@ -13,8 +13,7 @@ public class DeltaDataUpdateStrategy implements DataUpdateStrategy{
         }**/
         int received = 0;
         for(Link l : m.getLinks()){
-            if(l.getState() == Link.State.ACTIVE && l.getSource().getData().getDirtyFlag().equalDirtyFlag(l.getTarget().getData().getDirtyFlag().getFlag())
-                    && l.getSource().getData() != null && l.getTarget().getData() != null ) {
+            if(checkLinks(l)) {
                 if (!l.getSource().getData().getInvalid()) {
 
                         received = received + deltaUpdate(m, l.getSource(), l);
@@ -27,6 +26,16 @@ public class DeltaDataUpdateStrategy implements DataUpdateStrategy{
             }
         }
         return received;
+    }
+
+    public boolean checkLinks(Link l){
+        if(l.getState() == Link.State.ACTIVE && l.getSource().getData() != null && l.getTarget().getData() != null) {
+            return l.getSource().getData().getDirtyFlag().equalDirtyFlag(l.getTarget().getData().getDirtyFlag().getFlag());
+        }
+        else{
+            return false;
+        }
+
     }
 
     @Override

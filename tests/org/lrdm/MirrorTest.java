@@ -1,7 +1,9 @@
 package org.lrdm;
 
-import de.tud.inf.st.trdm.data_update_strategy.DeltaDataUpdateStrategy;
+
 import org.junit.jupiter.api.Test;
+import org.lrdm.data_update_strategy.DeltaDataUpdateStrategy;
+
 import java.io.IOException;
 
 import static org.lrdm.TestUtils.loadProperties;

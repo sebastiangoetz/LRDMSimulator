@@ -1,7 +1,8 @@
-package de.tud.inf.st.trdm.data_update_strategy;
+package org.lrdm.data_update_strategy;
 
-import de.tud.inf.st.trdm.Mirror;
-import de.tud.inf.st.trdm.Network;
+
+import org.lrdm.Mirror;
+import org.lrdm.Network;
 
 public interface DataUpdateStrategy {
 

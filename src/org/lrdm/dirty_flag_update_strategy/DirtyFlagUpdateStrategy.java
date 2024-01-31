@@ -1,7 +1,9 @@
-package de.tud.inf.st.trdm.dirty_flag_update_strategy;
+package org.lrdm.dirty_flag_update_strategy;
 
-import de.tud.inf.st.trdm.Mirror;
-import de.tud.inf.st.trdm.Network;
+
+
+import org.lrdm.Mirror;
+import org.lrdm.Network;
 
 import java.util.List;
 

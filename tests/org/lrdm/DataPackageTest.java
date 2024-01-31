@@ -1,7 +1,6 @@
 package org.lrdm;
 
-import static de.tud.inf.st.trdm.TestUtils.loadProperties;
-import static de.tud.inf.st.trdm.TestUtils.props;
+
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 

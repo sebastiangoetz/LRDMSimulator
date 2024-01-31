@@ -3,6 +3,7 @@ package org.lrdm.topologies;
 import org.lrdm.Link;
 import org.lrdm.Mirror;
 import org.lrdm.Network;
+import org.lrdm.data_update_strategy.DataUpdateStrategy;
 import org.lrdm.effectors.Action;
 import org.lrdm.effectors.MirrorChange;
 import org.lrdm.effectors.TargetLinkChange;
@@ -97,8 +98,8 @@ public class NConnectedTopology extends TopologyStrategy {
      * @param simTime current simulation time
      */
     @Override
-    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
-        List<Mirror> mirrorsToAdd = createMirrors(newMirrors, simTime, props);
+    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime, DataUpdateStrategy dataUpdateStrategy) {
+        List<Mirror> mirrorsToAdd = createMirrors(newMirrors, simTime, props, dataUpdateStrategy);
         n.getMirrors().addAll(mirrorsToAdd);
         restartNetwork(n, props, simTime);
     }

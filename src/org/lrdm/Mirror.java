@@ -1,6 +1,6 @@
 package org.lrdm;
 
-import de.tud.inf.st.trdm.data_update_strategy.DataUpdateStrategy;
+import org.lrdm.data_update_strategy.DataUpdateStrategy;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -89,7 +89,7 @@ public class Mirror {
 	}
 
 	public void crash(int simTime) {
-		if(this.getData() != null) this.getData().reset();
+		if(this.getData() != null) this.setDataPackage(null);
 		this.state = State.STARTING;
 		this.initTime = simTime;
 		for(Link l : links) {

@@ -3,6 +3,7 @@ package org.lrdm.topologies;
 import org.lrdm.Link;
 import org.lrdm.Mirror;
 import org.lrdm.Network;
+import org.lrdm.data_update_strategy.DataUpdateStrategy;
 import org.lrdm.effectors.Action;
 import org.lrdm.util.IDGenerator;
 
@@ -21,7 +22,7 @@ public abstract class TopologyStrategy {
 		n.getLinks().clear();
 		n.getMirrors().forEach(m -> m.getLinks().clear());
 	}
-	public abstract void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime);
+	public abstract void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime, DataUpdateStrategy dataUpdateStrategy);
 
 	/**Remove the requested amount of links from the network.
 	 * The mirrors with the highest ID will be removed first.
@@ -59,10 +60,10 @@ public abstract class TopologyStrategy {
 	 * @param props the {@link Properties} of the simulation
 	 * @return a list of added {@link Mirror}s
 	 */
-	protected List<Mirror> createMirrors(int numberOfMirrors, int simTime, Properties props) {
+	protected List<Mirror> createMirrors(int numberOfMirrors, int simTime, Properties props, DataUpdateStrategy dataUpdateStrategy) {
 		List<Mirror> addedMirrors = new ArrayList<>();
 		for(int i = 0; i < numberOfMirrors; i++) {
-			Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props);
+			Mirror m = new Mirror(IDGenerator.getInstance().getNextID(), simTime, props, dataUpdateStrategy);
 			addedMirrors.add(m);
 		}
 		return addedMirrors;

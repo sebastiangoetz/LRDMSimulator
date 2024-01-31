@@ -4,6 +4,8 @@ package org.lrdm;
  *
  * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
+
+
 import java.util.List;
 
 public class DataPackage {
@@ -36,6 +38,22 @@ public class DataPackage {
 
     public DirtyFlag getDirtyFlag(){
         return dirtyFlag;
+    }
+
+    public int getFileSize(){
+        int size = 0;
+        for(Data d : data){
+            size = size + d.getFileSize();
+        }
+        return size;
+    }
+
+    public int getReceived(){
+        int size = 0;
+        for(Data d : data){
+            size = size + d.getReceived();
+        }
+        return size;
     }
 
     /**Answers whether the complete data package has been loaded.

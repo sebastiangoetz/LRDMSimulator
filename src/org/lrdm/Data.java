@@ -1,4 +1,4 @@
-package de.tud.inf.st.trdm;
+package org.lrdm;
 
 public class Data {
     /** the file size of the data package measured in GB*/

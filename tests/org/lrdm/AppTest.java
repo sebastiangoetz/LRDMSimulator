@@ -1,6 +1,7 @@
 package org.lrdm;
 
 import org.lrdm.effectors.Action;
+import org.lrdm.effectors.Effector;
 import org.lrdm.examples.ExampleOptimizer;
 import org.lrdm.examples.ExampleSimulation;
 import org.lrdm.probes.LinkProbe;

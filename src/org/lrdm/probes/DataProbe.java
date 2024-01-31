@@ -1,8 +1,9 @@
-package de.tud.inf.st.trdm.probes;
+package org.lrdm.probes;
 
-import de.tud.inf.st.trdm.DirtyFlag;
-import de.tud.inf.st.trdm.Mirror;
-import de.tud.inf.st.trdm.Network;
+
+import org.lrdm.DirtyFlag;
+import org.lrdm.Mirror;
+import org.lrdm.Network;
 
 import java.util.ArrayList;
 import java.util.Arrays;
