@@ -4,6 +4,9 @@ package org.lrdm.effectors;
 import org.lrdm.DataPackage;
 import org.lrdm.Network;
 
+/**An adaptation action representing the addition of a new {@link DataPackage}.
+ *
+ */
 public class DataPackageChange extends Action{
     private final int mirrorId;
     private final DataPackage data;

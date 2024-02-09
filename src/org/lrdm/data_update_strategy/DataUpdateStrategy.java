@@ -15,7 +15,7 @@ public interface DataUpdateStrategy {
       * @param n the {@link Network}, if the implementation needs more information to update
       * @return received bandwidth in one timestep
       */
-     public abstract int updateData(Mirror m, Network n);
+     int updateData(Mirror m, Network n);
 
      /**Checks if the data of a {@link Mirror} needs to be updated.
       *
@@ -23,6 +23,6 @@ public interface DataUpdateStrategy {
       * @param n the {@link Network}, if the implementation needs more information
       * @return true if the data update is required, false if not
       */
-    public abstract boolean updateRequired(Mirror m, Network n);
+    boolean updateRequired(Mirror m, Network n);
 
 }

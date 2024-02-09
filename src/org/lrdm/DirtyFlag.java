@@ -3,11 +3,12 @@ package org.lrdm;
 import java.util.List;
 import java.util.Objects;
 
-/**Represents a single data package to be held by mirrors.
+/**Represents a single dirtyFlag to be held by dataPackages.
  *
- * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
 public class DirtyFlag {
+
+    /** representation of the dirtyFlag */
     List<Integer> flag;
 
     public DirtyFlag(List<Integer> data){
@@ -22,25 +23,34 @@ public class DirtyFlag {
         this.flag = flag;
     }
 
-    // 0: kleiner, 1: größer, 2: gleich
-    public int compareFlag(List<Integer> newest){
+    /**Compares this {@link DirtyFlag} with another one.
+     *
+     * @param otherFlag the {@link DirtyFlag} that needs to be compared
+     * @return 0 for smaller, 1 for bigger, 2 for equals
+     */
+    public int compareFlag(List<Integer> otherFlag){
         for(int i = 0; i< flag.size(); i++){
-            if(flag.get(i) < newest.get(i)){
+            if(flag.get(i) < otherFlag.get(i)){
                 return 0;
             }
-            if(flag.get(i) > newest.get(i)){
+            if(flag.get(i) > otherFlag.get(i)){
                 return 1;
             }
         }
         return 2;
     }
 
-    public boolean equalDirtyFlag(List<Integer> otherDirtyFlag){
-        if(flag.size() != otherDirtyFlag.size()){
+    /**Compares this {@link DirtyFlag} with another one, if they are equal.
+     *
+     * @param otherFlag the {@link DirtyFlag} that needs to be compared
+     * @return true if equal, false if not
+     */
+    public boolean equalDirtyFlag(List<Integer> otherFlag){
+        if(flag.size() != otherFlag.size()){
             return false;
         }
         for(int i = 0; i< flag.size(); i++){
-            if(!Objects.equals(flag.get(i), otherDirtyFlag.get(i))){
+            if(!Objects.equals(flag.get(i), otherFlag.get(i))){
                 return false;
             }
         }

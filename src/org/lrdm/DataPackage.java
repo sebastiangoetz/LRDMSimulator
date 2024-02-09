@@ -8,8 +8,13 @@ import java.util.List;
 
 public class DataPackage {
 
+    /** list of {@link Data} units*/
     private List<Data> data;
+
+    /** {@link DirtyFlag} of the package*/
     private DirtyFlag dirtyFlag;
+
+    /** invalid-flag if {@link Data} is invalid*/
     boolean invalid = false;
 
     public DataPackage(List<Data> data, DirtyFlag dirtyFlag) {
@@ -17,50 +22,33 @@ public class DataPackage {
         this.dirtyFlag = dirtyFlag;
     }
 
-    /**Answers whether the complete data package has been loaded.
-     *
-     * @param invalid the true if all data has been received, else false
-     */
     public void setInvalid(boolean invalid){
         this.invalid = invalid;
     }
 
 
-    /**Answers whether the complete data package has been loaded.
-     *
-     * @return true if all data has been received, else false
-     */
     public boolean getInvalid(){
         return invalid;
     }
 
-    /**Answers whether the complete data package has been loaded.
-     *
-     * @return true if all data has been received, else false
-     */
+
     public List<Data> getData(){
         return data;
     }
 
-    /**Answers whether the complete data package has been loaded.
-     *
-     * @param dirtyFlag the {@link DirtyFlag} true if all data has been received, else false
-     */
+
     public void setDirtyFlag(DirtyFlag dirtyFlag){
         this.dirtyFlag = dirtyFlag;
     }
 
-    /**Answers whether the complete data package has been loaded.
-     *
-     * @return true if all data has been received, else false
-     */
+
     public DirtyFlag getDirtyFlag(){
         return dirtyFlag;
     }
 
-    /**Answers whether the complete data package has been loaded.
+    /**get file size of the complete {@link DataPackage}
      *
-     * @return true if all data has been received, else false
+     * @return sum of all {@link Data} units
      */
     public int getFileSize(){
         int size = 0;
@@ -70,9 +58,9 @@ public class DataPackage {
         return size;
     }
 
-    /**Answers whether the complete data package has been loaded.
+    /**get received size of the complete {@link DataPackage}
      *
-     * @return true if all data has been received, else false
+     * @return sum of all {@link Data} units
      */
     public int getReceived(){
         int size = 0;

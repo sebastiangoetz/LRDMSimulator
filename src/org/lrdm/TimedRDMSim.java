@@ -3,7 +3,7 @@ package org.lrdm;
 import org.lrdm.data_update_strategy.DeltaDataUpdateStrategy;
 import org.lrdm.dirty_flag_update_strategy.HighestFlagPerTimestep;
 import org.lrdm.effectors.Effector;
-import org.lrdm.probes.DataProbe;
+import org.lrdm.probes.DirtyFlagProbe;
 import org.lrdm.probes.LinkProbe;
 import org.lrdm.probes.MirrorProbe;
 import org.lrdm.probes.Probe;
@@ -112,7 +112,7 @@ public class TimedRDMSim {
 		probes = new ArrayList<>();
 		Probe mprobe = new MirrorProbe(network);
 		Probe lprobe = new LinkProbe(network);
-		Probe dprobe = new DataProbe(network);
+		Probe dprobe = new DirtyFlagProbe(network);
 		probes.add(mprobe);
 		probes.add(lprobe);
 		probes.add(dprobe);
@@ -160,9 +160,9 @@ public class TimedRDMSim {
 		return null;
 	}
 
-	public DataProbe getDataProbe() {
+	public DirtyFlagProbe getDataProbe() {
 		for(Probe p : probes) {
-			if(p instanceof DataProbe dp) return dp;
+			if(p instanceof DirtyFlagProbe dp) return dp;
 		}
 		return null;
 	}

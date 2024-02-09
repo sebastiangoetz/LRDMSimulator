@@ -9,18 +9,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**Interface to be used by all DataUpdate strategies. Specifies methods to be used for updating the data and checking if the update is required.
+/**Interface to be used by all {@link DirtyFlag} strategies. Specifies methods to be used for updating the dirtyFlags and
+ * getting metaData about the flags.
  *
  */
 public abstract class DirtyFlagUpdateStrategy {
 
+    /**The history of the distribution of dirtyFlags. A map with {@link DirtyFlag} as key and a map,
+     *  with the simulation time as key and appearance of the flag as value, as value.*/
     protected Map<DirtyFlag, Map<Integer, Integer>> dirtyFlagAppearance = new HashMap<>();
 
-    /**Updates the data of a {@link Mirror}.
+    /**Updates the {@link DirtyFlag} of each mirror.
      *
-     * @param mirrors  where the data is updated
+     * @param mirrors mirrors of the network
      * @param n the {@link Network}, if the implementation needs more information to update
-     * @return received bandwidth in one timestep
+     * @param simTime current simulation time
      */
     public abstract void updateDirtyFlag(List<Mirror> mirrors, Network n, Integer simTime);
 
@@ -28,9 +31,9 @@ public abstract class DirtyFlagUpdateStrategy {
         return dirtyFlagAppearance;
     }
 
-    /**Updates the data of a {@link Mirror}.
+    /**Setup a {@link Mirror} if it has no data.
      *
-     * @param m the {@link Mirror}  where the data is updated
+     * @param m the {@link Mirror} which has no data
      */
     protected void setupMirror(Mirror m){
         List<Data> dataList = new ArrayList<>();

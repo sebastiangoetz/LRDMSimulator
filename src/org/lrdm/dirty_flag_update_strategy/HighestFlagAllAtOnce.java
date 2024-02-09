@@ -6,8 +6,17 @@ import org.lrdm.Network;
 
 import java.util.*;
 
+/**A {@link DirtyFlagUpdateStrategy} which updates the {@link DirtyFlag} of each {@link Mirror}.
+ * Each {@link Mirror} gets updated in one timestep. Only the highest {@link DirtyFlag} is propagated.
+ *
+ */
 public class HighestFlagAllAtOnce extends DirtyFlagUpdateStrategy{
 
+    /**Gets highest {@link DirtyFlag} in the {@link Network}.
+     *
+     * @param mirrors mirrors of the {@link Network}
+     * @return highest {@link DirtyFlag} of the {@link Network}.
+     */
     private DirtyFlag getHighest(List<Mirror> mirrors){
         DirtyFlag highest = new DirtyFlag(new ArrayList<>(Arrays.asList(0,0,0)));
         for(Mirror m:mirrors){
@@ -20,6 +29,13 @@ public class HighestFlagAllAtOnce extends DirtyFlagUpdateStrategy{
         }
         return highest;
     }
+
+    /**Updates the {@link DirtyFlag} of each mirror. In one simulation step, all mirrors are updated.
+     *
+     * @param mirrors mirrors of the network
+     * @param n the {@link Network}, if the implementation needs more information to update
+     * @param simTime current simulation time
+     */
     @Override
     public void updateDirtyFlag(List<Mirror> mirrors, Network n, Integer simTime) {
         DirtyFlag highest = getHighest(mirrors);

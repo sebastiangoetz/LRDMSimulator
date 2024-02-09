@@ -4,17 +4,20 @@ import org.lrdm.*;
 
 import java.util.List;
 
+/**A {@link DataUpdateStrategy} which updates the data of a {@link Mirror} and updates
+ *  all parts of the {@link DataPackage}.
+ *
+ */
 public class FullDataUpdateStrategy extends ConnectedDataUpdateStrategy{
 
-    private boolean setZero = false;
-
-    private DirtyFlag setZeroWhen;
+    /**Updates the data of a {@link Mirror}.
+     *
+     * @param m the {@link Mirror}, where the data is updated
+     * @param n the {@link Network}, if the implementation needs more information to update
+     * @return received bandwidth in one timestep
+     */
     @Override
     public int updateData(Mirror m, Network n) {
-        /**
-         if(m.getState() != Mirror.State.READY || m.getState() != Mirror.State.HASDATA){
-         return;
-         }**/
         int received = 0;
         for(Link l : m.getLinks()){
             if(checkLinks(l)) {
@@ -33,14 +36,19 @@ public class FullDataUpdateStrategy extends ConnectedDataUpdateStrategy{
     }
 
 
-
+    /** Updates the data of a {@link Mirror} and updates all parts of the {@link DataPackage}.
+     *
+     * @param m the {@link Mirror}, which needs to be updated
+     * @param m2 the {@link Mirror}, which will update the other
+     * @param l the {@link Link}, that connects both mirrors
+     * @return used bandwidth of the {@link Link}
+     */
     public int fullUpdate(Mirror m, Mirror m2, Link l){
         DataPackage data1 = m.getData();
         DataPackage data2 = m2.getData();
         int bandwidth = l.getCurrentBandwidth();
-        int difference;
-        checkLength(data1, data2);
         List<Data> dataList;
+        checkLength(data1, data2);
         if(setZeroWhen != null && !setZeroWhen.equalDirtyFlag(data2.getDirtyFlag().getFlag())){
                 setZero = false;
         }
@@ -55,15 +63,9 @@ public class FullDataUpdateStrategy extends ConnectedDataUpdateStrategy{
             setZero = true;
             setZeroWhen = new DirtyFlag(data2.getDirtyFlag().getFlag());
         }
-        for(int i=0;i<m.getData().getData().size();i++){
-            difference = doNormalUpdate(data1, data2, i, bandwidth);
-        if(difference >= 0){
-            break;
-        }
-        else{
-            bandwidth = -1 * difference;
-        }
-        }
+
+        data1 = doNormalUpdate(data1, data2, bandwidth);
+
         m.setDataPackage(data1);
         return l.getCurrentBandwidth();
     }

@@ -45,6 +45,8 @@ public class Network {
 	/**The history of the time to write metric. The map has simulation time as key and the time to write as value.*/
 	private final Map<Integer,Integer> ttwHistory;
 
+	/**The history of the distribution of dirtyFlags. A map with {@link DirtyFlag} as key and a map,
+	 *  with the simulation time as key and appearance of the flag as value, as value.*/
 	private final Map<DirtyFlag, Map<Integer,Integer>> dirtyFlagHistory;
 
 

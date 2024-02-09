@@ -11,15 +11,21 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DataProbe extends Probe{
+/**A probe observing the dirtyFlags.
+ *
+ */
+public class DirtyFlagProbe extends Probe{
 
+    /**List of all dirtyFlags in the {@link Network} */
     private List<DirtyFlag> dirtyFlagList = new ArrayList<>();
 
-    private DirtyFlag newest = new DirtyFlag(new ArrayList<>());
+    /**Highest {@link DirtyFlag} in the {@link Network} */
+    private DirtyFlag highest = new DirtyFlag(new ArrayList<>());
 
+    /**Ratio of the amount of nodes who have the highest {@link DirtyFlag} to the total amount of nodes.*/
     private double ratio = 0;
 
-    public DataProbe(Network n) {
+    public DirtyFlagProbe(Network n) {
         super(n);
     }
 
@@ -28,20 +34,20 @@ public class DataProbe extends Probe{
     public void update(int simTime) {
         List<Mirror> mirrorList = n.getMirrors();
         dirtyFlagList = new ArrayList<>();
-        newest = new DirtyFlag(new ArrayList<>());
+        highest = new DirtyFlag(new ArrayList<>());
         ratio = 0;
         updateParameters(mirrorList);
     }
 
     @Override
     public void print(int simTime) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data  ] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,newest, dirtyFlagList.size(), ratio});
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data  ] Highest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime, highest, dirtyFlagList.size(), ratio});
     }
 
     private void updateParameters(List<Mirror> mirrorList){
         int newestPackage=0;
         List<Integer> helper = new ArrayList<>(Arrays.asList(0,0,0));
-        newest.setFlag(helper);
+        highest.setFlag(helper);
         DirtyFlag dirtyFlag;
         int answer;
         for(Mirror m:mirrorList){
@@ -52,12 +58,12 @@ public class DataProbe extends Probe{
             if(!inDirtyFlagList(dirtyFlag)){
                 dirtyFlagList.add(dirtyFlag);
             }
-            answer = dirtyFlag.compareFlag(newest.getFlag());
+            answer = dirtyFlag.compareFlag(highest.getFlag());
             if(answer == 1){
                 helper.set(0, dirtyFlag.getFlag().get(0));
                 helper.set(1, dirtyFlag.getFlag().get(1));
                 helper.set(2, dirtyFlag.getFlag().get(2));
-                newest.setFlag(helper);
+                highest.setFlag(helper);
                 newestPackage = 1;
             } else{
                 if (answer == 2){

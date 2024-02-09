@@ -4,7 +4,17 @@ import org.lrdm.*;
 
 import java.util.List;
 
+/**Abstract class to be used by specific DataUpdate strategies. Specifies methods to be used for updating the data and
+ *  checking if the update is required.
+ *
+ */
 public abstract class ConnectedDataUpdateStrategy implements DataUpdateStrategy{
+
+    /**flag if affected parts of {@link DataPackage} was set to zero*/
+    protected boolean setZero = false;
+
+    /** dirtyFlag where {@link DataPackage} was set to zero last time */
+    protected DirtyFlag setZeroWhen;
 
     /**Checks if the data of a mirror needs to be updated.
      * The data needs to be updated if the mirror is invalid and is connected via an active link to another mirror, who
@@ -33,6 +43,13 @@ public abstract class ConnectedDataUpdateStrategy implements DataUpdateStrategy{
         return false;
     }
 
+    /**Check if one {@link Mirror} can update the other.
+     * This includes whether the {@link Link} is active,
+     * whether both mirrors have data and whether the dirty flags of both mirrors are the same.
+     *
+     * @param l the {@link Link}, which needs to be checked
+     * @return true if one mirror can update the other
+     */
     protected boolean checkLinks(Link l){
         if(l.getState() == Link.State.ACTIVE && l.getSource().getData() != null && l.getTarget().getData() != null) {
             return l.getSource().getData().getDirtyFlag().equalDirtyFlag(l.getTarget().getData().getDirtyFlag().getFlag());
@@ -43,6 +60,12 @@ public abstract class ConnectedDataUpdateStrategy implements DataUpdateStrategy{
 
     }
 
+    /**Checks the length of both mirror data lists.
+     * If they are different, the list is increased or reduced for one mirror.
+     *
+     * @param data1 the {@link DataPackage}, which needs to be updated
+     * @param data2 the {@link DataPackage}, which will update the other
+     */
     protected void checkLength(DataPackage data1, DataPackage data2){
         int length = data1.getData().size() - data2.getData().size();
         List<Data> dataList;
@@ -64,21 +87,32 @@ public abstract class ConnectedDataUpdateStrategy implements DataUpdateStrategy{
         }
     }
 
-    protected int doNormalUpdate(DataPackage data1, DataPackage data2, int i, int bandwidth){
-        boolean helper = data1.getInvalid();
-        List<Data> dataList = data1.getData();
-        Data data = new Data(data2.getData().get(i).getFileSize(), data1.getData().get(i).getContent());
-        data.setReceived(data1.getData().get(i).getReceived());
-        dataList.set(i, data);
-        data1 = new DataPackage(dataList,data1.getDirtyFlag());
-        data1.setInvalid(helper);
+    /**Updates the data in the {@link DataPackage} of a {@link Mirror} by the bandwidth of the {@link Link}.
+     *
+     * @param data1 the {@link DataPackage}, which needs to be updated
+     * @param data2 the {@link DataPackage}, which will update the other
+     * @param bandwidth the bandwidth of the {@link Link}
+     * @return updated {@link DataPackage}
+     */
+    protected DataPackage doNormalUpdate(DataPackage data1, DataPackage data2, int bandwidth){
+        for(int i=0;i<data2.getData().size();i++){
+            if(data1.getData().get(i).getContent() != data2.getData().get(i).getContent()){
 
-        int difference = data1.getData().get(i).increaseReceived(bandwidth);
+                int difference = data1.getData().get(i).increaseReceived(bandwidth);
 
-        if(data1.getData().get(i).isLoaded()){
-            data1.getData().get(i).setContent(data2.getData().get(i).getContent());
+                if(data1.getData().get(i).isLoaded()){
+                    data1.getData().get(i).setContent(data2.getData().get(i).getContent());
+                }
+                if(difference >= 0){
+                    break;
+                }
+                else{
+                    bandwidth = -1 * difference;
+                }
+            }
         }
-        return difference;
+
+        return data1;
     }
 
 }
