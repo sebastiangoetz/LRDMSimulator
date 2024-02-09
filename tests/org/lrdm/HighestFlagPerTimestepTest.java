@@ -12,7 +12,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HighestFlagPerTimestepTest {
+class HighestFlagPerTimestepTest {
 
     @Test
     void updateMapTest() throws IOException {
@@ -35,7 +35,7 @@ public class HighestFlagPerTimestepTest {
         testMap = new HighestFlagPerTimestep().updateMap(m1, testMap, dirty1);
         System.out.println();
 
-        assertEquals(testMap.get(1).compareFlag(dirty1.getFlag()),1);
+        assertEquals(1,testMap.get(1).compareFlag(dirty1.getFlag()));
     }
 
     @Test
@@ -65,10 +65,6 @@ public class HighestFlagPerTimestepTest {
 
         Link l1 = new Link(4,m1,m2,0,TestUtils.props);
         Link l2 = new Link(5,m2,m3,0,TestUtils.props);
-        //Link l3 = new Link(6,m1,m3,0,TestUtils.props);
-        //Link l4 = new Link(8,m3,m4,0,TestUtils.props);
-
-        //new List<Integer> flag1 = new ArrayList<Integer>(Arrays.asList(1,2,4));
         DirtyFlag dirty1 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,2,4)));
         DirtyFlag dirty2 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(2,5,4)));
         DirtyFlag dirty3 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,8,4)));
@@ -88,20 +84,10 @@ public class HighestFlagPerTimestepTest {
         mirrors.add(m1);
         mirrors.add(m2);
         mirrors.add(m3);
-        //mirrors.add(m4);
 
-        //assertEquals(m2.getData().getDirtyFlag().compareFlag(m3.getData().getDirtyFlag().getDirtyFlag()), 2);
-        //assertEquals(m1.getData().getDirtyFlag().compareFlag(m2.getData().getDirtyFlag().getDirtyFlag()),2);
-        System.out.println(m1.getData().getDirtyFlag().toString());
-        System.out.println(m2.getData().getDirtyFlag().toString());
-        System.out.println(m3.getData().getDirtyFlag().toString());
-        System.out.println(m4.getData().getDirtyFlag().toString());
-        new HighestFlagPerTimestep().updateDirtyFlag(mirrors, network);
-        System.out.println(m1.getData().getDirtyFlag().toString());
-        System.out.println(m2.getData().getDirtyFlag().toString());
-        System.out.println(m3.getData().getDirtyFlag().toString());
-        System.out.println(m4.getData().getDirtyFlag().toString());
-        assertEquals(m3.getData().getDirtyFlag().compareFlag(m2.getData().getDirtyFlag().getFlag()), 2);
-        assertEquals(m1.getData().getDirtyFlag().compareFlag(m3.getData().getDirtyFlag().getFlag()),2);
+
+        new HighestFlagPerTimestep().updateDirtyFlag(mirrors, network, 3);
+        assertEquals(1, m3.getData().getDirtyFlag().compareFlag(m2.getData().getDirtyFlag().getFlag()));
+        assertEquals(1,m1.getData().getDirtyFlag().compareFlag(m3.getData().getDirtyFlag().getFlag()));
     }
 }

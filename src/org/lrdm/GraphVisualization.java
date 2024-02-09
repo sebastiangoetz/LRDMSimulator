@@ -154,6 +154,23 @@ public class GraphVisualization implements VisualizationStrategy {
         ttwChartPanel.setPreferredSize(new Dimension(WIDTH,HEIGHT/6));
         panel.add(ttwChartPanel);
 
+        ratioChart = new XYChart(600, 400);
+        ratioChart.setTitle("DirtyFlags Ratio");
+        ratioChart.setXAxisTitle(TIME_STEP);
+        ratioChart.setYAxisTitle(RATIO);
+        ratioChart.getStyler().setTheme(new MatlabTheme());
+        ratioChart.getStyler().setLegendVisible(false);
+        targetTTW.setMarker(SeriesMarkers.NONE);
+        ratioChartPanel = new XChartPanel<>(ratioChart);
+        gc = new GridBagConstraints();
+        gc.gridx=0;
+        gc.gridy=5;
+        gc.gridwidth=1;
+        gl.setConstraints(ratioChartPanel, gc);
+        ratioChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
+        ratioChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
+        panel.add(ratioChartPanel);
+
         JScrollPane scrollPane = new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setMinimumSize(new Dimension(WIDTH, HEIGHT));
         panel.setBackground(Color.WHITE);
@@ -161,20 +178,6 @@ public class GraphVisualization implements VisualizationStrategy {
         frame.add(scrollPane);
         frame.setTitle("Timed RDM Simulator");
 
-        ratioChart = QuickChart.getChart("Ratio of newest Package", TIME_STEP, RATIO, RATIO, List.of(0), List.of(0));
-        ratioChart.getStyler().setTheme(new MatlabTheme());
-        ratioChart.getStyler().setLegendVisible(false);
-        ratioChartPanel = new XChartPanel<>(ratioChart);
-        gc = new GridBagConstraints();
-        gc.gridx=0;
-        gc.gridy=4;
-        gc.gridwidth=1;
-        gl.setConstraints(ratioChartPanel, gc);
-        ratioChartPanel.setMinimumSize(new Dimension(600,200));
-        ratioChartPanel.setMaximumSize(new Dimension(600,200));
-        panel.add(ratioChartPanel);
-
-        //frame.setResizable(false);
         frame.setSize(WIDTH,HEIGHT);
         frame.setVisible(true);
         frame.setBackground(Color.WHITE);
@@ -206,6 +209,8 @@ public class GraphVisualization implements VisualizationStrategy {
         List<Integer> activeLinksGoalTS = Collections.nCopies(network.getActiveLinksHistory().size(),35);
         List<Integer> ttwTS = new ArrayList<>(network.getTtwHistory().values());
         List<Integer> ttwGoalTS = Collections.nCopies(network.getTtwHistory().size(), 45);
+        Map<DirtyFlag, Map<Integer, Integer>> dirtyFlags = network.getDirtyFlagHistory();
+
 
         bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
         bandwidthChart.updateXYSeries("Target", timeSteps, bandwidthGoalTS,null);
@@ -219,7 +224,17 @@ public class GraphVisualization implements VisualizationStrategy {
         timeToWriteChart.updateXYSeries("Target Time To Write", timeSteps, ttwGoalTS,null);
         ttwChartPanel.repaint();
 
-        ratioChart.updateXYSeries(RATIO, timeSteps, activeLinksTS, null);
+        Map<String, XYSeries> seriesMap = ratioChart.getSeriesMap();
+        for(Map.Entry<DirtyFlag, Map<Integer, Integer>> entry : dirtyFlags.entrySet()){
+            if(seriesMap.containsKey(entry.getKey().toString())){
+                ratioChart.updateXYSeries(entry.getKey().toString(), new ArrayList<>(entry.getValue().keySet()),
+                        new ArrayList<>(entry.getValue().values()), null);
+            }
+            else{
+                ratioChart.addSeries(entry.getKey().toString(), new ArrayList<>(entry.getValue().keySet()),
+                        new ArrayList<>(entry.getValue().values())).setMarker(SeriesMarkers.NONE);
+            }
+        }
         ratioChartPanel.repaint();
     }
 

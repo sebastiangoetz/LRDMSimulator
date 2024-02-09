@@ -12,9 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DataProbe extends Probe{
-    //aktuellste Version
-    //wie viele Versionen gibt es
-    //ratio zwischen aktuellste Version und Rest
+
     private List<DirtyFlag> dirtyFlagList = new ArrayList<>();
 
     private DirtyFlag newest = new DirtyFlag(new ArrayList<>());
@@ -37,7 +35,7 @@ public class DataProbe extends Probe{
 
     @Override
     public void print(int simTime) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data  ] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,flagToString(newest.getFlag()), dirtyFlagList.size(), ratio});
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO,"[{0}] [Data  ] Newest/Amount/Ratio: {1} | {2} | {3}", new Object[]{simTime,newest, dirtyFlagList.size(), ratio});
     }
 
     private void updateParameters(List<Mirror> mirrorList){
@@ -79,16 +77,5 @@ public class DataProbe extends Probe{
             }
         }
         return false;
-    }
-
-    private String flagToString(List<Integer> dirtyFlag){
-        StringBuilder answer = new StringBuilder();
-        for(Integer i:dirtyFlag){
-            answer.append(i).append(".");
-        }
-        if(!answer.isEmpty()) {
-            answer.deleteCharAt(answer.length()-1);
-        }
-        return answer.toString();
     }
 }

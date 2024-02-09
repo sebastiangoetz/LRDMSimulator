@@ -3,6 +3,10 @@ package org.lrdm;
 import java.util.List;
 import java.util.Objects;
 
+/**Represents a single data package to be held by mirrors.
+ *
+ * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
+ */
 public class DirtyFlag {
     List<Integer> flag;
 
@@ -53,5 +57,24 @@ public class DirtyFlag {
             answer.deleteCharAt(answer.length()-1);
         }
         return answer.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof DirtyFlag)) {
+            return false;
+        }
+        DirtyFlag c = (DirtyFlag) o;
+
+        return equalDirtyFlag(c.getFlag());
+    }
+
+    @Override
+    public int hashCode() {
+        return getFlag() != null ? getFlag().hashCode() : 0;
     }
 }

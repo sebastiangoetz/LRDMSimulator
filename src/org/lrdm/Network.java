@@ -45,6 +45,9 @@ public class Network {
 	/**The history of the time to write metric. The map has simulation time as key and the time to write as value.*/
 	private final Map<Integer,Integer> ttwHistory;
 
+	private final Map<DirtyFlag, Map<Integer,Integer>> dirtyFlagHistory;
+
+
 	private int currentTimeStep = 0;
 
 	/**Creates a new network. Uses parameters for number of mirrors and links.
@@ -55,7 +58,6 @@ public class Network {
 	 * @param numLinks the number of links each mirror should have
 	 * @param props the properties of the simulation
 	 */
-	//default-UpdateStrategy speichern und z.B. an topologyStrategy weitergeben
 	public Network(TopologyStrategy strategy, int numMirrors, int numLinks, DataPackage dataPackage, Properties props, DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy, DataUpdateStrategy dataUpdateStrategy) {
 		numTargetMirrors = numMirrors;
 		numTargetLinksPerMirror = numLinks;
@@ -71,18 +73,18 @@ public class Network {
 			mirrors.add(new Mirror(i, 0, props, dataUpdateStrategy));
 		}
 		mirrors.get(0).setRoot(true);
+		mirrors.get(0).setDataPackage(dataPackage);
 		// create the links - default strategy: spanning tree
 		links = strategy.initNetwork(this, props);
 		log = Logger.getLogger(this.getClass().getName());
 		//put a new data package on the first mirror
 		faultProbability = Double.parseDouble(props.getProperty("fault_probability"));
 		random = new Random();
-		Optional<Mirror> firstMirror = mirrors.stream().filter(n->n.getID() == 0).findAny();
-		firstMirror.ifPresent(mirror -> mirror.setDataPackage(dataPackage));
 
 		bandwidthHistory = new HashMap<>();
 		activeLinkHistory = new HashMap<>();
 		ttwHistory = new HashMap<>();
+		dirtyFlagHistory = new HashMap<>();
     }
 
 	public int getCurrentTimeStep() {
@@ -131,6 +133,10 @@ public class Network {
 	 */
 	public Set<Link> getLinks() {
 		return links;
+	}
+
+	public DirtyFlagUpdateStrategy getDirtyFlagUpdateStrategy(){
+		return dirtyFlagUpdateStrategy;
 	}
 
 	/**
@@ -285,6 +291,10 @@ public class Network {
 	 */
 	public Map<Integer, Integer> getTtwHistory() { return ttwHistory; }
 
+	public Map<DirtyFlag, Map<Integer, Integer>> getDirtyFlagHistory() {
+		return dirtyFlagHistory;
+	}
+
 	/**
 	 * Performs a single simulation step. Clears stopped mirrors and delegates
 	 * simulation to all active mirrors. Notifies all probes.
@@ -315,7 +325,7 @@ public class Network {
 	 */
 	private void handleMirrors(int simTime) {
 		//find stopped mirrors to remove them or invoke timeStep on the active mirrors
-		dirtyFlagUpdateStrategy.updateDirtyFlag(mirrors, this);
+		dirtyFlagUpdateStrategy.updateDirtyFlag(mirrors, this, simTime);
 		List<Mirror> stoppedMirrors = new ArrayList<>();
 		for (Mirror m : mirrors) {
 			if (m.getState() == Mirror.State.STOPPED) {
@@ -373,6 +383,20 @@ public class Network {
 			ttwHistory.put(simTime, 100);
 		} else {
 			ttwHistory.put(simTime, 100 - 100 * (ttw - 1) / (maxTTW - 1));
+		}
+
+		Map<DirtyFlag, Map<Integer, Integer>> dirtyFlagStrategy = dirtyFlagUpdateStrategy.getDirtyFlagAppearance();
+		for(Map.Entry<DirtyFlag, Map<Integer, Integer>> entry : dirtyFlagStrategy.entrySet()){
+			for(Map.Entry<Integer, Integer> innerEntry: entry.getValue().entrySet()){
+				if(innerEntry.getKey() == simTime){
+					Map<Integer, Integer> map = dirtyFlagHistory.get(entry.getKey());
+					if(map == null){
+						map = new TreeMap<>();
+					}
+					map.put(simTime, innerEntry.getValue());
+					dirtyFlagHistory.put(entry.getKey(), map);
+				}
+			}
 		}
 	}
 
@@ -437,10 +461,8 @@ public class Network {
 
 	public void setDataPackage(int mirrorId, DataPackage data, int timeStep){
 		log.log(Level.INFO, "(setDataPackage{0},{1},{2})",  new Object[] {mirrorId, data.getDirtyFlag(), timeStep});
-		for(Mirror m:mirrors){
-			if(m.getID()==mirrorId){
-				m.setDataPackage(data);
-			}
+		if(mirrors.size() >= mirrorId){
+			mirrors.get(mirrorId-1).setDataPackage(data);
 		}
 	}
 

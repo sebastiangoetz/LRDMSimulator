@@ -1,5 +1,10 @@
 package org.lrdm;
 
+import com.sun.tools.javac.Main;
+import org.lrdm.data_update_strategy.DeltaDataUpdateStrategy;
+import org.lrdm.data_update_strategy.FullDataUpdateStrategy;
+import org.lrdm.dirty_flag_update_strategy.HighestFlagAllAtOnce;
+import org.lrdm.dirty_flag_update_strategy.HighestFlagPerTimestep;
 import org.lrdm.effectors.Action;
 import org.lrdm.effectors.Effector;
 import org.lrdm.examples.ExampleOptimizer;
@@ -11,8 +16,10 @@ import org.lrdm.topologies.BalancedTreeTopologyStrategy;
 import org.lrdm.topologies.FullyConnectedTopology;
 import org.junit.jupiter.api.Test;
 import org.lrdm.topologies.NConnectedTopology;
+import org.lrdm.util.IDGenerator;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +31,7 @@ import static org.lrdm.TestUtils.props;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
+
     private TimedRDMSim sim;
     private static final String config = "resources/sim-test-1.conf";
     int startup_time_min;
@@ -50,50 +58,6 @@ class AppTest {
     }
 
     @Test
-    void PackageTest() throws IOException{
-        TimedRDMSim sim = new TimedRDMSim();
-        sim.initialize(new BalancedTreeTopologyStrategy());
-        Effector effector = sim.getEffector();
-        int mirrors = 10;
-        effector.setMirrors(mirrors, 0);
-        //effector.setStrategy(new FullyConnectedTopology(), 20);
-        //effector.setStrategy(new BalancedTreeTopologyStrategy(), 40);
-        //effector.setStrategy(new FullyConnectedTopology(), 60);
-        //effector.setStrategy(new BalancedTreeTopologyStrategy(), 80);
-        DirtyFlag dirty1 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,2,4)));
-        Data d = new Data(10, 3);
-        Data d2 = new Data(10, 5);
-        Data d3 = new Data(10, 6);
-        d.increaseReceived(10);
-        d2.increaseReceived(10);
-        d3.increaseReceived(10);
-
-        DataPackage package1 = new DataPackage(new ArrayList<>(Arrays.asList(d,d2,d3)), dirty1);
-
-        DirtyFlag dirty2 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(5,8,9)));
-        Data d4 = new Data(10, 50);
-        Data d5 = new Data(10, 80);
-        Data d6 = new Data(10, 60);
-        d4.increaseReceived(10);
-        d5.increaseReceived(10);
-        d6.increaseReceived(10);
-
-        DataPackage package2 = new DataPackage(new ArrayList<>(Arrays.asList(d4,d5,d6)), dirty2);
-
-        //use this code to manually run the simulation step by step
-        effector.setDataPackage(4,package1,10 );
-        effector.setDataPackage(9,package2,100 );
-        List<Probe> probes = sim.getProbes();
-        int simTime = sim.getSimTime();
-        for (int t = 1; t <= simTime; t++) {
-            for(Probe p : probes) p.print(t);
-
-            sim.runStep(t);
-        }
-        sim.plotLinks();
-    }
-
-    @Test
     void testMissingConfig() {
         assertDoesNotThrow(() -> new TimedRDMSim("does-not-exist.conf"));
     }
@@ -115,12 +79,14 @@ class AppTest {
         assertDoesNotThrow(() -> sim.run());
     }
 
+
     @Test
     void testWrongUsageOfRunStep() throws IOException {
         initSimulator();
         sim.initialize(null);
         assertDoesNotThrow(() -> sim.runStep(5));
     }
+
 
     @Test()
     void testInitializeHasToBeCalled() throws IOException {
@@ -135,6 +101,7 @@ class AppTest {
     void testSzenarioZero() {
         assertDoesNotThrow(()-> ExampleOptimizer.main(new String[]{}));
     }
+
 
     @Test
     void testMirrorChange() throws IOException {
@@ -186,8 +153,12 @@ class AppTest {
         }
     }
 
+
     @Test
-    void testMirrorReduction() throws IOException {
+    void testMirrorReduction() throws IOException, NoSuchFieldException, IllegalAccessException {
+        Field field = IDGenerator.class.getDeclaredField("instance");
+        field.setAccessible(true);
+        field.set( IDGenerator.class,null);
         initSimulator();
         sim.initialize(new BalancedTreeTopologyStrategy());
         sim.getEffector().setMirrors(2, 10);
@@ -197,6 +168,88 @@ class AppTest {
             sim.runStep(t);
             if(t < 10) assertEquals(10, mp.getNumMirrors());
             else if(t >= 15) assertEquals(2, mp.getNumMirrors());
+        }
+    }
+
+    @Test
+    void testDataPackageChange() throws IOException, NoSuchFieldException, IllegalAccessException {
+        Field field = IDGenerator.class.getDeclaredField("instance");
+        field.setAccessible(true);
+        field.set( IDGenerator.class,null);
+        initSimulator();
+        sim.initialize(new BalancedTreeTopologyStrategy());
+        DirtyFlag dirty1 = new DirtyFlag(new ArrayList<Integer>(Arrays.asList(1,2,4)));
+        Data d = new Data(10, 3);
+        Data d2 = new Data(10, 5);
+        Data d3 = new Data(10, 6);
+        d.increaseReceived(10);
+        d2.increaseReceived(10);
+        d3.increaseReceived(10);
+
+        DataPackage package1 = new DataPackage(new ArrayList<>(Arrays.asList(d,d2,d3)), dirty1);
+
+        sim.getEffector().setDataPackage(1, package1, 10);
+        MirrorProbe mp = null;
+        for(Probe p : sim.getProbes()) {
+            if(p instanceof  MirrorProbe) {
+                mp = (MirrorProbe) p;
+            }
+        }
+        assert(mp != null);
+        for(int t = 1; t < sim.getSimTime(); t++) {
+
+            sim.runStep(t);
+            if(t>=10){
+                Mirror m = mp.getMirrors().get(0);
+                assertTrue(m.getData().getDirtyFlag().equalDirtyFlag(package1.getDirtyFlag().getFlag()));
+            }
+        }
+    }
+
+    @Test
+    void testDataUpdateChange() throws IOException{
+        initSimulator();
+        sim.initialize(new BalancedTreeTopologyStrategy());
+
+        sim.getEffector().setDataUpdateStrategy(new FullDataUpdateStrategy(), 10);
+        MirrorProbe mp = null;
+        for(Probe p : sim.getProbes()) {
+            if(p instanceof  MirrorProbe) {
+                mp = (MirrorProbe) p;
+            }
+        }
+        assert(mp != null);
+        for(int t = 1; t < sim.getSimTime(); t++) {
+
+            sim.runStep(t);
+            if(t<10){
+                for(Mirror m: mp.getMirrors()){
+                    assertTrue(m.getDataUpdateStrategy() instanceof DeltaDataUpdateStrategy);
+                }
+            } else{
+                for(Mirror m: mp.getMirrors()){
+                    assertTrue(m.getDataUpdateStrategy() instanceof FullDataUpdateStrategy);
+                }
+            }
+        }
+    }
+
+
+    @Test
+    void testDirtyFlagChange() throws IOException{
+        initSimulator();
+        sim.initialize(new BalancedTreeTopologyStrategy());
+
+        sim.getEffector().setDirtyFlagUpdateStrategy(new HighestFlagAllAtOnce(), 10);
+        for(int t = 1; t < sim.getSimTime(); t++) {
+
+            sim.runStep(t);
+            if (t < 10) {
+                assertTrue(sim.getNetwork().getDirtyFlagUpdateStrategy() instanceof HighestFlagPerTimestep);
+
+            } else {
+                assertTrue(sim.getNetwork().getDirtyFlagUpdateStrategy() instanceof HighestFlagAllAtOnce);
+            }
         }
     }
 

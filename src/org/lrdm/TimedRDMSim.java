@@ -136,6 +136,7 @@ public class TimedRDMSim {
 		return props;
 	}
 
+	public Network getNetwork(){ return network;}
 	/**
 	 * Get the probes of the network observing it.
 	 * 
@@ -158,6 +159,14 @@ public class TimedRDMSim {
 		}
 		return null;
 	}
+
+	public DataProbe getDataProbe() {
+		for(Probe p : probes) {
+			if(p instanceof DataProbe dp) return dp;
+		}
+		return null;
+	}
+
 
 	/**Get the effector to apply changes to the network.
 	 *
@@ -192,7 +201,7 @@ public class TimedRDMSim {
 	 */
 	public void runStep(int timeStep) {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(250);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}

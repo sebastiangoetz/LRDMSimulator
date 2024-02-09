@@ -4,8 +4,6 @@ package org.lrdm;
  *
  * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
-
-
 import java.util.List;
 
 public class DataPackage {
@@ -19,27 +17,51 @@ public class DataPackage {
         this.dirtyFlag = dirtyFlag;
     }
 
+    /**Answers whether the complete data package has been loaded.
+     *
+     * @param invalid the true if all data has been received, else false
+     */
     public void setInvalid(boolean invalid){
         this.invalid = invalid;
     }
 
 
+    /**Answers whether the complete data package has been loaded.
+     *
+     * @return true if all data has been received, else false
+     */
     public boolean getInvalid(){
         return invalid;
     }
 
+    /**Answers whether the complete data package has been loaded.
+     *
+     * @return true if all data has been received, else false
+     */
     public List<Data> getData(){
         return data;
     }
 
+    /**Answers whether the complete data package has been loaded.
+     *
+     * @param dirtyFlag the {@link DirtyFlag} true if all data has been received, else false
+     */
     public void setDirtyFlag(DirtyFlag dirtyFlag){
         this.dirtyFlag = dirtyFlag;
     }
 
+    /**Answers whether the complete data package has been loaded.
+     *
+     * @return true if all data has been received, else false
+     */
     public DirtyFlag getDirtyFlag(){
         return dirtyFlag;
     }
 
+    /**Answers whether the complete data package has been loaded.
+     *
+     * @return true if all data has been received, else false
+     */
     public int getFileSize(){
         int size = 0;
         for(Data d : data){
@@ -48,6 +70,10 @@ public class DataPackage {
         return size;
     }
 
+    /**Answers whether the complete data package has been loaded.
+     *
+     * @return true if all data has been received, else false
+     */
     public int getReceived(){
         int size = 0;
         for(Data d : data){

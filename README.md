@@ -75,3 +75,6 @@ You can build the framework using ``mvn package``, which will run all tests, too
 
 This project is preconfigured to work with [SonarQube](https://www.sonarsource.com/products/sonarqube/) and JaCoCo. If you want to get an overview with a local SonarQube use:
 ``mvn clean verify jacoco:report sonar:sonar -Dsonar.projectKey=<<YourName>> -Dsonar.host.url=http://localhost:9000 -Dsonar.token=<<YourToken>> -f pom.xml``
+
+the real deal:
+mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package  org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.host.url=https://ipra38.inf.tu-dresden.de/sonar -Dsonar.projectKey=TimedRDMSimulator -Dsonar.login=rschmidt -Dsonar.password=Sonysony37?
