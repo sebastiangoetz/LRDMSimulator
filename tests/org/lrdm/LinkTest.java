@@ -1,6 +1,7 @@
 package org.lrdm;
 
 import org.junit.jupiter.api.Test;
+import org.lrdm.data_update_strategy.DeltaDataUpdateStrategy;
 
 import java.io.IOException;
 
@@ -11,9 +12,9 @@ class LinkTest {
     void testLinkEquality() throws IOException {
         TestUtils.loadProperties("resources/sim-test-1.conf");
 
-        Mirror m1 = new Mirror(1,0,TestUtils.props);
-        Mirror m2 = new Mirror(2,0, TestUtils.props);
-        Mirror m3 = new Mirror(3,0,TestUtils.props);
+        Mirror m1 = new Mirror(1,0,TestUtils.props,new DeltaDataUpdateStrategy());
+        Mirror m2 = new Mirror(2,0, TestUtils.props, new DeltaDataUpdateStrategy());
+        Mirror m3 = new Mirror(3,0,TestUtils.props, new DeltaDataUpdateStrategy());
 
         Link l1 = new Link(4,m1,m2,0,TestUtils.props);
         Link l2 = new Link(5,m2,m3,0,TestUtils.props);

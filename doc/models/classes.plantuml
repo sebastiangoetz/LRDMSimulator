@@ -1,4 +1,6 @@
 @startuml
+!define ABSTRACT &#123;abstract&#125;
+
 class TimedRDMSim
 {
   + int getSimTime()
@@ -17,6 +19,9 @@ class Effector
   + setMirrors(int m, int t)
   + setStrategy(TopologyStrategy strategy, int t)
   + setTargetLinksPerMirror(int numTargetedLinks, int t)
+  + setDataPackage(int mirrorId, List<Data> data, int t)
+  + setMirrorUpdateStrategy(MirrorUpdater updater, int t)
+  + setDataUpdateStrategy(UpdateStrategy updateStrategy, int t)
   + timeStep(int t)
 }
 
@@ -42,6 +47,21 @@ class Network
   + int getNumMirrors(int m, int t)
   ---
   + void timeStep(int t)
+}
+
+abstract class DirtyFlagUpdateStrategy
+{
+  + {abstract} void updateMirrors(Network network)
+}
+
+class PushMirrorUpdater
+{
+  + void updateMirrors(Network network)
+}
+
+class PullMirrorUpdater
+{
+  + void updateMirrors(Network network)
 }
 
 note right of Network::timeStep
@@ -74,6 +94,16 @@ class MirrorProbe
   + int getNumTargetMirrors()
   + double getMirrorRatio()
 }
+
+class DataProbe
+{
+  - double DataRatio
+  + void update(int t)
+  + void print(int t)
+  + int getNewestFlag(int t)
+  - void notifyNetwork()
+}
+
 
 enum MirrorState {
   down
@@ -114,11 +144,38 @@ class Link
 
 class DataPackage
 {
+  - List<Data> data
+  - List<int> dirtyFlag
+  + int getDirtyFlag
+  + List<String> getData
+  + boolean isLoaded()
+}
+
+class Data
+{
   - int fileSize
   - int received
+  - String content
   + int getFileSize()
+  + int getDirtyFlag
+  + String getData
   + void increaseReceived(int amount)
   + boolean isLoaded()
+}
+
+abstract class DataUpdateStrategy
+{
+  + {abstract} void updateData()
+}
+
+class DeltaUpdateStrategy
+{
+  + void updateData()
+}
+
+class FullUpdateStrategy
+{
+  + void updateData()
 }
 
 class LinkProbe
@@ -136,6 +193,24 @@ interface TopologyStrategy
     + int getNumTargetLinks(Network)
 }
 
+interface Action{
++ void run(Network, t)
+
+}
+
+class DataPackageAction{
+- int mirrorId
+- List<Data> data
+}
+
+class DataUpdateAction{
+- DataUpdateStrategy dataUpdateStrategy
+}
+
+class DirtyFlagUpdateAction{
+- DirtyFlagUpdateStrategy dirtyFlagUpdateStrategy
+}
+
 class BalancedTreeTopologyStrategy
 
 class FullyConnectedTopologyStrategy
@@ -147,6 +222,7 @@ VisualizationStrategy <|. GraphVisualization
 TimedRDMSim --> Effector
 TimedRDMSim --> "*" Probe
 Network --> TopologyStrategy
+Network --> DirtyFlagUpdateStrategy
 Network <--> Effector
 Network *--> "*" Mirror
 Network *-> "*" Link
@@ -155,12 +231,24 @@ IDGenerator <-- Network
 Mirror -> MirrorState
 Mirror *--> Link
 Mirror --> DataPackage
+Mirror --> DataUpdateStrategy
 Link -> LinkState
 Link --> "source" Mirror
 Link --> "target" Mirror
 
 Probe <|-- MirrorProbe
 Probe <|-- LinkProbe
+Probe <|-- DataProbe
 
+DirtyFlagUpdateStrategy <|-- PushMirrorUpdater
+DirtyFlagUpdateStrategy <|-- PullMirrorUpdater
+
+DataUpdateStrategy <|-- DeltaUpdateStrategy
+DataUpdateStrategy <|-- FullUpdateStrategy
+DataPackage -> "*" Data
 TimedRDMSim -> Network
+Action <|.. DataPackageAction
+Action <|.. DataUpdateAction
+Action <|.. DirtyFlagUpdateAction
+Effector --> Action
 @enduml

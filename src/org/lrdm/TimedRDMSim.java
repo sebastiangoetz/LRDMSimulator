@@ -1,6 +1,9 @@
 package org.lrdm;
 
+import org.lrdm.data_update_strategy.DeltaDataUpdateStrategy;
+import org.lrdm.dirty_flag_update_strategy.HighestFlagPerTimestep;
 import org.lrdm.effectors.Effector;
+import org.lrdm.probes.DirtyFlagProbe;
 import org.lrdm.probes.LinkProbe;
 import org.lrdm.probes.MirrorProbe;
 import org.lrdm.probes.Probe;
@@ -9,6 +12,7 @@ import org.lrdm.topologies.TopologyStrategy;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -91,18 +95,30 @@ public class TimedRDMSim {
 		}
 		if(!headless)
 			visualizationStrategy = new GraphVisualization();
+		DirtyFlag dirtyFlag = new DirtyFlag(Arrays.asList(0,0,1));
+		Data data1 = new Data(fileSize, 34);
+		Data data2 = new Data(fileSize, 100);
+		Data data3 = new Data(fileSize, 45);
+		data1.increaseReceived(fileSize);
+		data2.increaseReceived(fileSize);
+		data3.increaseReceived(fileSize);
+
+		DataPackage dataPackage = new DataPackage(Arrays.asList(data1,data2,data3), dirtyFlag);
 
 		// create network of mirrors
-		network = new Network(strategy, numMirrors, numLinksPerMirror, fileSize, props);
+		network = new Network(strategy, numMirrors, numLinksPerMirror, dataPackage, props, new HighestFlagPerTimestep(), new DeltaDataUpdateStrategy());
 
 		effector = new Effector(network);
 		probes = new ArrayList<>();
 		Probe mprobe = new MirrorProbe(network);
 		Probe lprobe = new LinkProbe(network);
+		Probe dprobe = new DirtyFlagProbe(network);
 		probes.add(mprobe);
 		probes.add(lprobe);
+		probes.add(dprobe);
 		network.registerProbe(mprobe);
 		network.registerProbe(lprobe);
+		network.registerProbe(dprobe);
 		network.setEffector(effector);
 
 		if(!headless)
@@ -120,6 +136,7 @@ public class TimedRDMSim {
 		return props;
 	}
 
+	public Network getNetwork(){ return network;}
 	/**
 	 * Get the probes of the network observing it.
 	 * 
@@ -142,6 +159,14 @@ public class TimedRDMSim {
 		}
 		return null;
 	}
+
+	public DirtyFlagProbe getDataProbe() {
+		for(Probe p : probes) {
+			if(p instanceof DirtyFlagProbe dp) return dp;
+		}
+		return null;
+	}
+
 
 	/**Get the effector to apply changes to the network.
 	 *

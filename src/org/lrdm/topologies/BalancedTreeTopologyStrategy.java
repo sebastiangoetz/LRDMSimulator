@@ -3,6 +3,7 @@ package org.lrdm.topologies;
 import org.lrdm.Link;
 import org.lrdm.Mirror;
 import org.lrdm.Network;
+import org.lrdm.data_update_strategy.DataUpdateStrategy;
 import org.lrdm.effectors.Action;
 import org.lrdm.effectors.MirrorChange;
 import org.lrdm.util.IDGenerator;
@@ -145,8 +146,8 @@ public class BalancedTreeTopologyStrategy extends TopologyStrategy {
      * @param simTime current simulation time
      */
     @Override
-    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime) {
-        List<Mirror> mirrorsToAdd = createMirrors(newMirrors, simTime, props);
+    public void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime, DataUpdateStrategy dataUpdateStrategy) {
+        List<Mirror> mirrorsToAdd = createMirrors(newMirrors, simTime, props, dataUpdateStrategy);
         //add links by filling up existing nodes with less than the max amount of links per node
         List<Link> linksToAdd = new ArrayList<>();
         List<Mirror> mirrorsToLink = new ArrayList<>(mirrorsToAdd);

@@ -1,5 +1,7 @@
 package org.lrdm;
 
+import org.lrdm.data_update_strategy.DataUpdateStrategy;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,9 +31,12 @@ public class Mirror {
 
 	private DataPackage data; //the data hosted on this mirror
 
+
+	private DataUpdateStrategy dataUpdateStrategy;
+
 	private final Map<Integer, Integer> receivedDataPerTimestep;
 
-	public Mirror(int id, int initTime, Properties props) {
+	public Mirror(int id, int initTime, Properties props, DataUpdateStrategy dataUpdateStrategy) {
 		this.id = id;
 		this.initTime = initTime;
 		// get time to startup
@@ -54,8 +59,13 @@ public class Mirror {
 		receivedDataPerTimestep = new HashMap<>();
 
 		isRoot = false;
+
+		this.dataUpdateStrategy= dataUpdateStrategy;
 	}
 
+	public DataUpdateStrategy getDataUpdateStrategy(){
+		return dataUpdateStrategy;
+	}
 	public State getState() {
 		return state;
 	}
@@ -82,7 +92,7 @@ public class Mirror {
 	}
 
 	public void crash(int simTime) {
-		if(this.getData() != null) this.getData().reset();
+		if(this.getData() != null) this.setDataPackage(null);
 		this.state = State.STARTING;
 		this.initTime = simTime;
 		for(Link l : links) {
@@ -108,7 +118,19 @@ public class Mirror {
 		}
 		maxLinkActiveTime = max;
 	}
-	
+
+	public void setDataUpdateStrategy(DataUpdateStrategy dataUpdateStrategy){
+		this.dataUpdateStrategy = dataUpdateStrategy;
+	}
+
+	public void setDataPackage(List<Data> data, DirtyFlag dirtyFlag){
+		this.data = new DataPackage(data, dirtyFlag);
+	}
+
+	public void setInvalidFlagState(){
+		data.setInvalid(true);
+	}
+
 	public Set<Link> getLinks() {
 		return links;
 	}
@@ -149,9 +171,10 @@ public class Mirror {
 	 * 
 	 * @param currentSimTime (int) current simulation time
 	 */
-	public void timeStep(int currentSimTime) {
+	public void timeStep(int currentSimTime, Network n) {
+
 		if (state != State.STOPPING) {
-			if (data != null && data.isLoaded()) {
+			if (data != null && !data.getInvalid()) {
 				state = State.HASDATA;
 			} else if (currentSimTime - initTime >= readyTime+startupTime+maxLinkActiveTime - 1) {
 				state = State.READY;
@@ -165,34 +188,17 @@ public class Mirror {
 				state = State.STOPPED;
 			}
 		}
-		handleDataTransfer(currentSimTime);
+		handleDataTransfer(currentSimTime, n);
 	}
 
-	private void handleDataTransfer(int currentSimTime) {
-		if(state == State.READY && (data == null || !data.isLoaded())) {
-			//try to fetch data from linked mirrors if necessary
-			//find all ready partners
-			int received = 0;
-			for(Link l : links) {
-				Mirror sourceMirror = getActiveMirrorForLink(l);
-				if(sourceMirror != null) {
-					if (data == null) data = new DataPackage(sourceMirror.getData().getFileSize());
-					data.increaseReceived(l.getCurrentBandwidth());
-					received += l.getCurrentBandwidth();
-				}
+	private void handleDataTransfer(int currentSimTime, Network n) {
+		if(state == State.READY && data != null && data.getInvalid() && dataUpdateStrategy.updateRequired(this, n)) {
+				int received = dataUpdateStrategy.updateData(this, n);
+				receivedDataPerTimestep.put(currentSimTime, received);
+			if (data != null && data.isLoaded() && !data.getInvalid()) {
+				state = State.HASDATA;
 			}
-			receivedDataPerTimestep.put(currentSimTime, received);
 		}
-	}
-
-	private static Mirror getActiveMirrorForLink(Link l) {
-		Mirror sourceMirror = null;
-		if(l.getState() == Link.State.ACTIVE && l.getTarget().getState() == State.HASDATA) {
-			sourceMirror = l.getTarget();
-		} else if(l.getState() == Link.State.ACTIVE && l.getSource().getState() == State.HASDATA) {
-			sourceMirror = l.getSource();
-		}
-		return sourceMirror;
 	}
 
 	/**Send a shutdown signal to the mirror. The mirror will change its state to <i>stopping</i>.
@@ -222,4 +228,15 @@ public class Mirror {
 	public Integer getReceivedPerTimestep(int timestep) {
 		return receivedDataPerTimestep.get(timestep);
 	}
+
+	/**
+	 private static Mirror getActiveMirrorForLink(Link l) {
+	 Mirror sourceMirror = null;
+	 if(l.getState() == Link.State.ACTIVE && l.getTarget().getState() == State.HASDATA) {
+	 sourceMirror = l.getTarget();
+	 } else if(l.getState() == Link.State.ACTIVE && l.getSource().getState() == State.HASDATA) {
+	 sourceMirror = l.getSource();
+	 }
+	 return sourceMirror;
+	 }**/
 }

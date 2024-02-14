@@ -38,14 +38,22 @@ public class GraphVisualization implements VisualizationStrategy {
     private static final String ACTIVE_LINKS = "% Active Links";
     private static final String TTW = "% Time to Write";
     private static final String TIMESTEP = "Timestep";
+
+    private static final String RATIO = "% Ratio";
+
+    private static final String TIME_STEP = "Timestep";
     private Graph graph;
     private JLabel simTimeLabel;
     private XYChart bandwidthChart;
     private XYChart activeLinksChart;
     private XYChart timeToWriteChart;
+
+    private XYChart ratioChart;
     private JPanel chartPanel;
     private JPanel linkChartPanel;
     private JPanel ttwChartPanel;
+
+    private JPanel ratioChartPanel;
 
     @Override
     public void init(Network network) {
@@ -146,6 +154,23 @@ public class GraphVisualization implements VisualizationStrategy {
         ttwChartPanel.setPreferredSize(new Dimension(WIDTH,HEIGHT/6));
         panel.add(ttwChartPanel);
 
+        ratioChart = new XYChart(600, 400);
+        ratioChart.setTitle("DirtyFlags Ratio");
+        ratioChart.setXAxisTitle(TIME_STEP);
+        ratioChart.setYAxisTitle(RATIO);
+        ratioChart.getStyler().setTheme(new MatlabTheme());
+        ratioChart.getStyler().setLegendVisible(false);
+        targetTTW.setMarker(SeriesMarkers.NONE);
+        ratioChartPanel = new XChartPanel<>(ratioChart);
+        gc = new GridBagConstraints();
+        gc.gridx=0;
+        gc.gridy=5;
+        gc.gridwidth=1;
+        gl.setConstraints(ratioChartPanel, gc);
+        ratioChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
+        ratioChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
+        panel.add(ratioChartPanel);
+
         JScrollPane scrollPane = new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setMinimumSize(new Dimension(WIDTH, HEIGHT));
         panel.setBackground(Color.WHITE);
@@ -153,7 +178,6 @@ public class GraphVisualization implements VisualizationStrategy {
         frame.add(scrollPane);
         frame.setTitle("Timed RDM Simulator");
 
-        //frame.setResizable(false);
         frame.setSize(WIDTH,HEIGHT);
         frame.setVisible(true);
         frame.setBackground(Color.WHITE);
@@ -185,6 +209,8 @@ public class GraphVisualization implements VisualizationStrategy {
         List<Integer> activeLinksGoalTS = Collections.nCopies(network.getActiveLinksHistory().size(),35);
         List<Integer> ttwTS = new ArrayList<>(network.getTtwHistory().values());
         List<Integer> ttwGoalTS = Collections.nCopies(network.getTtwHistory().size(), 45);
+        Map<DirtyFlag, Map<Integer, Integer>> dirtyFlags = network.getDirtyFlagHistory();
+
 
         bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
         bandwidthChart.updateXYSeries("Target", timeSteps, bandwidthGoalTS,null);
@@ -197,6 +223,19 @@ public class GraphVisualization implements VisualizationStrategy {
         timeToWriteChart.updateXYSeries(TTW, timeSteps, ttwTS, null);
         timeToWriteChart.updateXYSeries("Target Time To Write", timeSteps, ttwGoalTS,null);
         ttwChartPanel.repaint();
+
+        Map<String, XYSeries> seriesMap = ratioChart.getSeriesMap();
+        for(Map.Entry<DirtyFlag, Map<Integer, Integer>> entry : dirtyFlags.entrySet()){
+            if(seriesMap.containsKey(entry.getKey().toString())){
+                ratioChart.updateXYSeries(entry.getKey().toString(), new ArrayList<>(entry.getValue().keySet()),
+                        new ArrayList<>(entry.getValue().values()), null);
+            }
+            else{
+                ratioChart.addSeries(entry.getKey().toString(), new ArrayList<>(entry.getValue().keySet()),
+                        new ArrayList<>(entry.getValue().values())).setMarker(SeriesMarkers.NONE);
+            }
+        }
+        ratioChartPanel.repaint();
     }
 
     private void updateLinks(Network network) {
@@ -264,11 +303,22 @@ public class GraphVisualization implements VisualizationStrategy {
             if (n == null)
                 n = graph.addNode(String.valueOf(m.getID()));
             n.setAttribute("ui.label", m.getID());
+            String invalid = "notinvalid";
+            if(m.getData() != null) {
+                String label = m.getID() + ": " + m.getData().getDirtyFlag().toString();
+                n.setAttribute("ui.label", label);
+                if (m.getData().getInvalid()) {
+                    invalid = "invalid";
+                } else {
+                    invalid = "notinvalid";
+                }
+            }
+
             switch (m.getState()) {
-                case HASDATA -> n.setAttribute(UI_CLASS, "hasdata");
-                case READY -> n.setAttribute(UI_CLASS, "running");
-                case STOPPING -> n.setAttribute(UI_CLASS, "stopping");
-                default -> n.setAttribute(UI_CLASS,"starting");
+                case HASDATA -> n.setAttribute(UI_CLASS, invalid, "hasdata");
+                case READY -> n.setAttribute(UI_CLASS, invalid, "running");
+                case STOPPING -> n.setAttribute(UI_CLASS, invalid,"stopping");
+                default -> n.setAttribute(UI_CLASS,invalid,"starting");
             }
         }
     }

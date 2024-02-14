@@ -4,32 +4,70 @@ package org.lrdm;
  *
  * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
+import java.util.List;
+
 public class DataPackage {
-    /** the file size of the data package measured in GB*/
-    private final int fileSize; //in GB
-    /** how much data of the file measured in GB is already received. has to be less than fileSize. */
-    private int received; //in GB
 
-    public DataPackage(int fileSize) {
-        this.fileSize = fileSize;
-        received = 0;
+    /** list of {@link Data} units*/
+    private List<Data> data;
+
+    /** {@link DirtyFlag} of the package*/
+    private DirtyFlag dirtyFlag;
+
+    /** invalid-flag if {@link Data} is invalid*/
+    boolean invalid = false;
+
+    public DataPackage(List<Data> data, DirtyFlag dirtyFlag) {
+        this.data = data;
+        this.dirtyFlag = dirtyFlag;
     }
 
-    public int getFileSize() {
-        return fileSize;
+    public void setInvalid(boolean invalid){
+        this.invalid = invalid;
     }
 
-    public int getReceived() {
-        return received;
+
+    public boolean getInvalid(){
+        return invalid;
     }
 
-    /**Increases the amount of received data (in GB) until {@link #fileSize} is reached.
+
+    public List<Data> getData(){
+        return data;
+    }
+
+
+    public void setDirtyFlag(DirtyFlag dirtyFlag){
+        this.dirtyFlag = dirtyFlag;
+    }
+
+
+    public DirtyFlag getDirtyFlag(){
+        return dirtyFlag;
+    }
+
+    /**get file size of the complete {@link DataPackage}
      *
-     * @param amount the amount of data in GB received
+     * @return sum of all {@link Data} units
      */
-    public void increaseReceived(int amount) {
-        received += amount;
-        if(received > fileSize) received = fileSize;
+    public int getFileSize(){
+        int size = 0;
+        for(Data d : data){
+            size = size + d.getFileSize();
+        }
+        return size;
+    }
+
+    /**get received size of the complete {@link DataPackage}
+     *
+     * @return sum of all {@link Data} units
+     */
+    public int getReceived(){
+        int size = 0;
+        for(Data d : data){
+            size = size + d.getReceived();
+        }
+        return size;
     }
 
     /**Answers whether the complete data package has been loaded.
@@ -37,12 +75,13 @@ public class DataPackage {
      * @return true if all data has been received, else false
      */
     public boolean isLoaded() {
-        return received == fileSize;
+        for (Data datum : data) {
+            if (!datum.isLoaded()) {
+                return false;
+            }
+        }
+        invalid = false;
+        return true;
     }
 
-    /**Resets the amount of received data to 0.
-     */
-    public void reset() {
-        this.received = 0;
-    }
 }
