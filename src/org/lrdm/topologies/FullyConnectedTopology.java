@@ -59,6 +59,11 @@ public class FullyConnectedTopology extends TopologyStrategy {
         n.getLinks().addAll(ret);
     }
 
+    @Override
+    public void modifyNetworkAfterLinkRemove(Network n, Properties props, int simTime) {
+        //TODO: impl
+    }
+
     /**Adds the requested amount of mirrors to the network and connects them accordingly.
      *
      * @param n the {@link Network}
@@ -74,6 +79,16 @@ public class FullyConnectedTopology extends TopologyStrategy {
             List<Link> links = connectMirrorToAllOthers(n, props, simTime, m);
             n.getLinks().addAll(links);
         }
+    }
+
+    @Override
+    public void modifyNetworkAfterAddMirror(Network n, int newMirrors, Properties props, int simTime) {
+        //TODO: impl
+    }
+
+    @Override
+    public void modifyNetworkAfterRemoveMirror(Network n, int removeMirrors, Properties props, int simTime) {
+
     }
 
     /**Connects a {@link Mirror} to all other mirrors of the {@link Network}.
@@ -115,5 +130,10 @@ public class FullyConnectedTopology extends TopologyStrategy {
             m += mc.getNewMirrors();
         }
         return (m*(m-1))/2;
+    }
+
+    @Override
+    public void modifyNetworkAfterAddLink(Network network, Properties props, int timeStep) {
+
     }
 }

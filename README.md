@@ -75,3 +75,44 @@ You can build the framework using ``mvn package``, which will run all tests, too
 
 This project is preconfigured to work with [SonarQube](https://www.sonarsource.com/products/sonarqube/) and JaCoCo. If you want to get an overview with a local SonarQube use:
 ``mvn clean verify jacoco:report sonar:sonar -Dsonar.projectKey=<<YourName>> -Dsonar.host.url=http://localhost:9000 -Dsonar.token=<<YourToken>> -f pom.xml``
+
+# New way to execute
+* You can still run it just as java project by ``java -jar lrdm.jar`` or just run the ExampleMAPEKOptimizer manually
+* In the program there are some test situations that are working, default one is peak situation
+* Each situation is named so you can easily recognize the logic
+
+## Add new Situation
+
+1. In ExampleMAPEKOptimizer.java there is a method setCurrentSituationMap() where you can add new case or just use the case that already exists
+   2. ```new TreeMap<>(Map.of(
+      50, 35, // 35 is wished value from 0 to 50 Iteration
+      60, 60, // 60 is wished value from 50 to 60 Iteration
+      150, 35 // 35 is wished value from 60 to 150
+      ));´´´
+   3. last interval (150 in the example is always the size of iterartions)
+2. In LoopIteration.java there is a method runMAPEKCheckOnIteration() which includes some Situations for testing. for new situations you need to create new method to be able to test it
+   3. be aware that for each case you should only have one function, otherwise it will be buggy
+   4. in the function there are already some examples for latency-aware, not-latency-aware situations and some examples for balanced tree topology
+5. After modifying these two classes you can simply run ExampleMAPEKOptimizer. Simulation will start to show the results immediately. Also you can find logs for each iteration in the console
+
+* You can also create your own Optimizer by the example of ExampleMAPEKOptimizer. It needs to include main method method like:
+  *     public static void main(String[] args) throws IOException {
+
+        List<Double> meanSquaredErrorList = new ArrayList<>();
+        Map<Integer, List<Double>> meanSquaredErrorMap = new HashMap<>();
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 20; j++) {
+                meanSquaredErrorList.add(automaticRun());
+            }
+            meanSquaredErrorMap.put(CURRENT_SITUATION_CODE, meanSquaredErrorList);
+            CURRENT_SITUATION_CODE++;
+
+            System.out.println("\n MEAN SQUARED ERROR LIST:");
+            meanSquaredErrorList.forEach(System.out::println);
+
+            meanSquaredErrorList = new ArrayList<>();
+        }
+
+        EventQueue.invokeLater(() -> MeanSquaredErrorBoxPlot.display(meanSquaredErrorMap));
+        MeanSquaredErrorBoxPlot.writeDataLineByLine(meanSquaredErrorMap);    }
+  * where you can define data for a new simulation

@@ -18,6 +18,7 @@ public class ExampleSimulation {
 		System.setProperty("java.util.logging.SimpleFormatter.format",
 				"[%1$tF %1$tT] [%4$-7s] %5$s %n");
 		TimedRDMSim sim = new TimedRDMSim();
+		sim.setHeadless(true);
 		sim.initialize(new BalancedTreeTopologyStrategy());
 		Effector effector = sim.getEffector();
 		int mirrors = 10;

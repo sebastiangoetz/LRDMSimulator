@@ -130,7 +130,7 @@ public class Effect {
         int minStartup = Integer.parseInt(action.getNetwork().getProps().getProperty("startup_time_min"));
         int maxStartup = Integer.parseInt(action.getNetwork().getProps().getProperty("startup_time_max"));
         int minReady = Integer.parseInt(action.getNetwork().getProps().getProperty("ready_time_min"));
-        int maxReady = Integer.parseInt(action.getNetwork().getProps().getProperty("ready_time_min"));
+        int maxReady = Integer.parseInt(action.getNetwork().getProps().getProperty("ready_time_max"));
         int minActive = Integer.parseInt(action.getNetwork().getProps().getProperty("link_activation_time_min"));
         int maxActive = Integer.parseInt(action.getNetwork().getProps().getProperty("link_activation_time_max"));
         int time = 0;
