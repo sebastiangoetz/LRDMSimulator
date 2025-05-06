@@ -43,7 +43,7 @@ class AppTest {
         link_activation_time_min = Integer.parseInt(props.get("link_activation_time_min").toString());
         link_activation_time_max = Integer.parseInt(props.get("link_activation_time_max").toString());
         sim = new TimedRDMSim(config);
-        sim.setHeadless(false);
+        sim.setHeadless(true);
     }
 
     @Test

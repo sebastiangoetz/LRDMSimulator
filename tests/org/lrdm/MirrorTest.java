@@ -11,7 +11,7 @@ class MirrorTest {
 
     @Test
     void testMirror() throws IOException {
-        loadProperties("sim-test-1.conf");
+        loadProperties("resources/sim-test-1.conf");
         Mirror m = new Mirror(1, 0, props);
         assertEquals(1, m.getID());
         assertEquals(0, m.getLinks().size());
@@ -24,7 +24,7 @@ class MirrorTest {
 
     @Test
     void testMirrorConnections() throws IOException {
-        loadProperties("sim-test-1.conf");
+        loadProperties("resources/sim-test-1.conf");
         Mirror m1 = new Mirror(1, 0, props);
         Mirror m2 = new Mirror(2,0, props);
         Link l = new Link(3,m1,m2,0,props);
@@ -36,7 +36,7 @@ class MirrorTest {
 
     @Test
     void testTimes() throws IOException {
-        loadProperties("sim-test-1.conf");
+        loadProperties("resources/sim-test-1.conf");
         int startup_time_min = Integer.parseInt(props.get("startup_time_min").toString());
         int startup_time_max = Integer.parseInt(props.get("startup_time_max").toString());
         int ready_time_min = Integer.parseInt(props.get("ready_time_min").toString());

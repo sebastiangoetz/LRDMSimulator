@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class LinkTest {
     @Test
     void testLinkEquality() throws IOException {
-        TestUtils.loadProperties("sim-test-1.conf");
+        TestUtils.loadProperties("resources/sim-test-1.conf");
 
         Mirror m1 = new Mirror(1,0,TestUtils.props);
         Mirror m2 = new Mirror(2,0, TestUtils.props);
