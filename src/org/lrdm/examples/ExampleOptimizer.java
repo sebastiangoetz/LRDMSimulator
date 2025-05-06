@@ -15,6 +15,7 @@ public class ExampleOptimizer {
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         TimedRDMSim sim = new TimedRDMSim();
         sim.initialize(new NConnectedTopology());
+        sim.setHeadless(true);
 
         LinkProbe lp = sim.getLinkProbe();
         MirrorProbe mp = sim.getMirrorProbe();

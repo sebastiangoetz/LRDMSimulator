@@ -19,6 +19,7 @@ public class ExampleSimulation {
 				"[%1$tF %1$tT] [%4$-7s] %5$s %n");
 		TimedRDMSim sim = new TimedRDMSim();
 		sim.initialize(new BalancedTreeTopologyStrategy());
+		sim.setHeadless(true);
 		Effector effector = sim.getEffector();
 		int mirrors = 10;
 		for(int t = 0; t < 100; t += 10) {
