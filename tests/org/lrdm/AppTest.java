@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
     private TimedRDMSim sim;
-    private static final String config = "sim-test-1.conf";
+    private static final String config = "resources/sim-test-1.conf";
     int startup_time_min;
     int startup_time_max;
     int ready_time_min;
@@ -62,7 +62,7 @@ class AppTest {
 
     @Test
     void testHeadlessNoDebug() throws IOException {
-        initSimulator("sim-test-short.conf");
+        initSimulator("resources/sim-test-short.conf");
         sim.setHeadless(true);
         sim.initialize(null);
         assertDoesNotThrow(() -> sim.run());
