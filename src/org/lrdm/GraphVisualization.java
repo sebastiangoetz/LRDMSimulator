@@ -1,6 +1,7 @@
 package org.lrdm;
 
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -26,7 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-/**Graphical visualisation of the simulator using the GraphStream library.
+/**
+ * Graphical visualisation of the simulator using the GraphStream library.
  *
  * @author Sebastian Götz <sebastian.goetz1@tu-dresden.de>
  */
@@ -47,6 +49,8 @@ public class GraphVisualization implements VisualizationStrategy {
     private JPanel linkChartPanel;
     private JPanel ttwChartPanel;
 
+    private ArrayList<Integer> listForGoalActiveLinks = new ArrayList<>();
+
     @Override
     public void init(Network network) {
         graph = new SingleGraph("Runtime View");
@@ -55,7 +59,7 @@ public class GraphVisualization implements VisualizationStrategy {
         Viewer viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         View view = viewer.addDefaultView(false);
         viewer.enableAutoLayout();
-        if(view instanceof DefaultView dv) {
+        if (view instanceof DefaultView dv) {
             createUI(dv);
         }
         for (Mirror m : network.getMirrors()) {
@@ -81,69 +85,69 @@ public class GraphVisualization implements VisualizationStrategy {
         simTimeLabel = new JLabel();
         simTimeLabel.setText("Simulation Time: 0");
         simTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        gc.gridx=0;
-        gc.gridy=0;
-        gc.gridwidth=1;
-        gc.gridheight=1;
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.gridwidth = 1;
+        gc.gridheight = 1;
         gc.fill = GridBagConstraints.HORIZONTAL;
         gl.setConstraints(simTimeLabel, gc);
         panel.add(simTimeLabel);
 
         gc = new GridBagConstraints();
-        gc.gridx=0;
-        gc.gridy=1;
-        gc.gridwidth=1;
+        gc.gridx = 0;
+        gc.gridy = 1;
+        gc.gridwidth = 1;
         gc.fill = GridBagConstraints.HORIZONTAL;
         gl.setConstraints(dv, gc);
-        dv.setMinimumSize(new Dimension(WIDTH,HEIGHT/2));
-        dv.setPreferredSize(new Dimension(WIDTH, HEIGHT/2));
+        dv.setMinimumSize(new Dimension(WIDTH, HEIGHT / 2));
+        dv.setPreferredSize(new Dimension(WIDTH, HEIGHT / 2));
         panel.add(dv);
 
-        bandwidthChart = QuickChart.getChart("Bandwidth over Time",TIMESTEP,BANDWIDTH,BANDWIDTH, List.of(0), List.of(0));
+        bandwidthChart = QuickChart.getChart("Bandwidth over Time", TIMESTEP, BANDWIDTH, BANDWIDTH, List.of(0), List.of(0));
         bandwidthChart.getStyler().setTheme(new MatlabTheme());
         bandwidthChart.getStyler().setLegendVisible(false);
-        XYSeries targetBW = bandwidthChart.addSeries("Target",List.of(0),List.of(0));
+        XYSeries targetBW = bandwidthChart.addSeries("Target", List.of(0), List.of(0));
         targetBW.setMarker(SeriesMarkers.NONE);
 
         chartPanel = new XChartPanel<>(bandwidthChart);
         gc = new GridBagConstraints();
-        gc.gridx=0;
-        gc.gridy=2;
-        gc.gridwidth=1;
+        gc.gridx = 0;
+        gc.gridy = 2;
+        gc.gridwidth = 1;
         gl.setConstraints(chartPanel, gc);
-        chartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
-        chartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
+        chartPanel.setMinimumSize(new Dimension(WIDTH, HEIGHT / 6));
+        chartPanel.setMaximumSize(new Dimension(WIDTH, HEIGHT / 6));
         panel.add(chartPanel);
 
         activeLinksChart = QuickChart.getChart("Active Links", TIMESTEP, ACTIVE_LINKS, ACTIVE_LINKS, List.of(0), List.of(0));
         activeLinksChart.getStyler().setTheme(new MatlabTheme());
         activeLinksChart.getStyler().setLegendVisible(false);
-        XYSeries targetAL = activeLinksChart.addSeries("Target Active Links",List.of(0),List.of(0));
+        XYSeries targetAL = activeLinksChart.addSeries("Target Active Links", List.of(0), List.of(0));
         targetAL.setMarker(SeriesMarkers.NONE);
         linkChartPanel = new XChartPanel<>(activeLinksChart);
         gc = new GridBagConstraints();
-        gc.gridx=0;
-        gc.gridy=3;
-        gc.gridwidth=1;
+        gc.gridx = 0;
+        gc.gridy = 3;
+        gc.gridwidth = 1;
         gl.setConstraints(linkChartPanel, gc);
-        linkChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
-        linkChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
+        linkChartPanel.setMinimumSize(new Dimension(WIDTH, HEIGHT / 6));
+        linkChartPanel.setMaximumSize(new Dimension(WIDTH, HEIGHT / 6));
         panel.add(linkChartPanel);
 
         timeToWriteChart = QuickChart.getChart("Time To Write", TIMESTEP, TTW, TTW, List.of(0), List.of(0));
         timeToWriteChart.getStyler().setTheme(new MatlabTheme());
         timeToWriteChart.getStyler().setLegendVisible(false);
-        XYSeries targetTTW = timeToWriteChart.addSeries("Target Time To Write",List.of(0),List.of(0));
+        XYSeries targetTTW = timeToWriteChart.addSeries("Target Time To Write", List.of(0), List.of(0));
         targetTTW.setMarker(SeriesMarkers.NONE);
         ttwChartPanel = new XChartPanel<>(timeToWriteChart);
         gc = new GridBagConstraints();
-        gc.gridx=0;
-        gc.gridy=4;
-        gc.gridwidth=1;
+        gc.gridx = 0;
+        gc.gridy = 4;
+        gc.gridwidth = 1;
         gl.setConstraints(ttwChartPanel, gc);
-        ttwChartPanel.setMinimumSize(new Dimension(WIDTH,HEIGHT/6));
-        ttwChartPanel.setMaximumSize(new Dimension(WIDTH,HEIGHT/6));
-        ttwChartPanel.setPreferredSize(new Dimension(WIDTH,HEIGHT/6));
+        ttwChartPanel.setMinimumSize(new Dimension(WIDTH, HEIGHT / 6));
+        ttwChartPanel.setMaximumSize(new Dimension(WIDTH, HEIGHT / 6));
+        ttwChartPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT / 6));
         panel.add(ttwChartPanel);
 
         JScrollPane scrollPane = new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -154,7 +158,7 @@ public class GraphVisualization implements VisualizationStrategy {
         frame.setTitle("Timed RDM Simulator");
 
         //frame.setResizable(false);
-        frame.setSize(WIDTH,HEIGHT);
+        frame.setSize(WIDTH, HEIGHT);
         frame.setVisible(true);
         frame.setBackground(Color.WHITE);
 
@@ -167,50 +171,117 @@ public class GraphVisualization implements VisualizationStrategy {
     }
 
     @Override
-    public void updateGraph(Network network, long timeStep) {
-        updateTimeStep(network, timeStep);
+    public void updateGraph(Network network, long timeStep, int simTime) {
+        updateTimeStep(network, timeStep, simTime);
         updateMirrors(network);
         removeVanishedMirrors(network);
         removeVanishedLinks(network);
         updateLinks(network);
     }
 
-    private void updateTimeStep(Network network, long timeStep) {
-        simTimeLabel.setText("Simulation Time: "+timeStep);
+    @Override
+    public void updateGraphForOptimizer(Network network, long timeStep, int simTime, Integer targetAL) {
+        updateTimeStepForOptimizer(network, timeStep, simTime, targetAL);
+        updateMirrors(network);
+        removeVanishedMirrors(network);
+        removeVanishedLinks(network);
+        updateLinks(network);
+    }
+
+//    @Override
+//    public void updateGraphWithRelatedParams(Network network, long timeStep, int bandwidth, int activeLinks, int timeToWrite) {
+//        updateTimeStepWithRelatedParams(network, timeStep, bandwidth, activeLinks,timeToWrite);
+//        updateMirrors(network);
+//        removeVanishedMirrors(network);
+//        removeVanishedLinks(network);
+//        updateLinks(network);
+//    }
+
+    private void updateTimeStep(Network network, long timeStep, int simTime) {
+        simTimeLabel.setText("Simulation Time: " + timeStep);
 
         List<Integer> timeSteps = new ArrayList<>(network.getBandwidthHistory().keySet());
         List<Integer> bandwidthTS = new ArrayList<>(network.getBandwidthHistory().values());
-        List<Integer> bandwidthGoalTS = Collections.nCopies(network.getBandwidthHistory().size(),40);
+        List<Integer> bandwidthGoalTS = Collections.nCopies(network.getBandwidthHistory().size(), 40);
+
         List<Integer> activeLinksTS = new ArrayList<>(network.getActiveLinksHistory().values());
-        List<Integer> activeLinksGoalTS = Collections.nCopies(network.getActiveLinksHistory().size(),35);
+        List<Integer> activeLinksGoalTS = new ArrayList<>(listForGoalActiveLinks);
+
+        if (timeStep <= 50) {
+            listForGoalActiveLinks.add(35);
+        }
+        if (timeStep > 50 && timeStep <= 60) {
+            listForGoalActiveLinks.add(60);
+        }
+        if (timeStep > 60) {
+            listForGoalActiveLinks.add(35);
+        }
         List<Integer> ttwTS = new ArrayList<>(network.getTtwHistory().values());
         List<Integer> ttwGoalTS = Collections.nCopies(network.getTtwHistory().size(), 45);
 
         bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
-        bandwidthChart.updateXYSeries("Target", timeSteps, bandwidthGoalTS,null);
+        bandwidthChart.updateXYSeries("Target", timeSteps, bandwidthGoalTS, null);
         chartPanel.repaint();
 
         activeLinksChart.updateXYSeries(ACTIVE_LINKS, timeSteps, activeLinksTS, null);
-        activeLinksChart.updateXYSeries("Target Active Links", timeSteps, activeLinksGoalTS,null);
+        activeLinksChart.updateXYSeries("Target Active Links", timeSteps, activeLinksGoalTS, null);
         linkChartPanel.repaint();
 
         timeToWriteChart.updateXYSeries(TTW, timeSteps, ttwTS, null);
-        timeToWriteChart.updateXYSeries("Target Time To Write", timeSteps, ttwGoalTS,null);
+        timeToWriteChart.updateXYSeries("Target Time To Write", timeSteps, ttwGoalTS, null);
+        ttwChartPanel.repaint();
+    }
+
+    private void updateTimeStepForOptimizer(Network network, long timeStep, int simTime, Integer targetAL) {
+        simTimeLabel.setText("Simulation Time: " + timeStep);
+
+        List<Integer> timeSteps = new ArrayList<>(network.getBandwidthHistory().keySet());
+        List<Integer> bandwidthTS = new ArrayList<>(network.getBandwidthHistory().values());
+        List<Integer> bandwidthGoalTS = Collections.nCopies(network.getBandwidthHistory().size(), 40);
+
+        List<Integer> activeLinksTS = new ArrayList<>(network.getActiveLinksHistory().values());
+        List<Integer> activeLinksGoalTS = new ArrayList<>(listForGoalActiveLinks);
+        listForGoalActiveLinks.add(targetAL);
+
+        List<Integer> ttwTS = new ArrayList<>(network.getTtwHistory().values());
+        List<Integer> ttwGoalTS = Collections.nCopies(network.getTtwHistory().size(), 45);
+
+        bandwidthChart.updateXYSeries(BANDWIDTH, timeSteps, bandwidthTS, null);
+        bandwidthChart.updateXYSeries("Target", timeSteps, bandwidthGoalTS, null);
+        chartPanel.repaint();
+
+        activeLinksChart.updateXYSeries(ACTIVE_LINKS, timeSteps, activeLinksTS, null);
+        activeLinksChart.updateXYSeries("Target Active Links", timeSteps, activeLinksGoalTS, null);
+        linkChartPanel.repaint();
+
+        timeToWriteChart.updateXYSeries(TTW, timeSteps, ttwTS, null);
+        timeToWriteChart.updateXYSeries("Target Time To Write", timeSteps, ttwGoalTS, null);
         ttwChartPanel.repaint();
     }
 
     private void updateLinks(Network network) {
+        System.out.println("ITERATION: "+ network.getCurrentTimeStep());
         for (Link l : network.getLinks()) {
+//            System.out.println(l);
             if (l.getState() != Link.State.CLOSED) {
                 Optional<Edge> e = graph.edges().filter(edge -> edge.getSourceNode().getId().equals(Integer.toString(l.getSource().getID())) &&
                         edge.getTargetNode().getId().equals(Integer.toString(l.getTarget().getID()))).findAny();
 
                 Edge edge = null;
                 if (e.isEmpty() && (l.getSource().getState() != Mirror.State.STOPPING
-                            && l.getSource().getState() != Mirror.State.STOPPED
-                            && l.getTarget().getState() != Mirror.State.STOPPING
-                            && l.getTarget().getState() != Mirror.State.STOPPED)) {
-                        edge = graph.addEdge(Integer.toString(l.getID()), Integer.toString(l.getSource().getID()), Integer.toString(l.getTarget().getID()));
+                        && l.getSource().getState() != Mirror.State.STOPPED
+                        && l.getTarget().getState() != Mirror.State.STOPPING
+                        && l.getTarget().getState() != Mirror.State.STOPPED)) {
+//                    System.out.println(l);
+//                    if(graph.getNode(l.getSource().getID())==null || graph.getNode(l.getTarget().getID())==null) {
+//                        System.out.println("No link found");
+//                    }
+                    try {
+                    edge = graph.addEdge(Integer.toString(l.getID()), Integer.toString(l.getSource().getID()), Integer.toString(l.getTarget().getID()));
+
+                    } catch (Exception ex){
+                       ex.printStackTrace();
+                    }
                 }
                 if (e.isPresent()) {
                     edge = e.get();
@@ -233,7 +304,7 @@ public class GraphVisualization implements VisualizationStrategy {
     private void removeVanishedLinks(Network network) {
         Set<Edge> edgesToRemove = graph.edges().filter(e -> {
             boolean exists = false;
-            if(e != null) {
+            if (e != null) {
                 for (Link l : network.getLinks()) {
                     if (e.getSourceNode().getId().equals(Integer.toString(l.getSource().getID())) &&
                             e.getTargetNode().getId().equals(Integer.toString(l.getTarget().getID())))
@@ -247,15 +318,15 @@ public class GraphVisualization implements VisualizationStrategy {
 
     private void removeVanishedMirrors(Network network) {
         for (int i = 0; i < graph.getNodeCount(); i++) {
-                Node n = graph.getNode(i);
-                boolean exists = false;
-                for (Mirror m : network.getMirrors()) {
-                    if (m.getID() == Integer.parseInt(n.getId()))
-                        exists = true;
-                }
-                if (!exists)
-                    graph.removeNode(i);
+            Node n = graph.getNode(i);
+            boolean exists = false;
+            for (Mirror m : network.getMirrors()) {
+                if (m.getID() == Integer.parseInt(n.getId()))
+                    exists = true;
             }
+            if (!exists)
+                graph.removeNode(i);
+        }
     }
 
     private void updateMirrors(Network network) {
@@ -268,14 +339,14 @@ public class GraphVisualization implements VisualizationStrategy {
                 case HASDATA -> n.setAttribute(UI_CLASS, "hasdata");
                 case READY -> n.setAttribute(UI_CLASS, "running");
                 case STOPPING -> n.setAttribute(UI_CLASS, "stopping");
-                default -> n.setAttribute(UI_CLASS,"starting");
+                default -> n.setAttribute(UI_CLASS, "starting");
             }
         }
     }
 
     private String loadGraphCSS() {
-        try(InputStream in = getClass().getResourceAsStream("/graph.css");
-            BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+        try (InputStream in = getClass().getResourceAsStream("/graph.css");
+             BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
             StringBuilder ret = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {

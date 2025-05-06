@@ -133,6 +133,11 @@ public class BalancedTreeTopologyStrategy extends TopologyStrategy {
         n.getLinks().addAll(links);
     }
 
+    @Override
+    public void modifyNetworkAfterLinkRemove(Network n, Properties props, int simTime) {
+        //TODO: impl
+    }
+
     /**Creates the respective number of mirrors to be added and links them according to the balanced tree topology.
      * For this, the mirrors are traversed in ascending order of their IDs. Each mirror which still has less links than
      * expected by {@link Network#getNumTargetLinksPerMirror()} will be "filled up".
@@ -160,6 +165,16 @@ public class BalancedTreeTopologyStrategy extends TopologyStrategy {
         //what if there are still mirrors left to add? this is the case if all leafs are filled up
         n.getMirrors().addAll(mirrorsToAdd);
         n.getLinks().addAll(linksToAdd);
+    }
+
+    @Override
+    public void modifyNetworkAfterAddMirror(Network n, int newMirrors, Properties props, int simTime) {
+        //TODO: impl
+    }
+
+    @Override
+    public void modifyNetworkAfterRemoveMirror(Network n, int removeMirrors, Properties props, int simTime) {
+
     }
 
     /**Removes the requested amount of mirrors from the network. The mirrors with the largest ID will be removed.
@@ -194,5 +209,10 @@ public class BalancedTreeTopologyStrategy extends TopologyStrategy {
         int m = a.getNetwork().getNumMirrors();
         if(a instanceof MirrorChange mc) m += mc.getNewMirrors();
         return m - 1;
+    }
+
+    @Override
+    public void modifyNetworkAfterAddLink(Network network, Properties props, int timeStep) {
+
     }
 }

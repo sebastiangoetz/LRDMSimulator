@@ -22,7 +22,8 @@ public class Link {
 	private final int activationTime;
 
 	private final Random rand = new Random();
-	
+
+
 	public Link(int id, Mirror source, Mirror target, int initTime, Properties props) {
 		this.source = source;
 		this.target = target;

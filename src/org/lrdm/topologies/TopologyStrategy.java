@@ -21,7 +21,13 @@ public abstract class TopologyStrategy {
 		n.getLinks().clear();
 		n.getMirrors().forEach(m -> m.getLinks().clear());
 	}
+
+	public abstract void modifyNetworkAfterLinkRemove(Network n, Properties props, int simTime);
+
 	public abstract void handleAddNewMirrors(Network n, int newMirrors, Properties props, int simTime);
+
+	public abstract void modifyNetworkAfterAddMirror(Network n,int newMirrors, Properties props, int simTime);
+	public abstract void modifyNetworkAfterRemoveMirror(Network n, int removeMirrors, Properties props, int simTime);
 
 	/**Remove the requested amount of links from the network.
 	 * The mirrors with the highest ID will be removed first.
@@ -67,4 +73,6 @@ public abstract class TopologyStrategy {
 		}
 		return addedMirrors;
 	}
+
+	public abstract void modifyNetworkAfterAddLink(Network network, Properties props, int timeStep);
 }
