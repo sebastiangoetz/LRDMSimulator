@@ -1,0 +1,68 @@
+{
+	"time_steps": 500,
+	"mirror_number": 25,
+		
+    "link_threshold": 35,
+	"bandwidth_threshold": 40,
+	"writing_times_threshold":45,
+	
+    "topologies": ["mst", "rt"],
+	
+	"mst_active_links": [8, 58],	
+	"rt_active_links": [50, 83],
+	
+		
+	"current_scenario":6,
+
+	"deviation_scenario_0_mst_links": [0, 0],
+	"deviation_scenario_0_mst_bandwidth_consumption": [0, 0],
+	"deviation_scenario_0_mst_writing_time": [0, 0],
+	"deviation_scenario_0_rt_links": [0, 0],
+	"deviation_scenario_0_rt_bandwidth_consumption": [0, 0],
+	"deviation_scenario_0_rt_writing_time": [0, 0],
+	
+
+	"deviation_scenario_1_mst_links": [9, 12],
+	"deviation_scenario_1_mst_bandwidth_consumption": [0, 0],
+	"deviation_scenario_1_mst_writing_time": [0, 0],
+	"deviation_scenario_1_rt_links": [0, 0],
+	"deviation_scenario_1_rt_bandwidth_consumption": [0, 0],
+	"deviation_scenario_1_rt_writing_time": [0, 0],
+
+	"deviation_scenario_2_mst_links": [0, 0],
+	"deviation_scenario_2_mst_bandwidth_consumption": [0, 0],
+	"deviation_scenario_2_mst_writing_time": [0, 0],
+	"deviation_scenario_2_rt_links": [0, 0],
+	"deviation_scenario_2_rt_bandwidth_consumption": [9, 12],
+	"deviation_scenario_2_rt_writing_time": [9, 12],
+
+	"deviation_scenario_3_mst_links": [9, 12],
+	"deviation_scenario_3_mst_bandwidth_consumption": [0, 0],
+	"deviation_scenario_3_mst_writing_time": [0, 0],
+	"deviation_scenario_3_rt_links": [0, 0],
+	"deviation_scenario_3_rt_bandwidth_consumption": [9, 12],
+	"deviation_scenario_3_rt_writing_time": [9, 12],
+
+	"deviation_scenario_4_mst_links": [9, 12],
+	"deviation_scenario_4_mst_bandwidth_consumption": [9, 12],
+	"deviation_scenario_4_mst_writing_time": [9, 12],
+	"deviation_scenario_4_rt_links": [0, 0],
+	"deviation_scenario_4_rt_bandwidth_consumption": [0, 0],
+	"deviation_scenario_4_rt_writing_time": [0, 0],
+
+	"deviation_scenario_5_mst_links": [0, 0],
+	"deviation_scenario_5_mst_bandwidth_consumption": [0, 0],
+	"deviation_scenario_5_mst_writing_time": [0, 0],
+	"deviation_scenario_5_rt_links": [9, 12],
+	"deviation_scenario_5_rt_bandwidth_consumption": [9, 12],
+	"deviation_scenario_5_rt_writing_time": [9, 12],
+
+	"deviation_scenario_6_mst_links": [9, 12],
+	"deviation_scenario_6_mst_bandwidth_consumption": [9, 12],
+	"deviation_scenario_6_mst_writing_time": [9, 12],
+	"deviation_scenario_6_rt_links": [9, 12],
+	"deviation_scenario_6_rt_bandwidth_consumption": [9, 12],
+	"deviation_scenario_6_rt_writing_time": [9, 12]
+
+	
+}
